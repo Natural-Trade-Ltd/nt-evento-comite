@@ -107,8 +107,37 @@ const ETIQ = { en_analisis:'en análisis', en_progreso:'en progreso', to_be_cont
 const lbl = s => ETIQ[s] || String(s || '').replace(/_/g, ' ');
 
 /* ============================================================== LOGIN */
-function gErr(m) { const e = $('#gErr'); if (!m) return e.classList.add('hide'); e.textContent = m; e.classList.remove('hide'); }
+function gErr(m) {
+  const e = $('#gErr'); if (!m) return e.classList.add('hide');
+  e.innerHTML = m; e.classList.remove('hide');
+}
 const limpio = () => location.href.split('#')[0].split('?')[0];
+
+/* Supabase devuelve los errores de OAuth en el query O en el fragmento de la URL.
+   Si no los leemos, el usuario solo ve el login otra vez y no sabe qué pasó. */
+function errorEnUrl() {
+  const p = new URLSearchParams(location.search);
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const cod = p.get('error_code') || h.get('error_code') || p.get('error') || h.get('error');
+  if (!cod) return null;
+  const desc = (p.get('error_description') || h.get('error_description') || '').replace(/\+/g, ' ');
+  return { cod, desc };
+}
+function explica({ cod, desc }) {
+  const d = desc.toLowerCase();
+  if (d.includes('unable to exchange external code'))
+    return `<b>Google autenticó, pero Supabase no pudo canjear el código.</b><br>
+      Casi siempre es que el <b>Client Secret</b> del proveedor Google no corresponde al Client ID
+      (o se colaron un espacio o un salto de línea al pegarlo). Hay que volver a pegarlo en
+      Authentication → Providers → Google del proyecto.`;
+  if (cod === 'otp_expired' || d.includes('expired'))
+    return `<b>El enlace ya expiró o se usó.</b> Pide uno nuevo.`;
+  if (cod === 'access_denied')
+    return `<b>Se canceló el ingreso.</b> Vuelve a intentar con «Continuar con Google».`;
+  if (d.includes('provider is not enabled'))
+    return `<b>El proveedor Google no está activado</b> en este proyecto de Supabase.`;
+  return `<b>No se pudo completar el ingreso.</b><br>${esc(cod)}${desc ? ' — ' + esc(desc) : ''}`;
+}
 
 $('#gGoogle').onclick = async () => {
   gErr('');
@@ -134,8 +163,19 @@ $('#gPasteBtn').onclick = async () => {
 };
 
 async function route() {
+  const err = errorEnUrl();
+  if (err) {
+    gErr(explica(err));
+    history.replaceState(null, '', limpio());
+    return;
+  }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
+  return abrir(session);
+}
+
+async function abrir(session) {
+  if (me) return;
   const email = (session.user.email || '').toLowerCase();
   if (!DOMINIOS.includes(email.split('@')[1])) {
     await sb.auth.signOut();
@@ -1333,7 +1373,13 @@ document.addEventListener('click', async e => {
 });
 
 /* ============================================================ ARRANQUE */
-sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_IN' && !me) route(); });
+// OJO: dentro del callback de onAuthStateChange NO se debe llamar a otra función
+// de sb.auth (getSession, etc.): supabase-js tiene tomado el candado de auth y se
+// queda colgado sin error visible. Se usa la sesión que llega por parámetro y el
+// trabajo async se sale del callback con un setTimeout.
+sb.auth.onAuthStateChange((ev, session) => {
+  if (session && !me) setTimeout(() => abrir(session), 0);
+});
 route();
 setInterval(pintaCuenta, 60000);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
