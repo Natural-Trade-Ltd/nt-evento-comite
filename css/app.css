@@ -260,6 +260,35 @@ label.f:first-child{margin-top:0}
 #toast.on{transform:translateX(-50%) translateY(0);opacity:1}
 #toast.bad{background:#8a3520}
 
+/* ---------- matriz de tareas (patrón del CMO: la matriz filtra) ---------- */
+.mxwrap{overflow-x:auto;padding:8px}
+table.mx{border-collapse:separate;border-spacing:4px;min-width:640px;width:100%}
+.mx th{font-size:10.5px;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  padding:0}
+.mx thead th{padding:6px 8px;cursor:pointer;border-radius:8px;white-space:nowrap;text-align:center}
+.mx thead th:first-child{cursor:default}
+.mx thead th:not(:first-child):hover{color:var(--nt-soft);background:var(--card2)}
+.mx thead th.on{background:var(--nt);color:#06120c}
+.mxr{display:flex;align-items:center;gap:7px;padding:5px 9px;cursor:pointer;border-radius:8px;
+  text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:var(--tx);white-space:nowrap}
+.mxr:hover{background:var(--card2);color:var(--nt-soft)}
+:root.light .mxr:hover{color:var(--nt-deep)}
+.mxr.on{background:var(--nt);color:#06120c}
+.mxr .n2{margin-left:auto;padding-left:10px;font-size:11px;color:var(--tx3)}
+.mxr.on .n2{color:#06120c}
+.mxr.mxsin{color:var(--bad)}
+.mxr.mxsin.on{background:var(--bad);color:#fff}
+.mxc{background:var(--card2);border:1px solid var(--line);border-radius:8px;text-align:center;
+  padding:8px 4px;font-weight:750;font-variant-numeric:tabular-nums;cursor:pointer;min-width:46px;
+  position:relative;font-size:13.5px}
+.mxc:hover{border-color:var(--nt)}
+.mxc.on{background:color-mix(in srgb,var(--nt) 25%,var(--card2));border-color:var(--nt)}
+.mxc.zero{opacity:.25;cursor:default;font-weight:400}
+.mxc.zero:hover{border-color:var(--line)}
+.mxc .late{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--bad)}
+.stat.click{cursor:pointer}
+.stat.click:hover{border-color:var(--nt)}
+
 /* ---------- misc ---------- */
 .empty{text-align:center;color:var(--tx3);padding:26px 14px;font-size:13px;
   border:1px dashed var(--line);border-radius:var(--r)}

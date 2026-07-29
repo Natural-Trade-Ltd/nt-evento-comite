@@ -58,11 +58,12 @@ const D = {
   pregunta: [], acto: [], participacion: [], idea: [], tarea: [], asset: [],
   voto: [], comentario: []
 };
-let TAB = localStorage.getItem('ev_tab') || 'inicio';
+let TAB = localStorage.getItem('ev_tab') || 'tareas';
 let signedCache = {};                       // storage_path -> url
 
 /* ----------------------------------------------------------- catálogos */
 const TABS = [
+  { k:'tareas',      t:'Tareas',        n:() => D.tarea.filter(t => t.estado !== 'hecha').length },
   { k:'inicio',      t:'Inicio',        n:() => null },
   { k:'mensajes',    t:'Mensajes clave',n:() => D.mensaje.filter(m => m.estado !== 'descartado').length },
   { k:'programa',    t:'Programa',      n:() => D.bloque.length },
@@ -70,8 +71,7 @@ const TABS = [
   { k:'interaccion', t:'Encuesta y mago', n:() => D.pregunta.length + D.acto.length },
   { k:'reparto',     t:'Reparto',       n:() => D.participacion.length },
   { k:'repositorio', t:'Repositorio',   n:() => D.asset.length },
-  { k:'ideas',       t:'Ideas',         n:() => D.idea.filter(i => i.estado !== 'descartada').length },
-  { k:'tareas',      t:'Tareas',        n:() => D.tarea.filter(t => t.estado !== 'hecha').length }
+  { k:'ideas',       t:'Ideas',         n:() => D.idea.filter(i => i.estado !== 'descartada').length }
 ];
 
 const TIPO_BLOQUE = {
@@ -873,7 +873,8 @@ let filtroCarpeta = 'todas', filtroVideo = 'todos';
 function rRepositorio(el) {
   let items = D.asset;
   if (filtroCarpeta !== 'todas') items = items.filter(a => a.carpeta === filtroCarpeta);
-  if (filtroVideo !== 'todos') items = items.filter(a => a.video_codigo === filtroVideo);
+  if (filtroVideo === '_sin') items = items.filter(a => !a.video_codigo);
+  else if (filtroVideo !== 'todos') items = items.filter(a => a.video_codigo === filtroVideo);
 
   el.innerHTML = head('Repositorio de material',
     `Todo el material del evento vive aquí: fotos históricas, B-roll, logos, el Excel de orígenes, guiones,
@@ -1081,9 +1082,66 @@ function nuevaIdea() {
 }
 
 /* ---------------------------------------------------------- 9. TAREAS */
+let fResp = 'todos', fEq = 'todos', fEst = 'abiertas';
+const hoyISO = () => new Date().toISOString().slice(0, 10);
+const tAbierta = t => t.estado !== 'hecha';
+const tVencida = t => tAbierta(t) && t.fecha_limite && t.fecha_limite < hoyISO();
+const eqDe = t => t.equipo || 'otros';
+
 function rTareas(el) {
-  const abiertas = D.tarea.filter(t => t.estado !== 'hecha');
-  const hechas = D.tarea.filter(t => t.estado === 'hecha');
+  const abiertas = D.tarea.filter(tAbierta);
+  const ordEq = x => { const i = EQUIPOS.indexOf(x); return i < 0 ? 99 : i; };
+  const equipos = uniq(D.tarea.map(eqDe)).sort((a, b) => ordEq(a) - ordEq(b));
+  const respAb = r => abiertas.filter(t => (t.responsable || '_sin') === r);
+  const resps = uniq(abiertas.map(t => t.responsable || '_sin'))
+    .sort((a, b) => (a === '_sin') - (b === '_sin') || respAb(b).length - respAb(a).length);
+  const celda = (r, e) => abiertas.filter(t => (t.responsable || '_sin') === r && eqDe(t) === e);
+  const vencidas = abiertas.filter(tVencida).length;
+  const sinDueno = respAb('_sin').length;
+  const mias = abiertas.filter(t => t.responsable === me.email).length;
+
+  // ---- matriz responsable × equipo (clic = filtrar, como la matriz del CMO)
+  const mx = `<div class="card pad0" style="margin-bottom:12px"><div class="mxwrap"><table class="mx">
+    <thead><tr><th style="text-align:left;padding-left:10px">Quién / equipo</th>${equipos.map(e => `
+      <th class="${fEq === e ? 'on' : ''}" data-act="fEqT" data-v="${e}"
+        title="Ver solo el equipo ${lbl(e)}">${lbl(e)} · ${abiertas.filter(t => eqDe(t) === e).length}</th>`).join('')}
+    </tr></thead>
+    <tbody>${resps.map(r => `<tr>
+      <th><span class="mxr ${fResp === r ? 'on' : ''} ${r === '_sin' ? 'mxsin' : ''}" data-act="fRespT" data-v="${r}"
+        title="${r === '_sin' ? 'Ver las tareas sin dueño' : 'Ver solo lo de ' + esc(nombreDe(r))}">
+        ${r === '_sin' ? '⚠' : `<span class="av sm">${initials(nombreDe(r))}</span>`}
+        ${r === '_sin' ? 'Sin dueño' : esc(nombreDe(r))}<span class="n2">${respAb(r).length}</span></span></th>
+      ${equipos.map(e => {
+        const ts = celda(r, e), on = fResp === r && fEq === e;
+        return `<td class="mxc ${ts.length ? '' : 'zero'} ${on ? 'on' : ''}"
+          ${ts.length ? `data-act="fCellT" data-r="${r}" data-e="${e}"` : ''}
+          title="${r === '_sin' ? 'Sin dueño' : esc(nombreDe(r))} · ${lbl(e)}${ts.some(tVencida) ? ' · ¡hay vencidas!' : ''}">
+          ${ts.length || '·'}${ts.some(tVencida) ? '<i class="late"></i>' : ''}</td>`;
+      }).join('')}
+    </tr>`).join('')}</tbody></table></div></div>`;
+
+  // ---- lista filtrada
+  let items = [...D.tarea];
+  if (fEst === 'abiertas') items = items.filter(tAbierta);
+  else if (fEst !== 'todas') items = items.filter(t => t.estado === fEst);
+  if (fResp === '_sin') items = items.filter(t => !t.responsable);
+  else if (fResp !== 'todos') items = items.filter(t => t.responsable === fResp);
+  if (fEq !== 'todos') items = items.filter(t => eqDe(t) === fEq);
+  items.sort((a, b) => (tVencida(b) ? 1 : 0) - (tVencida(a) ? 1 : 0)
+    || String(a.fecha_limite || '9999').localeCompare(String(b.fecha_limite || '9999'))
+    || a.orden - b.orden);
+
+  const partes = [];
+  if (fResp === '_sin') partes.push('sin dueño');
+  else if (fResp !== 'todos') partes.push(fResp === me.email ? 'mías' : nombreDe(fResp));
+  if (fEq !== 'todos') partes.push('equipo ' + lbl(fEq));
+  if (fEst !== 'abiertas') partes.push(lbl(fEst));
+
+  const ESTS = [['abiertas', 'Abiertas'], ['pendiente', 'Pendiente'], ['en_progreso', 'En progreso'],
+                ['bloqueada', 'Bloqueada'], ['hecha', 'Hechas'], ['todas', 'Todas']];
+  const nEst = s => s === 'abiertas' ? abiertas.length
+    : s === 'todas' ? D.tarea.length : D.tarea.filter(t => t.estado === s).length;
+
   const fila = t => `
     <div class="item ${t.estado === 'hecha' ? 'descartado' : ''}">
       <div class="row wrap" style="align-items:flex-start">
@@ -1093,10 +1151,11 @@ function rTareas(el) {
           <div class="txt b">${esc(t.titulo)}</div>
           ${t.detalle ? `<div class="mut tiny" style="margin-top:4px">${br(t.detalle)}</div>` : ''}
           <div class="meta">
-            ${t.equipo ? `<span class="chip">${lbl(t.equipo)}</span>` : ''}
-            ${t.fecha_limite ? `<span class="chip ${t.fecha_limite < new Date().toISOString().slice(0, 10) && t.estado !== 'hecha' ? 'bad' : 'warn'}">📅 ${fecha(t.fecha_limite)}</span>` : ''}
+            ${t.equipo ? `<span class="chip click" data-act="fEqT" data-v="${eqDe(t)}">${lbl(t.equipo)}</span>` : ''}
+            ${t.fecha_limite ? `<span class="chip ${tVencida(t) ? 'bad' : 'warn'}">📅 ${fecha(t.fecha_limite)}${tVencida(t) ? ' · vencida' : ''}</span>` : ''}
             ${chipEst(t.estado)}
-            ${t.responsable ? `<span class="chip"><span class="av sm">${initials(nombreDe(t.responsable))}</span>${esc(nombreDe(t.responsable))}</span>`
+            ${t.responsable ? `<span class="chip click" data-act="fRespT" data-v="${esc(t.responsable)}">
+                <span class="av sm">${initials(nombreDe(t.responsable))}</span>${esc(nombreDe(t.responsable))}</span>`
               : `<button class="chip click bad" data-act="tomar" data-id="${t.id}">sin dueño · tomarla</button>`}
             <span class="acts">${cBtn('tarea', t.id, t.titulo)}
               <button class="mini" data-act="edTarea" data-id="${t.id}" title="Editar">✎</button></span>
@@ -1104,32 +1163,32 @@ function rTareas(el) {
         </div>
       </div>
     </div>`;
+
   el.innerHTML = head('Tareas',
-    `Carlos lo pidió así: «armar microequipos con tareas cortas semanales para que en dos semanas tengamos todo
-     listo». Si una tarea no tiene dueño, tómala. Si te falta algo de alguien más, coméntala.`,
+    `La matriz muestra quién trae qué. <b>Clic en un nombre, un equipo o una celda filtra la lista</b>;
+     vuelve a picarlo para quitar el filtro. El punto rojo avisa que ahí hay tareas vencidas.
+     Si una tarea no tiene dueño, tómala.`,
     `<button class="btn p" data-act="nuevaTarea">＋ Tarea</button>`) + `
 
-    <div class="grid g4" style="margin-bottom:14px">
-      <div class="stat"><div class="v">${abiertas.length}</div><div class="k">Abiertas</div></div>
-      <div class="stat ${abiertas.filter(t => !t.responsable).length ? 'bad' : 'ok'}">
-        <div class="v">${abiertas.filter(t => !t.responsable).length}</div><div class="k">Sin dueño</div></div>
-      <div class="stat warn"><div class="v">${abiertas.filter(t => t.responsable === me.email).length}</div><div class="k">Mías</div></div>
-      <div class="stat ok"><div class="v">${hechas.length}</div><div class="k">Hechas</div></div>
+    <div class="grid g4" style="margin-bottom:12px">
+      <div class="stat click" data-act="fLimpiaT" title="Ver todas las abiertas">
+        <div class="v">${abiertas.length}</div><div class="k">Abiertas</div></div>
+      <div class="stat click ${vencidas ? 'bad' : 'ok'}" data-act="fLimpiaT" title="Las vencidas suben solas al tope">
+        <div class="v">${vencidas}</div><div class="k">Vencidas</div></div>
+      <div class="stat click ${sinDueno ? 'bad' : 'ok'}" data-act="fRespT" data-v="_sin" title="Ver las tareas sin dueño">
+        <div class="v">${sinDueno}</div><div class="k">Sin dueño</div></div>
+      <div class="stat click warn" data-act="fRespT" data-v="${me.email}" title="Ver solo las mías">
+        <div class="v">${mias}</div><div class="k">Mías</div></div>
     </div>
 
-    ${abiertas.filter(t => t.responsable === me.email).length ? `
-      <h3 style="margin:16px 0 8px;font-size:14px">🙋 Mías</h3>
-      ${abiertas.filter(t => t.responsable === me.email).sort(by('fecha_limite')).map(fila).join('')}` : ''}
+    ${mx}
 
-    ${EQUIPOS.map(eq => {
-      const ts = abiertas.filter(t => t.equipo === eq && t.responsable !== me.email);
-      return ts.length ? `<h3 style="margin:18px 0 8px;font-size:14px">Equipo ${lbl(eq)}
-        <span class="mut2">· ${ts.length}</span></h3>` + ts.sort(by('fecha_limite')).map(fila).join('') : '';
-    }).join('')}
+    <div class="row wrap" style="margin-bottom:11px">
+      ${ESTS.map(([v, t2]) => `<span class="chip click ${fEst === v ? 'on' : ''}" data-act="fEstT" data-v="${v}">${t2} · ${nEst(v)}</span>`).join('')}
+      ${partes.length ? `<span class="chip click bad" data-act="fLimpiaT" title="Quitar todos los filtros">✕ Filtrando: ${esc(partes.join(' · '))}</span>` : ''}
+    </div>
 
-    ${hechas.length ? `<details style="margin-top:20px"><summary class="mut" style="cursor:pointer">
-      ${hechas.length} tarea${hechas.length === 1 ? '' : 's'} hecha${hechas.length === 1 ? '' : 's'}</summary>
-      <div style="margin-top:10px">${hechas.map(fila).join('')}</div></details>` : ''}`;
+    ${items.map(fila).join('') || '<div class="empty">Nada con esos filtros. Pica ✕ para limpiarlos.</div>'}`;
 }
 function edTarea(id) {
   const t = id ? D.tarea.find(x => x.id === id) : {};
@@ -1351,6 +1410,17 @@ document.addEventListener('click', async e => {
     },
     delIdea:    () => del('idea', id),
     fArea:      () => { filtroArea = b.dataset.v; render(); },
+
+    fRespT:   () => { fResp = fResp === b.dataset.v ? 'todos' : b.dataset.v; ir('tareas'); },
+    fEqT:     () => { fEq = fEq === b.dataset.v ? 'todos' : b.dataset.v; ir('tareas'); },
+    fCellT:   () => {
+      const r = b.dataset.r, e2 = b.dataset.e;
+      if (fResp === r && fEq === e2) { fResp = 'todos'; fEq = 'todos'; }
+      else { fResp = r; fEq = e2; }
+      render();
+    },
+    fEstT:    () => { fEst = b.dataset.v; render(); },
+    fLimpiaT: () => { fResp = 'todos'; fEq = 'todos'; fEst = 'abiertas'; render(); },
 
     nuevaTarea: () => edTarea(null),
     edTarea:    () => edTarea(id),

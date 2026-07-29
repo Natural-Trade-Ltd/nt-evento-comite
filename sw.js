@@ -1,6 +1,6 @@
 /* Service worker mínimo: solo hace la app instalable y sirve el shell si no hay red.
    Los datos SIEMPRE van a la red (nunca se cachean respuestas de Supabase). */
-const CACHE = 'ev-comite-v2';
+const CACHE = 'ev-comite-v3';
 const SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {
