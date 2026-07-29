@@ -1,0 +1,113 @@
+# Portal del Comité Organizador — Evento 1-sep-2026
+
+Portal de trabajo colaborativo del cóctel para clientes clave de **Natural Trade / Global Forest**
+(martes 1 de septiembre de 2026, 19:00–21:00, Presidente Polanco CDMX, Salón «Feria»).
+
+**En vivo:** https://natural-trade-ltd.github.io/nt-evento-comite/
+
+Nace de la junta del comité del **29-jul-2026**: todo lo que se dijo ahí quedó cargado como punto de
+partida (acuerdos, mensajes, programa, videos, preguntas del QR, actos del mago, ideas por autor y
+tareas), para que el comité solo tenga que **reaccionar y aportar** en lugar de volver a discutirlo.
+
+---
+
+## Quién entra
+
+Cualquier correo **@naturaltrade.ca** o **@globalforest.com.mx**, con «Continuar con Google»
+(magic link como respaldo). No hay altas manuales. Cualquier otro correo se rechaza en el gate
+y además no ve nada por RLS.
+
+## Qué hay adentro
+
+| Sección | Para qué |
+|---|---|
+| **Inicio** | Semáforo de tiempos, lo que urge esta semana, mensajes más votados, decisiones pendientes. |
+| **Mensajes clave** | La lluvia de ideas de «qué quiero que mi cliente se lleve». Se vota y lo más votado se marca acordado. Bloquea todo el guion. |
+| **Programa** | Run of show con minutos. Las horas se calculan solas desde las 18:45. Semáforo: presentación vs. meta de 30 min, más mago y preguntas aparte. |
+| **Videos** | Una mesa de trabajo por video (V1–V6): concepto, guion escena por escena y el material etiquetado con ese código. |
+| **Encuesta y mago** | Banco de preguntas del QR (registro / intercaladas / cierre) y los actos del mago con lo que necesita de nosotros. |
+| **Reparto** | Quién habla en qué bloque; cada quien escribe su propio guion. |
+| **Repositorio** | Sube archivos o pega links (quedan activos). Se etiqueta por carpeta y por video. Se espeja a git para el editor. |
+| **Ideas** | El muro. Todo lo de la junta ya está, con autor. Se vota, se comenta y lo adoptado se convierte en bloque, video o tarea. |
+| **Tareas** | Microequipos con tareas cortas semanales. Si algo no tiene dueño, cualquiera lo toma. |
+
+Transversal: **votos (▲)** y **comentarios (💬)** sobre casi cualquier cosa.
+
+---
+
+## Arquitectura
+
+```
+GitHub Pages (este repo, público)  ──▶  Supabase «NT-Evento-Comite» (dedicado)
+   index.html + css/app.js                Postgres  ·  tablas ev_*  ·  RLS por dominio
+   PWA instalable                         Auth      ·  Google + magic link
+                                          Storage   ·  bucket privado «repositorio»
+                                                          │
+                                                          ▼
+                                     Natural-Trade-Ltd/nt-evento-repo (privado)
+                                     espejo en git de fotos, docs y datos
+                                     → de aquí baja el editor de video
+```
+
+- **Proyecto Supabase:** `cytopyytymxjwvfhosvg` (dedicado a propósito: correr migraciones aquí
+  no puede tumbar el CMO del equipo ni la quote-api, como ya pasó una vez en un proyecto compartido).
+- **URL:** `https://cytopyytymxjwvfhosvg.supabase.co`
+- **Publishable key:** `sb_publishable_IjJWRYALvIWN-yzM11IYVw_GaVEf6RN` (pública a propósito; la
+  seguridad la da RLS, no la llave).
+- El repo es público y **no contiene ningún secreto**. El material sensible vive en Storage privado
+  (URLs firmadas de 1 h) y en el repo espejo privado.
+
+### Seguridad (verificada)
+
+`ev_autorizado()` = el dominio del correo está en `naturaltrade.ca` / `globalforest.com.mx`.
+Todas las tablas `ev_*` tienen RLS. Probado simulando identidades:
+
+| Identidad | Lo que ve |
+|---|---|
+| `jorge@naturaltrade.ca` | todo (y es admin) |
+| `ericka@globalforest.com.mx` | todo (no admin) |
+| `intruso@gmail.com` | **0 filas en todo** |
+| anónimo (sin login) | **0 filas en todo** |
+
+- **Documentos colaborativos** (programa, videos, escenas, actos, reparto, tareas, roster):
+  cualquiera del comité edita — es un documento de trabajo común.
+- **Aportaciones personales** (mensajes, ideas, preguntas, material): el estado lo cambia cualquiera
+  (el triage es un acto de grupo), pero **borrar** solo el autor o un admin.
+- `ev_admin_lista` no tiene policies: solo `service_role`. Hoy: `jorge@naturaltrade.ca`.
+
+## Estructura
+
+```
+index.html                 shell + gate de login
+css/app.css                estilos (claro/oscuro, marca NT #469466)
+js/app.js                  toda la app (módulo ES, sin build)
+sql/01_schema.sql          esquema completo, RLS y bucket (referencia)
+manifest.webmanifest       PWA instalable
+sw.js                      service worker (solo el shell; los datos siempre van a la red)
+serve.js                   servidor estático para desarrollo local
+```
+
+Sin build, sin dependencias instaladas: `supabase-js` se importa de esm.sh.
+Para desarrollo local: `node serve.js` → http://localhost:8099
+
+## Convención del repositorio de material
+
+Carpetas (mismas que ya se usaban en Drive, más tres nuevas):
+
+```
+01_Historicas_NaturalTrade   05_Broll_Stock        09_Capturas_App
+02_Historicas_GlobalForest   06_Equipo             99_General
+03_Sitios_Actuales           07_Datos_Excel
+04_Logos                     08_Guiones
+```
+
+Etiqueta cada cosa con el **código del video** (V1…V6) y aparece sola en la mesa de trabajo de ese
+video. Para videos muy pesados, mejor pegar el link que subir el archivo.
+
+## Contexto del evento
+
+- **Presentación:** 30 min + ~10 de preguntas, intercalando video y en vivo. El eje es la
+  **tecnología**, no repetir la operación que los clientes ya conocen.
+- **Audiencia:** dueños y decisores de tarimeras y embalaje de México, más Wood Pack Global y la
+  asociación (puerta a los socios de EUA).
+- **Fechas:** junta del comité 4-ago · Jorge fuera 7–14 ago · ensayo general 25-ago · evento 1-sep.
