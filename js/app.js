@@ -790,9 +790,14 @@ function rReparto(el) {
      quien para no salirnos y que no se extienda demasiado». Cada quien escribe su propio guion aquí.`,
     `<button class="btn" data-act="nuevaPersona">＋ Persona</button>`) + `
 
-    ${sinEntrar.length ? `<div class="help tiny" style="margin-bottom:14px"><b>Correos por confirmar.</b>
-      ${sinEntrar.map(p => esc(p.nombre) + ' (' + esc(p.email) + ')').join(' · ')} todavía no han entrado al
-      portal. Si alguno de esos correos está mal, corrígelo con ＋ Persona (o dime y lo cambio).</div>` : ''}
+    ${sinEntrar.length ? `<div class="card" style="margin-bottom:14px">
+      <h3>✉ Aún no entran · ${sinEntrar.length}</h3>
+      <p class="mut tiny" style="margin:-2px 0 10px">Mándales su invitación: se abre tu correo con el texto ya
+        escrito, o cópialo para WhatsApp. Si un correo está mal, corrígelo con ＋ Persona.</p>
+      <div class="row wrap">${sinEntrar.map(p => `
+        <button class="chip click" data-act="invitar" data-v="${esc(p.email)}"
+          title="Invitar a ${esc(p.nombre)} (${esc(p.email)})">✉ ${esc(p.nombre)}</button>`).join('')}</div>
+    </div>` : ''}
 
     <div class="card hl" style="margin-bottom:14px">
       <h3>🎤 Mi participación</h3>
@@ -866,6 +871,35 @@ function nuevaPersona() {
        title="${esc(p.email)}">${esc(p.nombre)}${p.visto_en ? '' : ' · sin entrar'}</span>`).join('')}</div>`,
     `<button class="btn" data-cerrar>Cancelar</button><button class="btn p" data-act="guardaPersona">Guardar</button>`);
   setTimeout(() => $('#psNom')?.focus(), 80);
+}
+
+/* ------------------------------------------------------- invitaciones */
+const URL_PORTAL = 'https://natural-trade-ltd.github.io/nt-evento-comite/';
+function invitar(email) {
+  const p = pMap()[email] || { nombre: email.split('@')[0], email };
+  const primer = String(p.nombre || '').split(' ')[0];
+  const cuerpo = `Hola ${primer}:
+
+Ya está listo el portal del comité del evento del 1 de septiembre. Todo lo de la junta ya está cargado (programa, videos, encuesta, mago, ideas y tareas) y ahí vamos a ir armando el evento entre todos.
+
+Entra aquí: ${URL_PORTAL}
+
+1. Pica «Continuar con Google» con tu correo de Natural Trade o Global Forest — no hay que registrarse.
+2. Empieza en «Mensajes clave»: escribe qué quieres que tu cliente se lleve en la cabeza y vota los de los demás.
+3. Pásate por «Tareas»: la matriz muestra quién trae qué. Si algo no tiene dueño, tómalo.
+
+Desde el celular también sirve, y se puede instalar como app («Añadir a inicio»).
+
+Gracias,
+${me.nombre}`;
+  modal('Invitar a ' + p.nombre,
+    campo('invTo', 'Para', p.email) +
+    campo('invSub', 'Asunto', 'Tu acceso al portal del comité — evento 1-sep') +
+    campo('invBody', 'Mensaje — edítalo si quieres', cuerpo, 'area', 'style="min-height:240px"'),
+    `<button class="btn" data-cerrar>Cancelar</button>
+     <button class="btn" data-act="invCopiar" title="Para pegarlo en WhatsApp">📋 Copiar</button>
+     <button class="btn" data-act="invMailto" title="Abre tu app de correo">Mi correo</button>
+     <button class="btn p" data-act="invGmail" title="Abre Gmail con todo listo">Abrir en Gmail</button>`);
 }
 
 /* ----------------------------------------------------- 7. REPOSITORIO */
@@ -1357,8 +1391,22 @@ document.addEventListener('click', async e => {
         { email: mail, nombre: nom, iniciales: initials(nom), area: val('psArea'), asiste: val('psVa') === 'true' },
         { onConflict: 'email' });
       if (error) return toast(error.message, true);
-      await recargar('persona'); render(); cerrar(); toast('Listo, ya puedes asignarle cosas.');
+      await recargar('persona'); render(); cerrar();
+      toast('Listo. Aquí está su invitación:');
+      invitar(mail);
     },
+    invitar:   () => invitar(b.dataset.v),
+    invCopiar: async () => {
+      await navigator.clipboard.writeText(val('invBody'));
+      toast('Copiado. Pégalo en WhatsApp o donde quieras.');
+    },
+    invGmail:  () => window.open('https://mail.google.com/mail/?view=cm&fs=1'
+      + '&to=' + encodeURIComponent(val('invTo'))
+      + '&su=' + encodeURIComponent(val('invSub'))
+      + '&body=' + encodeURIComponent(val('invBody')), '_blank'),
+    invMailto: () => window.open('mailto:' + encodeURIComponent(val('invTo'))
+      + '?subject=' + encodeURIComponent(val('invSub'))
+      + '&body=' + encodeURIComponent(val('invBody'))),
 
     addPart:    () => edPart(null, id),
     edPart:     () => edPart(id),
