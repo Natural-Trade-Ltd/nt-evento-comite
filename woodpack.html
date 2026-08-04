@@ -245,7 +245,8 @@ footer b{color:var(--ink-2)}
       <label class="btn btn-accent" tabindex="0">Cargar lista de Excel
         <input type="file" id="file" accept=".xlsx,.csv,.tsv,.txt"></label>
       <button class="btn" id="expand">Abrir todo</button>
-      <button class="btn" id="export">Exportar reporte</button>
+      <button class="btn btn-accent" id="excel" title="Descarga un .xlsx con exactamente lo que estas viendo: respeta el filtro de grupo y la busqueda">Excel de lo filtrado</button>
+      <button class="btn" id="export" title="Reporte en Markdown de las 93 empresas completas, sin filtrar">Reporte completo</button>
       <button class="btn" id="savestate">Respaldar notas</button>
       <label class="btn" tabindex="0">Restaurar notas
         <input type="file" id="loadstate" accept=".json"></label>
@@ -259,6 +260,7 @@ footer b{color:var(--ink-2)}
 <footer class="wrap">
   <p><b>Cómo clasifiqué.</b> Cada empresa se buscó por nombre normalizado y por dominio de correo contra los contactos de NetSuite, y después se verificó con su historial real de facturas, pedidos y órdenes de compra. Una ficha en NetSuite sin transacciones no cuenta como cliente y aparece marcada como alerta.</p>
   <p><b>El criterio, corregido.</b> La primera versión clasificaba por &laquo;fabrica tarimas&raquo;. Lo correcto es &laquo;vende madera a los mismos compradores que nosotros&raquo;: por eso NAHUA, MJB y Brasimex pasaron a competencia. Y Organización LB es cliente aunque el cruce automático no lo viera, porque en NetSuite está como LB Pallets &amp; Crates del Potosí con otro dominio. Si ves otra mal puesta, cámbiala con el selector de cada tarjeta.</p>
+  <p><b>Exportar a Excel.</b> <b>Excel de lo filtrado</b> baja un .xlsx con exactamente lo que tienes en pantalla: si elegiste un grupo o escribiste algo en el buscador, solo va eso, y el nombre del archivo lo indica. Trae dos hojas &mdash; <b>Personas</b>, una fila por asistente para filtrar y mandar correos, y <b>Empresas</b>, una fila por empresa con el estatus de NetSuite, qué hacen y la acción sugerida. Ambas con encabezado fijo y autofiltro puestos. Tus notas y el estatus de seguimiento viajan en las dos hojas.</p>
   <p><b>Dónde viven tus notas.</b> Se guardan en este navegador, en esta computadora. No viajan con el link: quien abra la URL verá el análisis base, no tus anotaciones. Para pasárselas a alguien del equipo usa <b>Respaldar notas</b> y que ellos las carguen con <b>Restaurar notas</b>.</p>
   <p><b>Fuentes.</b> Lista oficial de asistentes de Woodpack Global &middot; NetSuite (tablas customer, vendor, contact y transaction vía SuiteQL, consultadas el 3-ago-2026) &middot; investigación pública de cada empresa desconocida.</p>
 </footer>
@@ -837,6 +839,49 @@ document.getElementById("export").addEventListener("click", () => {
   dl(new Blob([md], {type:"text/markdown;charset=utf-8"}), "woodpack-2026-triaje.md");
   toast("Reporte descargado.");
 });
+document.getElementById("excel").addEventListener("click", () => {
+  const recs = sortRecs(records()).filter(matches);
+  if (!recs.length){ toast("El filtro actual no deja ninguna empresa que exportar.", true); return; }
+  const st = k => STATUS[(S.ov[k] || {}).s || "pendiente"];
+  const nota = k => (S.ov[k] || {}).n || "";
+  const detalle = d => d.t ? (d.g === "prospecto" ? "Prioridad " + d.t
+    : d.g === "cliente" ? (TIERS.cliente.find(x => x[0] === d.t) || [, d.t])[1] : d.t) : "";
+
+  const personas = [];
+  recs.forEach(d => {
+    if (!d.p.length){
+      personas.push([GNAME[d.g], detalle(d), d.n, d.loc, "(sin asistentes en la lista)", "", "", "", st(d.k), nota(d.k)]);
+      return;
+    }
+    d.p.forEach(p => personas.push([GNAME[d.g], detalle(d), d.n, d.loc,
+      p.n, p.e || "", (p.alt || []).join(", "), p.t || "", st(d.k), nota(d.k)]));
+  });
+  const empresas = recs.map(d => [GNAME[d.g], detalle(d), d.n, d.loc, d.p.length,
+    d.gone ? "No" : "Si", d.moved ? "Si" : "No", d.isNew ? "Si" : "No",
+    st(d.k), nota(d.k), d.ns, d.w, d.a]);
+
+  const blob = buildXlsx([
+    {name:"Personas", header:["Grupo","Detalle","Empresa","Ubicación","Nombre","Correo",
+      "Correos alternos","Teléfono","Seguimiento","Notas"],
+     widths:[16,18,38,30,26,32,28,18,16,46], rows:personas},
+    {name:"Empresas", header:["Grupo","Detalle","Empresa","Ubicación","Personas",
+      "Viene en la lista","Reclasificada","Nueva en la lista","Seguimiento","Notas",
+      "Estatus en NetSuite","Qué hacen","Acción sugerida"],
+     widths:[16,18,38,30,10,16,14,16,16,46,64,72,64], rows:empresas},
+  ]);
+
+  const tag = filter === "todos" ? "todos" : filter;
+  const q = query ? "-busqueda" : "";
+  const d = new Date();
+  const fecha = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  dl(blob, "woodpack-2026-" + tag + q + "-" + fecha + ".xlsx");
+
+  const filtro = [];
+  if (filter !== "todos") filtro.push(GPLURAL[filter]);
+  if (query) filtro.push('busqueda "' + query + '"');
+  toast("Excel descargado: " + recs.length + " empresas, " + personas.length + " filas"
+    + (filtro.length ? " (filtro: " + filtro.join(" + ") + ")" : " (sin filtro)"));
+});
 document.getElementById("savestate").addEventListener("click", () => {
   dl(new Blob([JSON.stringify(S, null, 1)], {type:"application/json"}), "woodpack-2026-mis-notas.json");
   toast("Respaldo descargado. Ese archivo lo puedes pasar a alguien mas del equipo.");
@@ -852,6 +897,136 @@ document.getElementById("loadstate").addEventListener("change", async e => {
     save(); render(); toast("Respaldo cargado.");
   } catch(err){ toast(err.message || "No pude leer el respaldo.", true); }
 });
+/* ===== escritura de .xlsx sin dependencias =====
+   ZIP con entradas SIN comprimir (metodo 0): Excel lo abre igual y evita
+   depender de CompressionStream. Lo unico que hay que calcular es el CRC32. */
+let CRCT;
+function crc32(u8){
+  if (!CRCT){
+    CRCT = new Uint32Array(256);
+    for (let n = 0; n < 256; n++){
+      let c = n;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      CRCT[n] = c >>> 0;
+    }
+  }
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = CRCT[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function dosStamp(d){
+  const time = ((d.getHours() & 31) << 11) | ((d.getMinutes() & 63) << 5) | ((d.getSeconds() / 2) & 31);
+  const date = (((d.getFullYear() - 1980) & 127) << 9) | (((d.getMonth() + 1) & 15) << 5) | (d.getDate() & 31);
+  return {time, date};
+}
+function zipStore(files){
+  const enc = new TextEncoder();
+  const {time, date} = dosStamp(new Date());
+  const parts = [], central = [];
+  let offset = 0;
+  for (const f of files){
+    const name = enc.encode(f.name);
+    const data = enc.encode(f.xml);
+    const crc = crc32(data);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0, true);
+    lh.setUint16(8, 0, true); lh.setUint16(10, time, true); lh.setUint16(12, date, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true);
+    lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    parts.push(new Uint8Array(lh.buffer), name, data);
+    const cd = new DataView(new ArrayBuffer(46));
+    cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true);
+    cd.setUint16(8, 0, true); cd.setUint16(10, 0, true); cd.setUint16(12, time, true);
+    cd.setUint16(14, date, true); cd.setUint32(16, crc, true);
+    cd.setUint32(20, data.length, true); cd.setUint32(24, data.length, true);
+    cd.setUint16(28, name.length, true); cd.setUint16(30, 0, true); cd.setUint16(32, 0, true);
+    cd.setUint16(34, 0, true); cd.setUint16(36, 0, true); cd.setUint32(38, 0, true);
+    cd.setUint32(42, offset, true);
+    central.push(new Uint8Array(cd.buffer), name);
+    offset += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((s, p) => s + p.length, 0);
+  const eocd = new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0, 0x06054b50, true); eocd.setUint16(8, files.length, true);
+  eocd.setUint16(10, files.length, true); eocd.setUint32(12, cdSize, true);
+  eocd.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, new Uint8Array(eocd.buffer)],
+    {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+}
+const XML_BAD = new RegExp("[\u0000-\u0008\u000B\u000C\u000E-\u001F]", "g");
+const xmlEsc = s => String(s == null ? "" : s)
+  .replace(XML_BAD, "")
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+function colName(i){
+  let s = "";
+  for (i++; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + ((i - 1) % 26)) + s;
+  return s;
+}
+function sheetXml(header, rows, widths){
+  const cell = (v, r, c, bold) => {
+    const ref = colName(c) + r;
+    if (typeof v === "number" && isFinite(v))
+      return '<c r="' + ref + '"><v>' + v + '</v></c>';
+    if (v == null || v === "") return "";
+    return '<c r="' + ref + '" t="inlineStr"' + (bold ? ' s="1"' : '')
+      + '><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>';
+  };
+  let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+    + '<sheetFormatPr defaultRowHeight="15"/><cols>'
+    + widths.map((w, i) => '<col min="' + (i+1) + '" max="' + (i+1) + '" width="' + w + '" customWidth="1"/>').join("")
+    + '</cols><sheetData>';
+  xml += '<row r="1">' + header.map((h, c) => cell(h, 1, c, true)).join("") + '</row>';
+  rows.forEach((row, i) => {
+    xml += '<row r="' + (i + 2) + '">' + row.map((v, c) => cell(v, i + 2, c)).join("") + '</row>';
+  });
+  xml += '</sheetData><autoFilter ref="A1:' + colName(header.length - 1) + (rows.length + 1) + '"/></worksheet>';
+  return xml;
+}
+function buildXlsx(sheets){
+  const files = [
+    {name:"[Content_Types].xml", xml:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      + '<Default Extension="xml" ContentType="application/xml"/>'
+      + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i+1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join("")
+      + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+      + '</Types>'},
+    {name:"_rels/.rels", xml:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+      + '</Relationships>'},
+    {name:"xl/workbook.xml", xml:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'
+      + sheets.map((s, i) => '<sheet name="' + xmlEsc(s.name) + '" sheetId="' + (i+1) + '" r:id="rId' + (i+1) + '"/>').join("")
+      + '</sheets></workbook>'},
+    {name:"xl/_rels/workbook.xml.rels", xml:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + sheets.map((s, i) => '<Relationship Id="rId' + (i+1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i+1) + '.xml"/>').join("")
+      + '<Relationship Id="rId' + (sheets.length+1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      + '</Relationships>'},
+    {name:"xl/styles.xml", xml:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+      + '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font>'
+      + '<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>'
+      + '<fills count="3"><fill><patternFill patternType="none"/></fill>'
+      + '<fill><patternFill patternType="gray125"/></fill>'
+      + '<fill><patternFill patternType="solid"><fgColor rgb="FF0A5A66"/><bgColor indexed="64"/></patternFill></fill></fills>'
+      + '<borders count="1"><border/></borders>'
+      + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      + '<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+      + '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs>'
+      + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+      + '</styleSheet>'},
+  ];
+  sheets.forEach((s, i) => files.push(
+    {name:"xl/worksheets/sheet" + (i+1) + ".xml", xml: sheetXml(s.header, s.rows, s.widths)}));
+  return zipStore(files);
+}
+
 function dl(blob, name){
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = name; a.click();
