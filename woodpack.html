@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Triaje de los asistentes al Woodpack Global 2026: prospectos, clientes, competencia y otros proveedores, cruzado contra NetSuite.">
+<meta name="robots" content="noindex, nofollow">
+<title>Woodpack Global 2026 — Triaje de asistentes</title>
+<style>
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --surface-2:#F6F9F8;
+  --ink:#0F1B1D; --ink-2:#4B5E61; --ink-3:#71858A;
+  --line:#D4DEDC; --line-2:#E4EBEA;
+  --accent:#0A5A66; --accent-ink:#083F48; --accent-soft:#DDECEE; --on-accent:#FFFFFF;
+  --c-sinclasificar:#8A6A12; --c-sinclasificar-bg:#F6EEDA;
+  --c-prospecto:#A8481A; --c-prospecto-bg:#F8E9DF;
+  --c-cliente:#15664A; --c-cliente-bg:#DDEEE6;
+  --c-competencia:#8F2B37; --c-competencia-bg:#F7E1E3;
+  --c-otro:#4A5C6E; --c-otro-bg:#E5EAEE;
+  --c-organizador:#5E4590; --c-organizador-bg:#E9E3F5;
+  --c-nosotros:#0A5A66; --c-nosotros-bg:#DDECEE;
+  --alert:#A8481A; --alert-bg:#FBEDE4;
+  --shadow:0 1px 2px rgba(15,27,29,.05), 0 8px 24px -18px rgba(15,27,29,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1315; --surface:#151F21; --surface-2:#111A1C;
+    --ink:#E7EEED; --ink-2:#9AACAE; --ink-3:#71868A;
+    --line:#253336; --line-2:#1D292B;
+    --accent:#57C2D0; --accent-ink:#8FDCE6; --accent-soft:#10313A; --on-accent:#0C1315;
+    --c-sinclasificar:#DFBB55; --c-sinclasificar-bg:#2E2510;
+    --c-prospecto:#E8945A; --c-prospecto-bg:#33200F;
+    --c-cliente:#5CC79A; --c-cliente-bg:#0F2C22;
+    --c-competencia:#EE818C; --c-competencia-bg:#331519;
+    --c-otro:#A2B5C6; --c-otro-bg:#1C262E;
+    --c-organizador:#B69BEE; --c-organizador-bg:#241C39;
+    --c-nosotros:#57C2D0; --c-nosotros-bg:#10313A;
+    --alert:#E8945A; --alert-bg:#2C1B0E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1315; --surface:#151F21; --surface-2:#111A1C;
+  --ink:#E7EEED; --ink-2:#9AACAE; --ink-3:#71868A;
+  --line:#253336; --line-2:#1D292B;
+  --accent:#57C2D0; --accent-ink:#8FDCE6; --accent-soft:#10313A; --on-accent:#0C1315;
+  --c-sinclasificar:#DFBB55; --c-sinclasificar-bg:#2E2510;
+  --c-prospecto:#E8945A; --c-prospecto-bg:#33200F;
+  --c-cliente:#5CC79A; --c-cliente-bg:#0F2C22;
+  --c-competencia:#EE818C; --c-competencia-bg:#331519;
+  --c-otro:#A2B5C6; --c-otro-bg:#1C262E;
+  --c-organizador:#B69BEE; --c-organizador-bg:#241C39;
+  --c-nosotros:#57C2D0; --c-nosotros-bg:#10313A;
+  --alert:#E8945A; --alert-bg:#2C1B0E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 20px}
+.mono,.eyebrow,.count,.meta-line,.chip,.pax,.pill,.block>.k,table.ppl th,td.tel,.saved,.srcline{
+  font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+}
+
+header{border-bottom:1px solid var(--line); background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
+.hd{display:flex; flex-direction:column; gap:24px; padding:38px 0 28px}
+.eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:600}
+h1{margin:8px 0 0; font-size:clamp(25px,4vw,38px); line-height:1.09; letter-spacing:-.022em; font-weight:700; text-wrap:balance}
+.lede{margin:12px 0 0; max-width:64ch; color:var(--ink-2); font-size:16px}
+.lede strong{color:var(--ink); font-weight:600}
+
+.metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(126px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.metric{background:var(--surface); padding:11px 13px 12px; display:flex; flex-direction:column; gap:1px}
+.metric .num{font-size:24px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.15}
+.metric .lbl{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.metric .sub{font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.metric.is-sinclasificar .num{color:var(--c-sinclasificar)}
+.metric.is-prospecto .num{color:var(--c-prospecto)}
+.metric.is-cliente .num{color:var(--c-cliente)}
+.metric.is-competencia .num{color:var(--c-competencia)}
+.metric.is-otro .num{color:var(--c-otro)}
+.metric.is-organizador .num{color:var(--c-organizador)}
+.metric.is-nosotros .num{color:var(--c-nosotros)}
+
+.bar{position:sticky; top:0; z-index:20; background:var(--surface); border-bottom:1px solid var(--line)}
+.bar-in{display:flex; flex-wrap:wrap; gap:9px; align-items:center; padding:10px 0}
+input[type="search"]{flex:1 1 200px; min-width:160px; padding:8px 12px; font:inherit; font-size:14px;
+  color:var(--ink); background:var(--surface-2); border:1px solid var(--line); border-radius:3px; outline:none}
+input[type="search"]:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.pills{display:flex; flex-wrap:wrap; gap:5px}
+.pill{font-size:11px; letter-spacing:.05em; text-transform:uppercase; font-weight:600;
+  padding:6px 10px; border-radius:3px; border:1px solid var(--line);
+  background:var(--surface-2); color:var(--ink-2); cursor:pointer}
+.pill:hover{border-color:var(--ink-3); color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.btn{font:inherit; font-size:13px; font-weight:600; padding:7px 13px; cursor:pointer;
+  border-radius:3px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+  display:inline-block; text-decoration:none}
+.btn:hover{border-color:var(--ink-3)}
+.btn-accent{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn-accent:hover{filter:brightness(1.08); border-color:var(--accent)}
+a.btn{border-bottom:0}
+.pill:focus-visible,.btn:focus-visible,select:focus-visible,textarea:focus-visible,
+input:focus-visible,label.btn:focus-within{outline:2px solid var(--accent); outline-offset:2px}
+input[type="file"]{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none}
+
+.srcline{font-size:11.5px; color:var(--ink-3); padding:0 0 10px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center}
+.srcline b{color:var(--ink-2); font-weight:600}
+.srcline .ok{color:var(--c-cliente)}
+.srcline .warn{color:var(--alert)}
+
+main{padding:30px 0 90px}
+section{margin:0 0 44px; scroll-margin-top:60px}
+.sec-hd{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  padding-bottom:9px; margin-bottom:14px; border-bottom:2px solid var(--ink)}
+.sec-hd h2{margin:0; font-size:20px; letter-spacing:-.015em; font-weight:700}
+.sec-hd .count{font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; letter-spacing:.03em}
+.sec-note{margin:-4px 0 16px; color:var(--ink-2); font-size:14px; max-width:68ch}
+section[data-g="sinclasificar"] .sec-hd{border-bottom-color:var(--c-sinclasificar)}
+section[data-g="prospecto"] .sec-hd{border-bottom-color:var(--c-prospecto)}
+section[data-g="cliente"] .sec-hd{border-bottom-color:var(--c-cliente)}
+section[data-g="competencia"] .sec-hd{border-bottom-color:var(--c-competencia)}
+section[data-g="otro"] .sec-hd{border-bottom-color:var(--c-otro)}
+section[data-g="organizador"] .sec-hd{border-bottom-color:var(--c-organizador)}
+section[data-g="nosotros"] .sec-hd{border-bottom-color:var(--c-nosotros)}
+.cards{display:flex; flex-direction:column; gap:9px}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:4px;
+  box-shadow:var(--shadow); overflow:hidden; border-left:3px solid var(--line)}
+.card[data-g="sinclasificar"]{border-left-color:var(--c-sinclasificar)}
+.card[data-g="prospecto"]{border-left-color:var(--c-prospecto)}
+.card[data-g="cliente"]{border-left-color:var(--c-cliente)}
+.card[data-g="competencia"]{border-left-color:var(--c-competencia)}
+.card[data-g="otro"]{border-left-color:var(--c-otro)}
+.card[data-g="organizador"]{border-left-color:var(--c-organizador)}
+.card[data-g="nosotros"]{border-left-color:var(--c-nosotros)}
+.card.gone{opacity:.5}
+.card.moved{box-shadow:0 0 0 2px var(--accent), var(--shadow)}
+
+.card-hd{display:grid; grid-template-columns:1fr auto; gap:9px 16px; align-items:start;
+  padding:13px 16px; cursor:pointer; background:none; border:0; width:100%; text-align:left;
+  font:inherit; color:inherit}
+.card-hd:hover{background:var(--surface-2)}
+.card-hd h3{margin:0; font-size:16px; font-weight:650; letter-spacing:-.012em; line-height:1.3}
+.meta-line{display:flex; flex-wrap:wrap; gap:5px 11px; align-items:center; margin-top:5px;
+  font-size:11.5px; color:var(--ink-3)}
+.chip{display:inline-block; padding:2px 7px; border-radius:2px; font-size:10.5px;
+  letter-spacing:.07em; text-transform:uppercase; font-weight:700}
+.chip.g-sinclasificar{background:var(--c-sinclasificar-bg); color:var(--c-sinclasificar)}
+.chip.g-prospecto{background:var(--c-prospecto-bg); color:var(--c-prospecto)}
+.chip.g-cliente{background:var(--c-cliente-bg); color:var(--c-cliente)}
+.chip.g-competencia{background:var(--c-competencia-bg); color:var(--c-competencia)}
+.chip.g-otro{background:var(--c-otro-bg); color:var(--c-otro)}
+.chip.g-organizador{background:var(--c-organizador-bg); color:var(--c-organizador)}
+.chip.g-nosotros{background:var(--c-nosotros-bg); color:var(--c-nosotros)}
+.chip.alert{background:var(--alert-bg); color:var(--alert)}
+.chip.edit{background:var(--accent-soft); color:var(--accent-ink)}
+:root[data-theme="dark"] .chip.edit{color:var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.edit{color:var(--accent)}}
+.pax{font-size:12px; font-weight:600; color:var(--ink-2); white-space:nowrap;
+  font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:8px}
+.pax .n{font-size:19px; color:var(--ink); font-weight:700}
+.caret{transition:transform .18s ease; color:var(--ink-3); font-size:12px}
+.card.open .caret{transform:rotate(90deg)}
+
+.card-bd{display:none; padding:2px 16px 16px; border-top:1px solid var(--line-2)}
+.card.open .card-bd{display:block}
+.block{margin:13px 0 0}
+.block>.k{font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3);
+  font-weight:700; display:block; margin-bottom:4px}
+.block p{margin:0; max-width:72ch; color:var(--ink-2)}
+.block p.strong{color:var(--ink)}
+.ns{background:var(--surface-2); border:1px solid var(--line-2); border-radius:3px;
+  padding:9px 11px; font-size:13.5px; color:var(--ink-2); max-width:none}
+.ns.is-alert{background:var(--alert-bg); border-color:var(--alert); color:var(--ink)}
+
+.tscroll{overflow-x:auto; margin-top:4px}
+table.ppl{width:100%; border-collapse:collapse; font-size:13.5px}
+table.ppl th{text-align:left; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:700; padding:0 12px 5px 0; border-bottom:1px solid var(--line)}
+table.ppl td{padding:7px 12px 7px 0; border-bottom:1px solid var(--line-2); vertical-align:top; white-space:nowrap}
+table.ppl tr:last-child td{border-bottom:0}
+table.ppl td.nm{white-space:normal; font-weight:600; color:var(--ink)}
+td.tel{color:var(--ink-3); font-size:12.5px}
+a{color:var(--accent-ink); text-decoration:none; border-bottom:1px solid transparent}
+:root[data-theme="dark"] a{color:var(--accent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) a{color:var(--accent)}}
+a:hover{border-bottom-color:currentColor}
+.alt{color:var(--ink-3); font-size:12px}
+
+.track{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;
+  margin-top:15px; padding-top:13px; border-top:1px dashed var(--line)}
+.fld{display:flex; flex-direction:column; gap:4px}
+.fld>span{font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3);
+  font-weight:700; font-family:ui-monospace,Consolas,monospace}
+select{font:inherit; font-size:13px; padding:6px 9px; border-radius:3px; width:100%;
+  border:1px solid var(--line); background:var(--surface-2); color:var(--ink)}
+.acts{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px}
+textarea{width:100%; margin-top:10px; min-height:62px; resize:vertical; font:inherit; font-size:13.5px;
+  padding:9px 11px; border-radius:3px; border:1px solid var(--line);
+  background:var(--surface-2); color:var(--ink); outline:none}
+textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.saved{font-size:11.5px; color:var(--c-cliente); opacity:0; transition:opacity .25s}
+.saved.on{opacity:1}
+.empty{padding:26px; text-align:center; color:var(--ink-3); font-size:14px}
+footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-3); font-size:12.5px}
+footer p{margin:0 0 7px; max-width:74ch}
+footer b{color:var(--ink-2)}
+#toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(140%);
+  background:var(--ink); color:var(--surface); padding:11px 18px; border-radius:4px;
+  font-size:13.5px; font-weight:600; z-index:60; transition:transform .28s ease; max-width:88vw;
+  box-shadow:0 8px 30px -10px rgba(0,0,0,.5)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+#toast.bad{background:var(--alert); color:#fff}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+@media (max-width:620px){
+  .card-hd{grid-template-columns:1fr; gap:8px}
+  .pax{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <div>
+      <span class="eyebrow">Woodpack Global &middot; Conferencia septiembre 2026 &middot; Patrocinadores Platino</span>
+      <h1>Quién nos compra, quién nos compite y quién sobra: los asistentes al Woodpack Global</h1>
+      <p class="lede">Las 93 empresas de la lista, cruzadas contra el padrón de NetSuite (1,366 clientes, 1,360 contactos, historial de facturas y de compras). <strong>Todo es editable:</strong> cambia la clasificación de cualquier empresa y se va sola a su grupo, escribe notas, y si te mandan la lista actualizada en Excel cárgala aquí y se recalcula al instante.</p>
+    </div>
+    <div class="metrics" id="metrics"></div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="bar-in">
+      <input type="search" id="q" placeholder="Buscar empresa, persona, correo o ciudad&hellip;" aria-label="Buscar">
+      <div class="pills" id="pills"></div>
+      <label class="btn btn-accent" tabindex="0">Cargar lista de Excel
+        <input type="file" id="file" accept=".xlsx,.csv,.tsv,.txt"></label>
+      <button class="btn" id="expand">Abrir todo</button>
+      <button class="btn" id="export">Exportar reporte</button>
+      <button class="btn" id="savestate">Respaldar notas</button>
+      <label class="btn" tabindex="0">Restaurar notas
+        <input type="file" id="loadstate" accept=".json"></label>
+    </div>
+    <div class="srcline" id="srcline"></div>
+  </div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<footer class="wrap">
+  <p><b>Cómo clasifiqué.</b> Cada empresa se buscó por nombre normalizado y por dominio de correo contra los contactos de NetSuite, y después se verificó con su historial real de facturas, pedidos y órdenes de compra. Una ficha en NetSuite sin transacciones no cuenta como cliente y aparece marcada como alerta.</p>
+  <p><b>El criterio, corregido.</b> La primera versión clasificaba por &laquo;fabrica tarimas&raquo;. Lo correcto es &laquo;vende madera a los mismos compradores que nosotros&raquo;: por eso NAHUA, MJB y Brasimex pasaron a competencia. Y Organización LB es cliente aunque el cruce automático no lo viera, porque en NetSuite está como LB Pallets &amp; Crates del Potosí con otro dominio. Si ves otra mal puesta, cámbiala con el selector de cada tarjeta.</p>
+  <p><b>Dónde viven tus notas.</b> Se guardan en este navegador, en esta computadora. No viajan con el link: quien abra la URL verá el análisis base, no tus anotaciones. Para pasárselas a alguien del equipo usa <b>Respaldar notas</b> y que ellos las carguen con <b>Restaurar notas</b>.</p>
+  <p><b>Fuentes.</b> Lista oficial de asistentes de Woodpack Global &middot; NetSuite (tablas customer, vendor, contact y transaction vía SuiteQL, consultadas el 3-ago-2026) &middot; investigación pública de cada empresa desconocida.</p>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ===== datos inyectados en build ===== */
+const BASE = [{"k": "chicagopallet", "n": "Chicago Pallet Services, Inc.", "g": "prospecto", "t": "A", "loc": "Lombard, IL · EE.UU.", "w": "Fabricante y reciclador de tarimas de madera para el corredor industrial de Chicago. Empresa familiar (familia Rodriguez); manejan tarima nueva, recuperada y servicio de recoleccion.", "ns": "Sin registro en NetSuite.", "a": "Maxima prioridad: 4 personas asistiendo, la delegacion no-cliente mas grande del evento. Consumidor directo de madera dimensional. Correo de presentacion a Rocio y Araceli Rodriguez.", "p": [{"n": "David Rodriguez", "e": "accounting@chicagopallet.com", "t": "847-439-8330", "alt": []}, {"n": "Rocio Rodriguez", "e": "rocio@chicagopallet.com", "t": "708-689-7747", "alt": []}, {"n": "Araceli Rodriguez", "e": "araceli@chicagopallet.com", "t": "708-417-6008", "alt": []}, {"n": "Jose Barbosa", "e": "araceli@chicagopallet.com", "t": "715-767-5131", "alt": []}]}, {"k": "rgm", "n": "RGM Tarimas y Embalajes", "g": "prospecto", "t": "A", "loc": "Tlajomulco de Zuñiga, Jal. · México", "w": "Fabricante de tarimas y embalaje de madera en el cluster de Tlajomulco (Jalisco), el mismo corredor donde ya vendemos a El Martillo, Fatami y CG de Occidente.", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: 3 asistentes, zona donde ya tenemos logistica y clientes espejo. Contacto: Ramon Emmanuel Garcia Ibarra (direccion).", "p": [{"n": "Ramon Emmanuel Garcia Ibarra", "e": "emmanuel.g@rgm-tarimas.com", "t": "3334540668", "alt": []}, {"n": "Alexis Uriel Garcia Ibarra", "e": "alexis.uriel2598@gmail.com", "t": "3322588991", "alt": []}, {"n": "Diego Emmanuel Sanchez de Leon", "e": "diego@rgm-tarimas.net", "t": "3338153513", "alt": []}]}, {"k": "nahua", "n": "NAHUA S.A. de C.V.", "g": "competencia", "t": "Competencia directa", "loc": "Mexicali, B.C. · México", "w": "Comercializadora de madera en Mexicali. CORRECCION DE JORGE (4-ago-2026): no es prospecto, es competencia — venden madera al mismo padron de tarimeros que nosotros, no solo fabrican.", "ns": "Sin registro en NetSuite. OJO: no confundir con «Maderas y Materiales ANAHUAC», que es otro cliente (Monterrey).", "a": "Competencia directa en la frontera de Baja California, el mismo mercado donde atendemos a Industrializadora de Maderas del Valle. 3 asistentes incluyendo direccion (Attila Cocchi): vigilar a quien se acercan en el piso.", "p": [{"n": "Attila Cocchi", "e": "attila@nahua.com.mx", "t": "6121311821", "alt": []}, {"n": "Ginette Geraldine Morett Rospigliosi", "e": "ginette@nahua.com.mx", "t": "13053066550", "alt": []}, {"n": "Efrain Guevara", "e": "efrain@nahua.com.mx", "t": "686 3947842", "alt": []}]}, {"k": "estibasop", "n": "Estibas O.P. SAS / La Fabrica de Estibas", "g": "prospecto", "t": "A", "loc": "Santa Marta, Magdalena · Colombia", "w": "Aserrio, cepillado e impregnacion de madera mas fabricacion de estibas NIMF-15 para exportacion de banano y carga liquida en el Caribe colombiano. Ventas 2023 de COP 10 a 20 mil millones.", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: 3 asistentes, integran aserrio propio pero exportan volumen, candidato para pino importado. Abre puerta a Colombia.", "p": [{"n": "Oscar Prieto", "e": "oprieto23@hotmail.com", "t": "057-3106096668", "alt": []}, {"n": "Nicolai Prieto", "e": "contraloria@estibasop.com", "t": "573225121450", "alt": []}, {"n": "Javier Gomez", "e": "gomezisjavier@gmail.com", "t": "573155067124", "alt": []}]}, {"k": "firstnations", "n": "First Nations Pallet Solutions", "g": "prospecto", "t": "A", "loc": "Atlanta, GA · EE.UU.", "w": "Compañia nacional de gestion de cadena de suministro de tarimas, propiedad de nativos americanos: programas full-service de tarima nueva, reciclada, combo y plastica, con tratamiento termico ISPM-15.", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: 3 asistentes y uno de ellos (Luis Montañez, skanoh.com.mx) opera desde Mexico, puente natural para nuestro modelo NT/GF.", "p": [{"n": "Brad Young", "e": "byoung@FirstNationsPalletSolutions.com", "t": "9522108318", "alt": []}, {"n": "Justin Bennett", "e": "jbennett@firstnationspalletsolutions.com", "t": "9522108318", "alt": []}, {"n": "Luis Montanez", "e": "lmontanez@skanoh.com.mx", "t": "55 4252 04699", "alt": []}]}, {"k": "lavilla", "n": "Madereria La Villa S.A. de C.V.", "g": "prospecto", "t": "A", "loc": "León, Gto. · México", "w": "Madereria y fabricante de tarimas en Leon, Guanajuato. Asisten 4 miembros de la familia Perez Gonzalez.", "ns": "ALERTA: existe ficha de cliente en NetSuite («Madereriala Villa», ID 7777) pero SIN una sola transaccion. Se dio de alta y nunca se le vendio.", "a": "Prioridad alta por tamaño de delegacion (4 personas). Revisar por que la ficha nunca se activo. Unico correo disponible: madereria.lavilla@hotmail.com.", "p": [{"n": "Julio Cesar Perez Gonzalez", "e": "madereria.lavilla@hotmail.com", "t": "477-783-0869", "alt": []}, {"n": "krystian ulises perez gonzalez", "e": "madereria.lavilla@hotmail.com", "t": "4777830869", "alt": []}, {"n": "ROBERTO PEREZ GONZALEZ", "e": "madereria.lavilla@hotmail.com", "t": "4777830869", "alt": []}, {"n": "ARTEMIO COSS PEÑA", "e": "madereria.lavilla@hotmail.com", "t": "4777830869", "alt": []}]}, {"k": "orglb", "n": "Organización LB", "g": "cliente", "t": "A", "loc": "Puebla, Pue. · México", "w": "Fabricante de tarimas industriales de madera con mas de 20 años sirviendo cadenas de suministro automotriz, farmaceutica y consumo masivo del corredor central. Plantas en Puebla, Toluca y Morelia. 51 a 200 empleados.", "ns": "CLIENTE (confirmado por Jorge, 4-ago-2026). En NetSuite esta como «LB Pallets & Crates del Potosi S de RL de CV» / entityid NT-LBPALLETS (ID 4426), con Frida Zamudio en compras y dominio lbpallets.com. ALERTA: esa ficha NO tiene ni una transaccion registrada — la relacion comercial no se esta reflejando en NetSuite. Hay que revisar por donde se esta facturando.", "a": "Cliente que el cruce automatico no detecto: en la lista viene como «Organizacion LB» con dominio organizacionlb.com y en NetSuite como LB Pallets con dominio lbpallets.com. Asisten Leticia Luna (ventas) y Jose Felipe Lopez Garcia. Tarea aparte: amarrar la ficha de NetSuite con la facturacion real.", "p": [{"n": "Leticia Luna", "e": "ventas.mx95@organizacionlb.com", "t": "7228224465", "alt": []}, {"n": "Jose Felipe Lopez Garcia", "e": "felipe.lopezgarcia@organizacionlb.com", "t": "5541937223", "alt": []}]}, {"k": "tabel", "n": "Tabel Pallet S.A. de C.V.", "g": "prospecto", "t": "A", "loc": "San Pedro Tlaquepaque, Jal. · México", "w": "Fabricante de tarimas en Tlaquepaque, zona metropolitana de Guadalajara.", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: mismo cluster Jalisco donde ya entregamos. 2 asistentes incluyendo ventas.", "p": [{"n": "Ismael Jauregui", "e": "tabel.pallet@gmail.com", "t": "33 23320881", "alt": []}, {"n": "Ivan Alexis Galvan Martinez", "e": "ventas3@tabelpallet.com.mx", "t": "3323320881", "alt": []}]}, {"k": "clc", "n": "Commercial Lumber and Pallet Co., Inc.", "g": "prospecto", "t": "A", "loc": "City of Industry, CA · EE.UU.", "w": "Fabricante de tarimas y distribuidor de madera en el sur de California. Empresa familiar (Raymond y Jennifer Gutierrez).", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: perfil «lumber + pallet» identico a nuestro cliente objetivo. Se registraron dos veces con dos correos, usar ray2@clcpallets.com.", "p": [{"n": "Raymond Gutierrez", "e": "raymond2@clcpallets.com", "t": "9099008388", "alt": ["ray2@clcpallets.com"]}, {"n": "Jennifer Gutierrez", "e": "raymond2@clcpallets.com", "t": "9099008388", "alt": ["ray2@clcpallets.com"]}]}, {"k": "mjb", "n": "MJB Tableros y Maderas, S. de R.L. de C.V.", "g": "competencia", "t": "Competencia directa", "loc": "Saltillo, Coah. · México", "w": "Distribuidor de tableros y madera en Saltillo, corredor automotriz del noreste. CORRECCION DE JORGE (4-ago-2026): es competencia, no prospecto — distribuye madera al mismo mercado que nosotros.", "ns": "ALERTA: existe ficha de cliente en NetSuite (ID 3854) SIN transacciones. Se dio de alta como cliente pero el rol real es de competidor: revisar y reclasificar la ficha en NetSuite.", "a": "Competencia directa en el noreste. 2 asistentes: Andres Ochoa y Jose Maria Alvarez.", "p": [{"n": "Andres Ochoa", "e": "andres@mjbtm.com", "t": "331-369-4439", "alt": []}, {"n": "Jose Maria Alvarez", "e": "jmalvarez@mjbtm.com", "t": "55 3731 8593", "alt": []}]}, {"k": "triplayjs", "n": "Maderas y Triplay JS", "g": "prospecto", "t": "A", "loc": "Hidalgo, TX · EE.UU.", "w": "Distribuidor de madera y triplay en la frontera de Hidalgo, Texas (McAllen-Reynosa). Hermanos Galpern.", "ns": "ALERTA: existe «Maderas y Triplay JA» (ID 4476) INACTIVO en NetSuite, probablemente otra razon social. Verificar.", "a": "Prioridad alta: frontera Texas, ruta terrestre que ya operamos. Dos socios asistiendo.", "p": [{"n": "Jon Galpern", "e": "jon@maderasjs.com", "t": "19567894693", "alt": []}, {"n": "Jaime Galpern", "e": "jaimeg@maderasjs.com", "t": "19562270776", "alt": []}]}, {"k": "lumberplywood", "n": "Lumber & Plywood Services and Supply Corp.", "g": "prospecto", "t": "A", "loc": "Xochimilco, CDMX · México", "w": "Distribuidor de madera y triplay con operacion en Ciudad de Mexico.", "ns": "Sin registro en NetSuite.", "a": "Prioridad alta: distribuidor CDMX con capacidad de absorber furgon completo. Contacto: Pablo Carrera.", "p": [{"n": "MICHEL ASSELOT", "e": "pcarrera@lumber-plywood.com", "t": "5523908000", "alt": []}, {"n": "Pablo Carrera", "e": "pcarrera@lumber-plywood.com", "t": "5523908000", "alt": []}]}, {"k": "durawood", "n": "Durawood S.A. de C.V. (Grupo Maderero la Reforma)", "g": "prospecto", "t": "A", "loc": "San Pedro Garza García, N.L. · México", "w": "Empresa del grupo Grumare (Grupo Maderero la Reforma), Monterrey. Correos corporativos @grumare.com.", "ns": "EX-CLIENTE: Grupo Maderero la Reforma (ID 6747), 7 facturas por USD 195,438, ultima venta 12-sep-2022. Cuenta dormida hace casi 4 años.", "a": "REACTIVACION prioritaria: asisten Rodrigo Elizondo Treviño y Juan Elias Villarreal. Averiguar por que se cayo la cuenta antes del evento.", "p": [{"n": "RODRIGO ELIZONDO TREVIÃ‘O", "e": "ret@grumare.com", "t": "8183621750", "alt": []}, {"n": "Juan Elias Villarreal Lozano", "e": "jevillareal@grumare.com", "t": "8120400529", "alt": []}]}, {"k": "embalatec", "n": "Embalatec Industrial LTDA", "g": "prospecto", "t": "A", "loc": "São Paulo, SP · Brasil", "w": "Fabricante de embalaje industrial de madera en Brasil. Uno de sus asistentes usa correo @bgswood.com.br (BGS Wood), lo que sugiere vinculo con operacion maderera exportadora.", "ns": "Sin registro en NetSuite.", "a": "Doble angulo: cliente potencial de madera Y posible proveedor para la matriz Brasil/Sudamerica. Alexandre Battistella (BGS Wood) es el contacto clave.", "p": [{"n": "Alexandre Battistella", "e": "alexandre.battistella@bgswood.com.br", "t": "55-47988362096", "alt": []}, {"n": "Marco Souza", "e": "marco.souza@embalatec.com.br", "t": "551155340003", "alt": []}]}, {"k": "inmansa", "n": "INMANSA", "g": "prospecto", "t": "A", "loc": "Ciudad de Guatemala · Guatemala", "w": "Industria maderera guatemalteca. Mercado centroamericano donde ya movemos pino.", "ns": "Sin registro en NetSuite.", "a": "2 asistentes. Contacto formal: Jorge Martinez (jmartinez@inmansagt.com).", "p": [{"n": "Jorge Martinez", "e": "jmartinez@inmansagt.com", "t": "502 56162496", "alt": []}, {"n": "Julissa Vargas", "e": "julysos82@gmail.com", "t": "50256328001", "alt": []}]}, {"k": "caribbean", "n": "Caribbean Pallet Company S.R.L.", "g": "prospecto", "t": "A", "loc": "Santiago · Rep. Dominicana", "w": "Diseño, fabricacion y reparacion de tarimas con madera certificada e ISPM-15. Facturacion reportada cerca de USD 10.6M. Red logistica en Haiti, Jamaica, Antillas Menores y Bahamas.", "ns": "Sin registro en NetSuite.", "a": "Prospecto de importacion maritima puro: isla sin bosque comercial, compra practicamente toda su madera importada. Contacto: Elias Ignacio Cruz (dueño).", "p": [{"n": "Elias Ignacio Cruz", "e": "ecruz@caribbeanpallet.com", "t": "809-575-6799", "alt": []}]}, {"k": "kamps", "n": "Kamps, Inc.", "g": "prospecto", "t": "B", "loc": "Grand Rapids, MI · EE.UU.", "w": "Una de las mayores redes de tarimas de Estados Unidos: reciclaje, fabricacion nueva y programas nacionales de gestion.", "ns": "Sin registro en NetSuite.", "a": "Cuenta grande pero compra madera en EE.UU. via contratos nacionales. Asiste un miembro de la familia dueña (Justin Kamps), vale la conversacion en piso.", "p": [{"n": "Justin Kamps", "e": "justink@kampspallets.com", "t": "6163189631", "alt": []}]}, {"k": "bettaway", "n": "Bettaway Pallet Systems", "g": "prospecto", "t": "B", "loc": "South Plainfield, NJ · EE.UU.", "w": "Gestion y suministro de tarimas para la costa este; parte de Bettaway Supply Chain Services.", "ns": "Sin registro en NetSuite.", "a": "Contacto hispanohablante (Ricardo Barrientos), buena puerta de entrada.", "p": [{"n": "Ricardo Barrientos", "e": "Barrientos.Ricardo@bettaway.com", "t": "9084206090", "alt": []}]}, {"k": "challenger", "n": "Challenger Pallet & Supply, Inc.", "g": "prospecto", "t": "B", "loc": "Idaho Falls, ID · EE.UU.", "w": "Fabricante de tarimas y suministro de madera en Idaho, zona de aserraderos de pino.", "ns": "Sin registro en NetSuite.", "a": "Perfil interesante como comprador y a la vez como posible fuente de madera del noroeste.", "p": [{"n": "Justin Hegsted", "e": "justin.hegsted@cpspallet.com", "t": "208-521-6115", "alt": []}]}, {"k": "jimenez", "n": "Jimenez Pallets LLC", "g": "prospecto", "t": "B", "loc": "Newark, NJ · EE.UU.", "w": "Fabricante de tarimas en el area metropolitana de Nueva York y Newark.", "ns": "Sin registro en NetSuite.", "a": "Dueño asistiendo (Alex Jimenez). Mercado de puerto con alta rotacion.", "p": [{"n": "Alex Jimenez", "e": "alex@jimenezpallets.com", "t": "5516895005", "alt": []}]}, {"k": "arpallets", "n": "A & R Pallets, LLC", "g": "prospecto", "t": "B", "loc": "Jacksonville, TX · EE.UU.", "w": "Fabricante de tarimas en el este de Texas, zona de pino amarillo del sur (SYP).", "ns": "Sin registro en NetSuite.", "a": "Texas SYP es producto que ya comercializamos. Contacto de ventas: Eric Muñoz.", "p": [{"n": "Eric Munoz", "e": "eric@salesarpalletsllc.com", "t": "903-830-8004", "alt": []}]}, {"k": "anchorbay", "n": "Anchor Bay Packaging Corporation", "g": "prospecto", "t": "B", "loc": "New Baltimore, MI · EE.UU.", "w": "Empaque y embalaje industrial de madera para el sector automotriz de Michigan.", "ns": "ALERTA: existe ficha de cliente en NetSuite (ID 11413) con el contacto Mark Mets ya cargado, pero SIN transacciones. Ademas hay un contacto suelto con dominio anchorbapackaging.com.mx, verificar filial mexicana.", "a": "Cuenta prospectada en el pasado y nunca cerrada. Mark Mets asiste: es la oportunidad de retomarla en persona.", "p": [{"n": "Mark Mets", "e": "mmets@anchorbaypackaging.com", "t": "", "alt": []}]}, {"k": "altex", "n": "ALTEX Packaging, Inc. (API)", "g": "prospecto", "t": "B", "loc": "Anniston, AL · EE.UU.", "w": "Empaque a la medida: corrugado, plastico, espuma, huacales y tarimas para industria y gobierno en Alabama. Cerca de 23 empleados.", "ns": "Sin registro en NetSuite.", "a": "Consumo de madera moderado (huacales y tarimas a la medida). Contacto: Randall Rigsby.", "p": [{"n": "Randall Rigsby", "e": "rrigsby@api4design.com", "t": "256-831-6603", "alt": []}]}, {"k": "brasimex", "n": "Brasimex Maderas y Embalajes S.A. de C.V.", "g": "competencia", "t": "Competencia directa", "loc": "Santa Rosa, Querétaro · México", "w": "Importador y comercializador de madera en el corredor Queretaro-Bajio. El nombre lo dice: Brasil + Mexico. CORRECCION DE JORGE (4-ago-2026): es competencia, y de la mas relevante — mueven producto sudamericano por contenedor, exactamente el mismo canal de nuestra matriz Brasil.", "ns": "Sin registro en NetSuite.", "a": "Competencia directa en el canal que mas nos importa: pino brasileño por contenedor hacia el Bajio, donde estan Losifra y TPM Proyectos. Emmanuel Olaguez Medina: vale entender que volumen y a que puerto llegan.", "p": [{"n": "Emmanuel Olaguez Medina", "e": "emmanuel.olaguez@brasimex.com", "t": "+52 447-392-1171", "alt": []}]}, {"k": "grumach", "n": "Grupo Maderero de Chihuahua S.A. de C.V.", "g": "prospecto", "t": "B", "loc": "Saltillo, Coah. · México", "w": "Grupo maderero con operacion en el norte de Mexico.", "ns": "ALERTA: existe ficha de cliente en NetSuite (ID 11403) SIN transacciones.", "a": "Cuenta dormida. Asiste Fatima Hernandez; el correo registrado es ferlopez@grumach.com.mx, verificar titular.", "p": [{"n": "Fatima Hernandez", "e": "ferlopez@grumach.com.mx", "t": "410-4591", "alt": []}]}, {"k": "maderaslafe", "n": "Maderas La Fe", "g": "prospecto", "t": "B", "loc": "San Nicolás de los Garza, N.L. · México", "w": "Madereria en el area metropolitana de Monterrey.", "ns": "ALERTA: existen DOS fichas de cliente en NetSuite (ID 7353 y 9721), ambas SIN transacciones. Duplicado a consolidar.", "a": "Monterrey, ruta Laredo que ya operamos. Contacto: Jesus Cabriales.", "p": [{"n": "Jesus Cabriales", "e": "jesus.cabriales@maderaslafe.com.mx", "t": "818-998-1450", "alt": []}]}, {"k": "tpai", "n": "Pallet Alliance México (TPAI)", "g": "prospecto", "t": "B", "loc": "San Pedro Garza García, N.L. · México", "w": "Brazo mexicano de The Pallet Alliance: programas gestionados de tarima para clientes corporativos, con red de fabricantes afiliados.", "ns": "Sin registro en NetSuite.", "a": "No fabrica: coordina fabricantes. Puede convertirse en canal hacia varios tarimeros a la vez. Contacto: Hilary Carr.", "p": [{"n": "Hilary Carr", "e": "hilary@TPAI.com", "t": "52-55-3909-3429", "alt": []}]}, {"k": "toluca", "n": "Tarimas y Empaques Industriales de Toluca", "g": "prospecto", "t": "B", "loc": "Toluca, Edo. Méx. · México", "w": "Fabricante de tarimas y empaque industrial en el corredor Toluca-Lerma.", "ns": "Sin registro en NetSuite.", "a": "El unico correo disponible es personal (filicevedo@gmail.com), de Filiberto Acevedo. Confirmar correo corporativo en el evento.", "p": [{"n": "Filiberto Acevedo", "e": "filicevedo@gmail.com", "t": "+52(722)3050016", "alt": []}]}, {"k": "froy", "n": "Froy Transport / Froy Pallets", "g": "prospecto", "t": "B", "loc": "Fontana, CA · EE.UU.", "w": "Transportista y operacion de tarimas en Fontana, Inland Empire (California). Asisten dos: George Oceguera y Froylan Mondragon.", "ns": "Sin registro en NetSuite.", "a": "Combina transporte y tarimas: puede ser cliente y a la vez apoyo logistico en el sur de California.", "p": [{"n": "george  oceguera", "e": "froytransport@aol.com", "t": "9094282400", "alt": []}, {"n": "froylan mondragon obregon", "e": "froylan@froytransport.com", "t": "9098276134", "alt": []}]}, {"k": "walkglobal", "n": "Walk Global LLC", "g": "prospecto", "t": "B", "loc": "San Juan · Puerto Rico", "w": "Soluciones internacionales de tarima y empaque: diseño, prueba y manufactura con software de analisis propio; programas de gestion de tarima para grandes minoristas en cerca de 30 paises, incluida renta de tarima Asia-Norteamerica.", "ns": "Sin registro en NetSuite.", "a": "Ambiguo: gestiona programas mas que comprar madera. Vale calificarlo en piso. Si maquilan en Mexico son canal; si no, descartar.", "p": [{"n": "Raymundo Ayala", "e": "rayala@walkglobal.com", "t": "526641888453", "alt": []}, {"n": "Rosa Maria Seele", "e": "ROSAMARIA1408@HOTMAIL.COM", "t": "52-664-305-3362", "alt": []}]}, {"k": "chep", "n": "Brambles / CHEP", "g": "prospecto", "t": "B", "loc": "CDMX · México", "w": "El mayor pool de tarimas del mundo. Compran volumenes enormes de tarima nueva y componentes a fabricantes locales.", "ns": "ALERTA: existe ficha de cliente en NetSuite («CHEP Innovation Center», ID 3911) con contacto cargado, SIN transacciones.", "a": "Prospecto estrategico indirecto: no nos compran madera, pero definen a quien le compran tarima. Alfonso Gonzalez vale la relacion.", "p": [{"n": "alfonso gonzalez", "e": "Alfonso.Gonzalez@chep.com", "t": "+52 5651022384", "alt": []}]}, {"k": "nasa", "n": "Madereria Nasa S.A. de C.V. (Grupo MN)", "g": "cliente", "t": "AAA", "loc": "Altamira, Tamps. · México", "w": "Fabricante de tarimas y embalaje; el grupo tambien opera bajo nasapack.com y grupomn.com.mx.", "ns": "CLIENTE #1: 1,102 facturas, USD 42.9M desde ago-2018. Ultima factura 31-jul-2026.", "a": "La cuenta mas grande de toda la lista. Asisten 3 (Jose Herrera, Jaime Zorrilla, Francisco Ruiz). Merece agenda dedicada.", "p": [{"n": "Jose Herrera", "e": "jtrevino@nasapack.com", "t": "8333119838", "alt": []}, {"n": "Jaime Zorrilla", "e": "jzorrilla@grupomn.com.mx", "t": "8333119838", "alt": []}, {"n": "Francisco Ruiz", "e": "fruiz@nasapack.com", "t": "8333119838", "alt": []}]}, {"k": "kayak", "n": "Kayak Packaging S.A. de C.V.", "g": "cliente", "t": "AAA", "loc": "Escobedo, N.L. · México", "w": "Empaque y tarima industrial para el cluster automotriz de Nuevo Leon.", "ns": "CLIENTE TOP: 282 facturas, USD 10.6M desde nov-2017. Ultima factura 31-jul-2026.", "a": "3 asistentes incluyendo Juan Pablo Zambrano, ya registrado como contacto en NetSuite. Cuenta viva.", "p": [{"n": "Antonio Caballero", "e": "jcaballero@kayakpackaging.com", "t": "+52 81 1600 8776", "alt": []}, {"n": "Juan Pablo Zambrano", "e": "jpzambrano@kayakpackaging.com", "t": "+52 81 1255 9505", "alt": []}, {"n": "Alfredo Vazquez Rodriguez", "e": "alfredo.vazquez@kayakpackaging.com", "t": "+52 8135526812", "alt": []}]}, {"k": "fatami", "n": "Fatami S.A. de C.V.", "g": "cliente", "t": "AAA", "loc": "Tlajomulco de Zuñiga, Jal. · México", "w": "Tarimas y embalaje de madera en Jalisco.", "ns": "CLIENTE TOP: 186 facturas, USD 10.8M desde oct-2018. Ultima factura 18-jun-2026.", "a": "Asiste David Mier Simental. Cuenta viva y de alto valor.", "p": [{"n": "David Mier Simental", "e": "david.mier@fatami.com.mx", "t": "3318030421", "alt": []}]}, {"k": "delvalle", "n": "Industrializadora de Maderas del Valle S.A. de C.V.", "g": "cliente", "t": "AAA", "loc": "Mexicali, B.C. · México", "w": "Industrializadora de madera y tarimas en la frontera de Baja California (tarimasdelvalle.com).", "ns": "CLIENTE TOP: 766 facturas, USD 8.4M desde may-2020. Ultima factura 13-mar-2026. OJO: casi 5 meses sin factura.", "a": "Asisten Jorge Ernesto Lopez Bojorquez y Araceli Estrada. Preguntar por la caida de actividad desde marzo.", "p": [{"n": "Jorge Ernesto Lopez Bojorquez", "e": "JLOPEZ@TARIMASDELVALLE.COM", "t": "658-516-7190", "alt": []}, {"n": "ARACELI ESTRADA", "e": "jlopez@tarimasdelvalle.com", "t": "6585167190", "alt": []}]}, {"k": "elmartillo", "n": "Industrializadora de Madera y Empaque El Martillo", "g": "cliente", "t": "AA", "loc": "Tlaquepaque, Jal. · México", "w": "Industrializadora de madera y empaque en Jalisco.", "ns": "CLIENTE: 101 facturas, USD 5.5M desde oct-2018. Ultima factura 23-jun-2026.", "a": "Asisten los dos de direccion (Maria Jose y Jose Luis Martinez). Cuenta viva.", "p": [{"n": "Maria Jose Martinez", "e": "adireccion@elmartillo.mx", "t": "52-33-3689-9032", "alt": []}, {"n": "Jose Luis Martinez", "e": "direccion@elmartillo.mx", "t": "52 33 3689-9032", "alt": []}]}, {"k": "sicomoro", "n": "Industrias Sicomoro / Ainco Industries", "g": "cliente", "t": "AA", "loc": "El Paso, TX · EE.UU.", "w": "Operacion fronteriza El Paso-Juarez de embalaje de madera. Facturamos via la entidad Ainco Industries, Inc.", "ns": "CLIENTE: Ainco Industries (ID 13199) 96 facturas, USD 5.3M, ultima 10-jul-2026. Industrias Sicomoro del Norte (ID 8862) USD 543K, ultima may-2024.", "a": "Asiste David Fong. OJO: dos fichas para el mismo grupo, consolidar en NetSuite.", "p": [{"n": "David Fong", "e": "dfong@indsicomoro.com", "t": "1-915-203-0300", "alt": []}]}, {"k": "protsur", "n": "Productora de Tarimas del Sur S.A. de C.V.", "g": "cliente", "t": "AA", "loc": "Cuautitlán Izcalli, Edo. Méx. · México", "w": "Productora de tarimas del Valle de Mexico (protsur.com).", "ns": "CLIENTE: 55 facturas, USD 1.34M desde mar-2019. Ultima factura 15-jul-2026.", "a": "Delegacion de 4 personas, la mayor de todos nuestros clientes. Incluye a J. Sostenes Garcia Bernal y Daniel Vidales, ya contactos en NetSuite.", "p": [{"n": "Malik Garcia", "e": "magarcia@protsur.com", "t": "52 5525910538", "alt": []}, {"n": "Isaac Garcia", "e": "igarcia@protsur.com", "t": "52 5525910538", "alt": []}, {"n": "Daniel Vidales", "e": "dvidales@protsur.com", "t": "5641848035", "alt": []}, {"n": "J Sostenes Garcia Bernal", "e": "sgarcia@protsur.com", "t": "52 5525910538", "alt": []}]}, {"k": "losifra", "n": "Losifra S.A. de C.V.", "g": "cliente", "t": "AA", "loc": "El Marqués, Querétaro · México", "w": "Fabricante de tarimas y embalaje en Queretaro.", "ns": "CLIENTE: 68 facturas, USD 2.17M desde oct-2018. Ultima factura 15-jul-2026.", "a": "Asisten padre e hijo (Fernando Lopez Bello y Fernando Lopez San Martin). Cuenta viva.", "p": [{"n": "Fernando Lopez San Martin", "e": "fernando.lopezsanmartin@losifra.com", "t": "4421805938", "alt": []}, {"n": "Fernando Lopez Bello", "e": "fernando.lopezbello@losifra.com", "t": "52 442-221-5038", "alt": []}]}, {"k": "elrayo", "n": "Tarimera El Rayo S.A. de C.V. / CANAINMA", "g": "cliente", "t": "AA", "loc": "Ecatepec, Edo. Méx. · México", "w": "Tarimera del Valle de Mexico, familia Podlipsky. Jacobo Podlipsky ademas representa a CANAINMA (Camara Nacional de la Industria Maderera).", "ns": "CLIENTE: 45 facturas, USD 2.02M desde dic-2016. Ultima factura 22-jul-2026.", "a": "Tres Podlipsky asistiendo, uno con sombrero de CANAINMA. Doble valor: cuenta mas acceso al gremio mexicano.", "p": [{"n": "Jacobo Podlipsky", "e": "jacobopodlipsky@gmail.com", "t": "+52 55-53964444", "alt": []}, {"n": "Samuel Podlipsky", "e": "samuel.podlipsky@tarimeraelrayo.com", "t": "+52 55-53964444", "alt": []}, {"n": "Jacobo Podlipsky JR", "e": "cobo@tarimeraelrayo.com", "t": "5553964444", "alt": []}]}, {"k": "tpm", "n": "Tarimas, Embalaje y Desarrollo de Proyectos, S. de R.L. de C.V.", "g": "cliente", "t": "AA", "loc": "Querétaro, Qro. · México", "w": "Tarimas, embalaje y proyectos (tpmproyectos.com).", "ns": "CLIENTE: 39 facturas, USD 1.6M desde mar-2023. Ultima factura 15-may-2026.", "a": "3 asistentes. Cuenta joven y creciendo, buen momento para ampliar.", "p": [{"n": "Victor Castro Caldera", "e": "v.castro@tpmproyectos.com", "t": "4421579475", "alt": []}, {"n": "Dulce Fernandez", "e": "d.fernandez@tpmproyectos.com", "t": "442-595-8914", "alt": []}, {"n": "Ciro Feregrino", "e": "c.feregrino@tpmproyectos.com", "t": "4421318729", "alt": []}]}, {"k": "recipak", "n": "Recipak Packaging S.A. de C.V.", "g": "cliente", "t": "AA", "loc": "San Luis Potosí, S.L.P. · México", "w": "Empaque y tarima en San Luis Potosi.", "ns": "CLIENTE: 26 facturas, USD 1.68M desde jul-2024. Ultima factura 14-jul-2026. Hay ficha vieja duplicada (Recipak S.A. de C.V., ID 7447) inactiva.", "a": "Asiste Martin de la Rosa Dibildox (dueño). Cuenta que arranco fuerte en 2024.", "p": [{"n": "Martin de la Rosa Dibildox", "e": "martin@recipak.com.mx", "t": "52-444-1657767", "alt": []}]}, {"k": "cgocc", "n": "Comercializadora C.G. de Occidente / Madepal / Grupo Cebra", "g": "cliente", "t": "AA", "loc": "Tlajomulco de Zuñiga, Jal. · México", "w": "Grupo comercializador maderero de Jalisco; opera con los dominios madepal.mx y grupocebra.com.mx.", "ns": "CLIENTE: facturamos via CG Grupo Forestal (ID 4029, USD 624K, 27 pedidos, ultimo SO 13-jul-2026) y Comercializadora C.G. de Occidente (ID 9254, USD 149K, ultimo 2022).", "a": "Se registraron 6 veces bajo 3 razones sociales, pero son 3 personas reales: Oscar Dominguez, Humberto Preciado y Jose Ernesto Ceballos. Consolidar fichas en NetSuite.", "p": [{"n": "OSCAR DOMINGUEZ OLIVARES", "e": "odominguez@madepal.mx", "t": "3336769000", "alt": []}, {"n": "HUMBERTO PRECIADO CHAVEZ", "e": "hpreciado@madepal.mx", "t": "3336769000", "alt": ["pmichel@grupocebra.com.mx"]}, {"n": "JOSE ERNESTO CEBALLOS RAMOS", "e": "pmichel@grupocebra.com.mx", "t": "33 3673 9000", "alt": []}, {"n": "Ernesto Ceballos", "e": "pmichel@grupocebra.com.mx", "t": "33 3673 9000", "alt": []}, {"n": "Oscar Dominguez", "e": "pmichel@grupocebra.com.mx", "t": "33 3673 9000", "alt": []}]}, {"k": "macopisa", "n": "MACOPISA, Embalajes y Tarimas", "g": "cliente", "t": "A", "loc": "Guadalajara, Jal. · México", "w": "Embalajes y tarimas de Guadalajara; en NetSuite factura como Maderas y Complementos el Pino, S.A. de C.V.", "ns": "CLIENTE: 10 facturas, USD 639K desde oct-2021. Ultima factura 5-jun-2026.", "a": "Asiste Alejandro Martinez Camarasa. Cuenta viva de tamaño medio con espacio para crecer.", "p": [{"n": "Alejandro Martinez Camarasa", "e": "amartinez@macopisa.com", "t": "+52 33 3689 1040", "alt": []}]}, {"k": "mazter", "n": "Mazter Maderas S.A. de C.V.", "g": "cliente", "t": "A", "loc": "García, N.L. · México", "w": "Madereria y tarimas en el area de Monterrey.", "ns": "CLIENTE: 24 facturas, USD 667K desde ago-2018. Ultima factura 21-abr-2026.", "a": "Asiste Everardo Martinez, ya contacto en NetSuite. OJO: 3 meses sin comprar, preguntar.", "p": [{"n": "EVERARDO MARTINEZ", "e": "everardoms@maztermaderas.com", "t": "8182878232", "alt": []}]}, {"k": "rigma", "n": "Rigma Pallets S.A. de C.V.", "g": "cliente", "t": "A", "loc": "Apodaca, N.L. · México", "w": "Fabricante de tarimas en Apodaca, Monterrey.", "ns": "CLIENTE: 16 facturas, USD 280K desde abr-2024. Ultima factura 23-jul-2026.", "a": "Asiste Ricardo Martinez Escareño. Cuenta nueva y activa, buen candidato para subir volumen.", "p": [{"n": "Ricardo Martinez Escareno", "e": "rigma.pallets@gmail.com", "t": "52 811-301-8489", "alt": []}]}, {"k": "customcrates", "n": "Custom Crates & Pallets, Ltd.", "g": "cliente", "t": "A", "loc": "Canutillo, TX · EE.UU.", "w": "Huacales y tarimas a la medida en la frontera de El Paso.", "ns": "CLIENTE NUEVO: 2 facturas, USD 35,765, ambas del 23-jun-2026.", "a": "Cuenta recien abierta hace seis semanas. Asiste Edgar Leonel Solano Diaz: momento perfecto para consolidar.", "p": [{"n": "Edgar Leonel Solano Diaz", "e": "edgar@ccprtx.com", "t": "6564182836", "alt": []}]}, {"k": "americanpallets", "n": "American Pallets S.A. de C.V.", "g": "cliente", "t": "A", "loc": "Cuautitlán Izcalli, Edo. Méx. · México", "w": "Fabricante de tarimas del Valle de Mexico.", "ns": "CLIENTE: 5 facturas, USD 70,451 (nov y dic 2025). Ultimo pedido 23-ene-2026. Sin facturar en 7 meses.", "a": "REACTIVACION: asisten Eloy y Ruben Vazquez. Averiguar por que se detuvo la compra.", "p": [{"n": "Eloy Vazquez", "e": "eloyvc@americanpallets.mx", "t": "(55) 79254248", "alt": []}, {"n": "RUBEN VAZQUEZ", "e": "rubenvazquez@americanpallets.mx", "t": "5586188889", "alt": []}]}, {"k": "pathros", "n": "Importadora Pathros S.A. de C.V.", "g": "cliente", "t": "B", "loc": "Tonalá, Jal. · México", "w": "Importadora de madera en Jalisco.", "ns": "EX-CLIENTE: 3 facturas, USD 83,898. Ultima venta 17-nov-2020.", "a": "Cuenta dormida hace casi 6 años. Asiste Enrique Magaña Flores. Reabrir conversacion.", "p": [{"n": "Enrique Magaña Flores", "e": "enrique@importadorapathros.com", "t": "3339685649", "alt": []}]}, {"k": "timberbase", "n": "TimberBase (UFP Industries)", "g": "competencia", "t": "Competencia directa", "loc": "Union City, GA · EE.UU.", "w": "Plataforma B2B de compraventa de madera y materiales de construccion, propiedad de UFP Industries (comprada a la alemana Timber Base GmbH en 2023). Conecta miles de compradores y vendedores en el mundo, con seguimiento de pedidos en linea.", "ns": "Sin relacion en NetSuite.", "a": "La competencia mas peligrosa: digitaliza exactamente lo que hacemos. 4 asistentes, todos hispano o lusohablantes apuntando a LatAm.", "p": [{"n": "Axel Lambertini", "e": "alambertini@ufpi.com", "t": "1-561-281-5685", "alt": []}, {"n": "Teresa Narvaez", "e": "teresa.narvaez@ufpi.com", "t": "1-305-457-6979", "alt": []}, {"n": "Ricardo Narvaez", "e": "ricardo.narvaez@ufpi.com", "t": "+1 786 3954096", "alt": []}, {"n": "Paulo Lopes", "e": "paulo.lopes@ufpi.com", "t": "+55 419 9184 3001", "alt": []}]}, {"k": "silvaris", "n": "Silvaris Corporation", "g": "competencia", "t": "Competencia directa", "loc": "Boise, ID · EE.UU.", "w": "Distribuidor mayorista y liquidador de madera desde el año 2000: maderas blandas y duras, triplay, pisos y saldos por camion completo. Sus mercados son EE.UU., Canada, el Caribe y MEXICO.", "ns": "Existe ficha de proveedor en NetSuite (Silvaris Corp, ID 13308 y 2695) sin transacciones.", "a": "Competencia directa en nuestro mercado exacto. 3 asistentes, uno de ellos basado en El Paso (Jose Contreras): estan empujando la frontera.", "p": [{"n": "Eric Miller", "e": "ericm@silvaris.com", "t": "503-750-8196", "alt": []}, {"n": "Joel Filart", "e": "jfilart@silvaris.com", "t": "442-258-8099", "alt": []}, {"n": "Jose Contreras", "e": "josec@silvaris.com", "t": "915-603-2027", "alt": []}]}, {"k": "concannon", "n": "Concannon Lumber Company", "g": "competencia", "t": "Competencia directa", "loc": "Portland, OR · EE.UU.", "w": "Comercializadora de madera del noroeste del Pacifico.", "ns": "ALERTA: tiene ficha de cliente en NetSuite («Concanon Lumber Company», ID 4176) SIN transacciones.", "a": "Competencia directa con presencia en Mexico: Oscar Acevedo opera con telefono de Tijuana (+52 664). Son 2 personas en 3 registros.", "p": [{"n": "Maryann Concannon Barnfield", "e": "maryann@concannonlumber.com", "t": "5038164406", "alt": []}, {"n": "Oscar Acevedo", "e": "chacha.acevedo@concannonlumber.com", "t": "52 664 592 4580", "alt": ["oscar.acevedo@concannonlumber.com"]}]}, {"k": "dantzler", "n": "Dantzler, Inc.", "g": "competencia", "t": "Competencia directa", "loc": "Miami, FL · EE.UU.", "w": "Casa comercializadora y exportadora de madera fundada en 1865, fuerte en pino amarillo del sur hacia el Caribe y Latinoamerica.", "ns": "ALERTA: tiene ficha de cliente en NetSuite (ID 4127) con contacto cargado, SIN transacciones.", "a": "Competencia directa en exportacion LatAm. Asiste Walter Riedel con telefono de Brasil (+55).", "p": [{"n": "WALTER RIEDEL", "e": "WRIEDEL@DANTZLER1865.COM", "t": "5547992118007", "alt": []}]}, {"k": "maderatrading", "n": "Madera Trading, LLC", "g": "competencia", "t": "Competencia directa", "loc": "Mesa, AZ · EE.UU.", "w": "Comercializadora de madera en Arizona (maderatrades.com), enfocada al mercado hispano y mexicano.", "ns": "Sin relacion en NetSuite.", "a": "Competencia directa en la frontera oeste. 2 asistentes.", "p": [{"n": "Adam Cooley", "e": "adamcooley@maderatrades.com", "t": "480-577-9367", "alt": []}, {"n": "Leon Mora", "e": "leonmora@maderatrades.com", "t": "(602) 290-7166", "alt": []}]}, {"k": "igt", "n": "IGT — International Trading", "g": "competencia", "t": "Competencia directa", "loc": "North Bay Village, FL · EE.UU.", "w": "Comercializadora de madera con sede en el area de Miami (igtrading.net). Su sitio web esta en construccion, lo que limita la informacion publica disponible.", "ns": "Sin relacion en NetSuite.", "a": "Competencia en el corredor Miami-LatAm. Asisten los hermanos Gonzalez (Daniel y Rafael); uno usa el correo generico de ventas.", "p": [{"n": "Daniel Gonzalez", "e": "sales@igtrading.net", "t": "3054585593", "alt": []}, {"n": "Rafael Gonzalez", "e": "Rgonzalez@igtrading.net", "t": "3055622266", "alt": []}]}, {"k": "boise", "n": "Boise Cascade", "g": "competencia", "t": "Productor", "loc": "Boise, ID · EE.UU.", "w": "Productor y distribuidor integrado de madera y paneles, uno de los grandes de Norteamerica.", "ns": "ALERTA: tiene ficha de cliente en NetSuite (ID 7498) SIN transacciones.", "a": "Doble cara: productor (posible fuente) y distribuidor (compite en el canal). Asisten 2 hispanohablantes, Eliazar Lopez y Hector Dimas: estan apuntando al mercado latino.", "p": [{"n": "Eliazar Lopez", "e": "EliazarLopez@BC.com", "t": "15034101928", "alt": []}, {"n": "Hector Dimas", "e": "hectordimas@bc.com", "t": "2083406913", "alt": []}]}, {"k": "mendocino", "n": "Mendocino Forest Products", "g": "competencia", "t": "Productor", "loc": "Ukiah, CA · EE.UU.", "w": "Productor de secuoya (redwood) y madera del norte de California; el mayor productor de redwood del mundo.", "ns": "Sin relacion en NetSuite.", "a": "Producto distinto al nuestro, pero compite por el mismo cliente en California. 2 asistentes.", "p": [{"n": "Hector Herrera", "e": "hherrera@mendoco.com", "t": "7075137356", "alt": []}, {"n": "Matthew Slack", "e": "mslack@mendoco.com", "t": "7075137771", "alt": []}]}, {"k": "girard", "n": "Girard Wood Products, Inc.", "g": "competencia", "t": "Competencia directa", "loc": "Puyallup, WA · EE.UU.", "w": "Remanufactura y comercializacion de madera del noroeste del Pacifico.", "ns": "Sin relacion en NetSuite.", "a": "Competencia en madera reprocesada. 1 asistente, Scott Vipond.", "p": [{"n": "Scott Vipond", "e": "scott@girardwoodproducts.com", "t": "253-845-0505", "alt": []}]}, {"k": "chinook", "n": "Chinook Wood Products / PNW Lumber", "g": "competencia", "t": "Competencia directa", "loc": "Vancouver, B.C. · Canadá", "w": "Comercializadora de madera del Pacifico noroeste, con sede en Vancouver, nuestra misma ciudad.", "ns": "Sin relacion en NetSuite. Existe «PNW Warehousing LLC» como proveedor, pero es entidad distinta, no confundir.", "a": "Competencia directa de casa: mismo domicilio comercial que Natural Trade. Roberto Gonzalez-Milroy.", "p": [{"n": "Roberto Gonzalez-Milroy", "e": "roberto@pnwlumber.com", "t": "6042835150", "alt": []}]}, {"k": "bpwood", "n": "BPWood", "g": "competencia", "t": "Competencia directa", "loc": "Penticton, B.C. · Canadá", "w": "Comercializadora de madera del interior de Columbia Britanica.", "ns": "Sin relacion en NetSuite.", "a": "Competencia canadiense en SPF. 1 asistente, Dan Bouchard.", "p": [{"n": "Dan Bouchard", "e": "dan@bpwood.com", "t": "12504939339", "alt": []}]}, {"k": "comsa", "n": "Consorcio Maderero (COMSA)", "g": "competencia", "t": "Competencia directa", "loc": "Santiago · Chile", "w": "Comercializadora maderera chilena (comsa.cl). Chile es una de las fuentes de pino radiata del mercado.", "ns": "Sin relacion en NetSuite.", "a": "Competencia y a la vez posible fuente sudamericana. Relevante para la matriz Brasil-Sudamerica. Cristian Rodriguez.", "p": [{"n": "Cristian Rodriguez", "e": "crodriguez@comsa.cl", "t": "56976995908", "alt": []}]}, {"k": "serrabras", "n": "SerraBRAS", "g": "competencia", "t": "Productor", "loc": "Itajaí, SC · Brasil", "w": "Aserradero y exportador brasileño en Itajai, el puerto por el que salen los contenedores de pino taeda y eucalipto.", "ns": "Sin relacion en NetSuite. Se reviso el padron de proveedores brasileños y no aparece.", "a": "Mas proveedor potencial que competencia: alimentaria directamente la matriz Brasil. Tiago Andrade de Miranda.", "p": [{"n": "Tiago Andrade de Miranda", "e": "tiago.miranda@serrabras.com", "t": "5547988380948", "alt": []}]}, {"k": "rioblanco", "n": "Forestal Río Blanco, S.A.", "g": "competencia", "t": "Productor", "loc": "Ciudad de Guatemala · Guatemala", "w": "Productor forestal guatemalteco de pino.", "ns": "Sin relacion en NetSuite.", "a": "Productor centroamericano: compite en el mercado guatemalteco y del sur de Mexico, y podria ser fuente. 2 asistentes.", "p": [{"n": "Daniel Santos", "e": "dsantos@rioblanco.com.gt", "t": "502 52012813", "alt": []}, {"n": "Primo Gonzalez", "e": "primo@rioblanco.com.gt", "t": "502-23133500", "alt": []}]}, {"k": "balticblock", "n": "Baltic Block", "g": "competencia", "t": "Producto sustituto", "loc": "Madona · Letonia", "w": "Fabricante de bloques compuestos para tarima: extrusion de residuo de madera con resina, tratado con vapor. Cerca de 15,000 m3 al mes a mas de 30 paises. Fundada en 1997, una de las plantas mas grandes de Europa.", "ns": "Sin relacion en NetSuite.", "a": "PRODUCTO SUSTITUTO: sus bloques reemplazan madera aserrada en la tarima tipo bloque. Compiten por el mismo peso del pedido de nuestros clientes. 2 asistentes.", "p": [{"n": "Gatis Skele", "e": "gatis.skele@balticblock.com", "t": "371 29496996", "alt": []}, {"n": "Robert Gjaltema", "e": "Robert.Gjaltema@balticblock.com", "t": "371 29496996", "alt": []}]}, {"k": "arauco", "n": "Arauco / Araucomex", "g": "competencia", "t": "Proveedor nuestro", "loc": "Tlajomulco, Jal. · México (grupo chileno)", "w": "Gigante forestal chileno con planta e industria en Mexico (Araucomex). Produce paneles y madera, y vende directo a industriales mexicanos.", "ns": "PROVEEDOR NUESTRO: Arauco Industrial de Mexico, 19 ordenes de compra por USD 8.25M (ultima oct-2025). Araucomex y Arauco Industria de Mexico con compras menores en 2025. Ademas hay ficha de cliente Araucomex (ID 8426) sin ventas.", "a": "Relacion de doble filo: les compramos, y venden directo a nuestros mismos clientes. 5 asistentes, la delegacion mas grande despues de Woodpack y la nuestra.", "p": [{"n": "JOSE MANUEL HERNANDEZ AYALA", "e": "jose.hernandez@arauco.com", "t": "3314872316", "alt": []}, {"n": "Noel Espino", "e": "noel.espino@arauco.com", "t": "3314872316", "alt": []}, {"n": "Juan Manuel Raygoza Plascencia", "e": "juanmanuel.raygoza@arauco.com", "t": "3314160875", "alt": []}, {"n": "Matias Alejandro Vargas Peralta", "e": "matias.vargas@arauco.com", "t": "5580451478", "alt": []}, {"n": "Juan Pablo Salcedo", "e": "juan.salcedo@arauco.com", "t": "37775200", "alt": []}]}, {"k": "binderholz", "n": "Binderholz Timber LLC", "g": "competencia", "t": "Proveedor nuestro", "loc": "Atlanta, GA · EE.UU. (grupo austriaco)", "w": "Grupo aserradero austriaco, uno de los mayores de Europa, con operacion en Estados Unidos.", "ns": "PROVEEDOR ACTIVO: Binderholz GmbH, 15 ordenes de compra por USD 420,530, ultima 28-jul-2026. Binderholz Bausysteme USD 148K (jun-2026). Binderholz Timber LLC USD 255K hasta nov-2024.", "a": "Es proveedor, no competencia. Asisten Thomas Mende y Andy Delgado desde Atlanta. Relacion viva: agenda de compras.", "p": [{"n": "Thomas Mende", "e": "THOMAS.MENDE@BINDERHOLZ.COM", "t": "8432983220", "alt": []}, {"n": "Andy Delgado", "e": "Andy.Delgado@binderholz.com", "t": "7862028970", "alt": []}]}, {"k": "hstimber", "n": "HS Timber Group", "g": "competencia", "t": "Proveedor nuestro", "loc": "Viena · Austria", "w": "Grupo aserradero austriaco (antes Holzindustrie Schweighofer) con plantas en Rumania y Alemania.", "ns": "PROVEEDOR: HS Timber Productions GmbH USD 79K y Reci S.R.L. USD 27K, ultimas compras en 2025. Tambien hay contacto ligado a Piniera GmbH.", "a": "Proveedor europeo con relacion tibia. Juan Manuel Garcia Muchacho es el contacto en español.", "p": [{"n": "Bogdan Nicula", "e": "bogdan.nicula@hs.at", "t": "4366488145635", "alt": []}, {"n": "Juan Manuel Garcia Muchacho", "e": "juan.garcia@hs.at", "t": "4366478824593", "alt": []}]}, {"k": "senco", "n": "Kyocera Senco Industrial Tools / Senco Latin America", "g": "otro", "t": "Herramienta y fijación", "loc": "Marinilla, Antioquia · Colombia", "w": "Clavadoras neumaticas, fijaciones y herramienta industrial para fabricacion de tarima. Su operacion LatAm sale de Marinilla, Colombia.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR como cuenta. Su delegacion conjunta de 6 personas es la mas grande entre proveedores de insumos: ven a LatAm como mercado clave.", "p": [{"n": "Veronica Dodson", "e": "vdodson@kyocera-senco.com", "t": "513-388-2557", "alt": []}, {"n": "Michael Callahan", "e": "mcallahan@kyocera-senco.com", "t": "8005434596", "alt": []}, {"n": "Alejandra Argote", "e": "aargote@kyocera-senco.com", "t": "5136059203", "alt": []}, {"n": "Andres Gallego Lopez", "e": "agallego@senco.co", "t": "52 1 33 1893 6902", "alt": []}, {"n": "Carolina Gaviria Morales", "e": "gmexico@senco.co", "t": "57 3153271894", "alt": []}, {"n": "JUAN CAMILO ACOSTA", "e": "juan.acosta@senco.co", "t": "+57 316 4784338", "alt": []}]}, {"k": "viking", "n": "Viking Engineering & Development", "g": "otro", "t": "Maquinaria", "loc": "Blaine, MN · EE.UU.", "w": "Maquinaria automatica de clavado y ensamble de tarima.", "ns": "CUIDADO: no confundir con «Viking Forest Products» (ID 12890), proveedor nuestro de madera con USD 28.7M en ordenes de compra. Son empresas distintas.", "a": "DESCARTAR. 3 asistentes.", "p": [{"n": "Matt Samuelson", "e": "Matts@vikingeng.com", "t": "763-586-1215", "alt": []}, {"n": "Derek King", "e": "derekk@vikingeng.com", "t": "763-586-1261", "alt": []}, {"n": "Jeff Stoddard", "e": "jeffs@vikingeng.com", "t": "", "alt": []}]}, {"k": "suasa", "n": "Sujetadores de Acero SUASA", "g": "otro", "t": "Insumo", "loc": "Chihuahua, Chih. · México", "w": "Fabricante mexicano de clavos y sujetadores de acero para tarima y embalaje.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR como cuenta, pero util: venden al mismo padron de tarimeros mexicanos que nosotros. 3 asistentes, posible socio de referencias cruzadas.", "p": [{"n": "ROGELIO GARCIA", "e": "rgarcia@sujetadoresdeacero.com", "t": "4421458748", "alt": []}, {"n": "LUISA RAMIREZ", "e": "luisaramirez@sujetadoresdeacero.com", "t": "8441299957", "alt": []}, {"n": "ANTONIO DOMINGUEZ", "e": "adominguez@sujetadoresdeacero.com", "t": "8181887768", "alt": []}]}, {"k": "tecma", "n": "Grupo TECMA", "g": "otro", "t": "Maquinaria", "loc": "Zapopan, Jal. · México", "w": "Fabricante mexicano de maquinaria para aserraderos con mas de 30 años: sistemas de corte, calderas de biomasa, secadores de madera y controles.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Se registro 3 veces la misma persona (Ing. Porfirio R. Corona): es 1 asistente real.", "p": [{"n": "Ing. Porfirio R Corona", "e": "ventas@tecma.com.mx", "t": "52-4624311727", "alt": []}]}, {"k": "altatec", "n": "Alta Tecnología en Maquinaria", "g": "otro", "t": "Maquinaria", "loc": "Querétaro, Qro. · México", "w": "Maquinaria para la industria de la madera en Queretaro.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. 2 asistentes.", "p": [{"n": "Rodolfo Lozano Moreno", "e": "htm_queretaro@yahoo.com.mx", "t": "4422301835", "alt": []}, {"n": "Jozseft Kuthy", "e": "jozsefkuthy@gmail.com", "t": "4425595988", "alt": []}]}, {"k": "cape", "n": "CAPE (Mecánica CAPE, S.L.)", "g": "otro", "t": "Maquinaria", "loc": "Manlleu, Barcelona · España", "w": "Fabricante pionero de maquinaria para fabricar palets, bobinas y apiladores. Fundada en 1967, 14,000 m2 de planta y presencia en mas de 40 paises. Lider europeo del sector.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Juan Manuel Perez.", "p": [{"n": "Juan Manuel Perez", "e": "jmanel@cape.es", "t": "+34 93 851 14 30", "alt": []}]}, {"k": "storti", "n": "Storti SpA", "g": "otro", "t": "Maquinaria", "loc": "Motta Baluffi, Cremona · Italia", "w": "Fabricante italiano de lineas automaticas de produccion de palets y sistemas de manipulacion de madera.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Es el caso que citaste como ejemplo. Mario Cucciari, contacto de marketing.", "p": [{"n": "Mario Cucciari", "e": "marketing@storti.it", "t": "39-0375-968311", "alt": []}]}, {"k": "bigondry", "n": "BigonDry Srl", "g": "otro", "t": "Maquinaria", "loc": "Loria, Treviso · Italia", "w": "Fabricante italiano de hornos de secado y equipos de tratamiento termico de madera.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Paolo Miotti.", "p": [{"n": "Paolo Miotti", "e": "paolo.miotti@bigondry.com", "t": "+39 3470728056", "alt": []}]}, {"k": "idg", "n": "Italian Drying Group SRL", "g": "otro", "t": "Maquinaria", "loc": "Montebelluna, Treviso · Italia", "w": "Secaderos y camaras de tratamiento termico de madera. Su representacion en Mexico va via Tecfor (Zapopan).", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. 2 asistentes: Diego Volpato desde Italia y Fernando Ramirez de Tecfor Mexico.", "p": [{"n": "Fernando Ramirez", "e": "ing.fernando@tecfor.com.mx", "t": "3329291548", "alt": []}, {"n": "Diego Volpato", "e": "diegovolpato@idgsrl.com", "t": "39 340 385 2384", "alt": []}]}, {"k": "weima", "n": "WEIMA Maschinenbau GmbH", "g": "otro", "t": "Maquinaria", "loc": "Ilsfeld · Alemania", "w": "Trituradoras y prensas de briquetas para residuo de madera. Tambien representada en Mexico por Tecfor.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. 2 asistentes, ambos operando con correos @tecfor.com.mx.", "p": [{"n": "Kallil Santos", "e": "ing.fernando@tecfor.com.mx", "t": "52 33 29291548", "alt": []}, {"n": "Magaly Sanchez", "e": "biol.magaly@tecfor.com.mx", "t": "3310935447", "alt": []}]}, {"k": "cresswood", "n": "Cresswood Shredding Machinery", "g": "otro", "t": "Maquinaria", "loc": "Cortland, IL · EE.UU.", "w": "Molinos y trituradoras de madera para reciclado de tarima.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Ryan Butzman.", "p": [{"n": "Ryan Butzman", "e": "rbutzman@cresswood.com", "t": "815-758-7171", "alt": []}]}, {"k": "giacomelli", "n": "Giacomelli Indústria de Máquinas Ltda", "g": "otro", "t": "Maquinaria", "loc": "Caxias do Sul, RS · Brasil", "w": "Fabricante brasileño de maquinaria para madera y palets.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Mauro Giacomelli, area de exportacion.", "p": [{"n": "Mauro Giacomelli", "e": "export@giacomelli.ind.br", "t": "5554999412447", "alt": []}]}, {"k": "woodmizer", "n": "Wood-Mizer LLC", "g": "otro", "t": "Maquinaria", "loc": "Indianapolis, IN · EE.UU.", "w": "Aserraderos de banda portatiles y equipo de aserrio de pequeña escala.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Jose Susunaga, enfocado al mercado hispano.", "p": [{"n": "Jose Susunaga", "e": "jsusunaga@woodmizer.com", "t": "765-346-4545", "alt": []}]}, {"k": "prs", "n": "PRS Group, Inc. (Pallet Repair Systems)", "g": "otro", "t": "Maquinaria", "loc": "Jacksonville, IL · EE.UU.", "w": "Maquinaria y fijaciones para reparacion de tarima; su linea de placas FIVESTAR repara polines partidos. Tambien compran y venden maquinaria usada de tarima. Fundada en 1989.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Jeff Williams.", "p": [{"n": "Jeff Williams", "e": "jwilliams@prsgroupinc.com", "t": "217-291-0009", "alt": []}]}, {"k": "isk", "n": "ISK Biocides, Inc.", "g": "otro", "t": "Químico", "loc": "Memphis, TN · EE.UU.", "w": "Biocidas y preservantes para madera (antimancha y antihongos) usados en aserrio y tarima.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. Lance Johnson se registro 2 veces, con correo corporativo y personal: es 1 asistente real.", "p": [{"n": "Lance Johnson", "e": "stabeltis@gmail.com", "t": "216-538-4802", "alt": ["johnsonl@iskbiocides.com"]}]}, {"k": "palletconnect", "n": "Pallet Connect", "g": "otro", "t": "Software", "loc": "Bradford West Gwillimbury, ON · Canadá", "w": "ERP en la nube hecho a la medida de fabricantes y recicladores de tarima: compra de madera, pedidos, inventario, produccion, ruteo de choferes y portal de clientes. Lo desarrollo Phil Varley para su propia tarimera.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR como cuenta, pero vale ver el producto: hace para el tarimero lo que nuestro Portal de Clientes 2.0 pretende hacer. Inteligencia de producto.", "p": [{"n": "Philip Varley", "e": "phil@palletconnect.com", "t": "14162629866", "alt": []}]}, {"k": "maraga", "n": "Maraga Industrial Supply, LLC", "g": "otro", "t": "Insumo", "loc": "San Antonio, TX · EE.UU.", "w": "Distribuidor de suministro industrial y herramienta manual con operacion transfronteriza (maraga.us y maraga.com.mx).", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR. 2 asistentes, ambos con correo mexicano.", "p": [{"n": "Jesus Alejandro", "e": "jesus.alejandro@maraga.com.mx", "t": "210-777-6460", "alt": []}, {"n": "Omar Alonso", "e": "omar.alonso@maraga.com.mx", "t": "528115333268", "alt": []}]}, {"k": "relogistics", "n": "Relogistics Services, LLC", "g": "otro", "t": "Servicio", "loc": "Houston, TX · EE.UU.", "w": "Servicios de logistica de tarima: recuperacion, clasificacion, gestion in-plant y logistica inversa para grandes cadenas.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR como comprador de madera. LeRoi Cochran.", "p": [{"n": "LeRoi Cochran", "e": "leroi.cochran@relogistics.com", "t": "713-382-1749", "alt": []}]}, {"k": "oppfilm", "n": "Opp Film El Salvador S.A. de C.V. (Grupo Oben)", "g": "otro", "t": "Empaque no madera", "loc": "San Juan Opico, La Libertad · El Salvador", "w": "Productor de pelicula BOPP para empaque flexible, parte del Grupo Oben.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR: es empaque plastico, no madera. Mauricio Antonio Cordova Lemus.", "p": [{"n": "Mauricio Antonio Cordova Lemus", "e": "mauriciocordova@obengroup.com", "t": "+503 7919 0988", "alt": []}]}, {"k": "silca", "n": "Silca Logística Agencia Aduanal", "g": "otro", "t": "Logística — proveedor nuestro", "loc": "Manzanillo, Colima · México", "w": "Agencia aduanal mexicana.", "ns": "PROVEEDOR CRITICO NUESTRO: Silca Logistica Agencia Aduanal S.C. acumula 4,442 facturas por USD 103.3M; Silca Logistics LLC 248 facturas, ultima 3-ago-2026. Ademas hay fichas por plaza: Altamira, Lazaro Cardenas, Manzanillo y Laredo.", "a": "NO es prospecto: es nuestro despachante aduanal principal. Asisten Alejandra Caldera y Griselda Reyes (gerencia comercial). Aprovechar para revisar servicio.", "p": [{"n": "ALEJANDRA CALDERA SALDIVAR", "e": "alejandra.caldera@silca.com.mx", "t": "3141201112", "alt": []}, {"n": "GRISELDA REYES ALPIZAR", "e": "gerencia.comercial@silca.com.mx", "t": "3141451301", "alt": []}]}, {"k": "freightnova", "n": "Freightnova Logistics", "g": "otro", "t": "Logística", "loc": "Manzanillo, Colima · México", "w": "Agente de carga en el puerto de Manzanillo.", "ns": "Sin relacion en NetSuite.", "a": "DESCARTAR como cliente; posible alternativa o segunda fuente logistica en Manzanillo. Iris Luz Morales.", "p": [{"n": "IRIS LUZ MORALES", "e": "comercial@freightnova.mx", "t": "3141461270", "alt": []}]}, {"k": "fas", "n": "Foreign Agricultural Service (USDA-FAS)", "g": "otro", "t": "Institución", "loc": "Embajada EE.UU., CDMX · México", "w": "Agencia del Departamento de Agricultura de Estados Unidos que promueve la exportacion agricola y forestal estadounidense; opera desde la embajada en Mexico.", "ns": "Sin relacion en NetSuite.", "a": "No es cuenta, es institucion. Util para datos de mercado y misiones comerciales. Divia Prieto y Lita Echiverri.", "p": [{"n": "Divia Prieto", "e": "PrietoDK@state.gov", "t": "525528882264", "alt": []}, {"n": "Lita Echiverri", "e": "EchiverriL@state.gov", "t": "TBD", "alt": []}]}, {"k": "sec", "n": "Softwood Export Council (SEC)", "g": "otro", "t": "Institución — proveedor nuestro", "loc": "Portland, OR / Guadalajara", "w": "Consejo de promocion de exportacion de maderas blandas de Estados Unidos.", "ns": "PROVEEDOR NUESTRO: 15 facturas por USD 19,700 en membresias y actividades, ultima 16-abr-2026. Tambien hay ficha ligada a Pacific Lumber Exporters Assn.", "a": "Ya somos miembros. Rebecca Bratter y Noharis Serrano: mantener la relacion, es fuente de leads.", "p": [{"n": "Rebecca Bratter", "e": "rbratter@softwood.org", "t": "+1 (202) 492-0522", "alt": []}, {"n": "Noharis Serrano Ovalles", "e": "nserrano@softwood.org", "t": "33 3957 4588", "alt": []}]}, {"k": "cwpca", "n": "Canadian Wood Pallet & Container Association", "g": "otro", "t": "Institución", "loc": "Miller Lake, ON · Canadá", "w": "Asociacion canadiense de fabricantes de tarima y contenedores de madera.", "ns": "Sin relacion en NetSuite.", "a": "Institucion. Scott Geffros. Relevante por nuestra base en Vancouver.", "p": [{"n": "Scott Geffros", "e": "scott.geffros@canadianpallets.com", "t": "613-521-6468 x201", "alt": []}]}, {"k": "woodpack", "n": "Woodpack Global", "g": "organizador", "t": "Organizadores del evento", "loc": "Alexandria, VA · EE.UU.", "w": "Organizadores del evento: la asociacion (antes NWPCA, National Wooden Pallet and Container Association) que agrupa a la industria de tarima y embalaje de madera. Operan con dos dominios, woodpackglobal.org y palletcentral.com.", "ns": "PROVEEDOR NUESTRO: 24 facturas por USD 44,035 en membresia y patrocinios, ultima 30-abr-2026. Ya tenemos como contactos a Mark Barford y Paola Beltran.", "a": "Somos patrocinador Platino, por eso tenemos esta lista. 7 personas del staff asistiendo, incluyendo a Brent McClendon (director general) y Paola Beltran (directora Mexico y LatAm).", "p": [{"n": "Paola Beltran Madrid", "e": "paola@woodpackglobal.org", "t": "2026420183", "alt": []}, {"n": "Luisa Lopez Gonzalez", "e": "luisa@palletcentral.com", "t": "528128908583", "alt": []}, {"n": "Jason Ortega", "e": "jason@woodpackglobal.org", "t": "703-519-6104", "alt": []}, {"n": "Brent McClendon", "e": "brent@palletcentral.com", "t": "703-519-6104", "alt": []}, {"n": "Kristen DeLack", "e": "kdelack@palletcentral.com", "t": "703-519-6104", "alt": []}, {"n": "Brad Gething", "e": "brad@woodpackglobal.org", "t": "+1 7035196104", "alt": []}, {"n": "Michelle Torelli", "e": "michellet@palletcentral.com", "t": "703-519-6104", "alt": []}]}, {"k": "nt", "n": "Natural Trade, Ltd. / Global Forest", "g": "nosotros", "t": "Nuestra delegación", "loc": "North Vancouver, B.C. · Canadá", "w": "Nuestro equipo.", "ns": "—", "a": "10 personas de NT y GF registradas. Repartir la lista de prospectos entre el equipo antes del evento.", "p": [{"n": "Alberto Bulle", "e": "alberto@naturaltrade.ca", "t": "", "alt": []}, {"n": "Paulino Suarez", "e": "paulino@globalforest.com.mx", "t": "", "alt": []}, {"n": "Javier Tijerina", "e": "javier@naturaltrade.ca", "t": "", "alt": []}, {"n": "Abel Ponce", "e": "abel@globalforest.com.mx", "t": "", "alt": []}, {"n": "Alvaro Madero", "e": "alvaro@naturaltrade.ca", "t": "604-988-6022", "alt": []}, {"n": "Dianne Angulo", "e": "dianne@naturaltrade.ca", "t": "604-990-6003", "alt": []}, {"n": "Jesus Canales", "e": "canales@naturaltrade.ca", "t": "604-988-6022", "alt": []}, {"n": "Ivan Garay", "e": "ivan@naturaltrade.ca", "t": "", "alt": []}, {"n": "Carlos Villavicencio", "e": "Carlos@naturaltrade.ca", "t": "604-988-6022", "alt": []}, {"n": "Jorge Chinchilla", "e": "jorge@naturaltrade.ca", "t": "16048081101", "alt": []}]}];
+const ALIASES = {"R PALLETS": "arpallets", "ALTA TECNOLOGIA EN MAQUINARIA": "altatec", "ALTEX PACKAGING": "altex", "AMERICAN PALLETS": "americanpallets", "ANCHOR BAY PACKAGING": "anchorbay", "ARAUCO": "arauco", "ARAUCOMEX": "arauco", "BPWOOD": "bpwood", "BALTIC BLOCK": "balticblock", "BETTAWAY PALLET SYSTEMS": "bettaway", "BIGONDRY": "bigondry", "BINDERHOLZ TIMBER": "binderholz", "BOISE CASCADE": "boise", "BRAMBLES CHEP": "chep", "BRASIMEX MADERAS Y EMBALAJES": "brasimex", "CANAINMA TARIMERA EL RAYO": "elrayo", "TARIMERA EL RAYO": "elrayo", "CAPE": "cape", "CCO950220HGA": "cgocc", "COMERCIALIZADORA G OCCIDENTE CCO950220HGA": "cgocc", "COMERCIALIZADORA CG OCCIDENTE": "cgocc", "CANADIAN WOOD PALLET CONTAINER ASSOCIATION": "cwpca", "CARIBBEAN PALLET": "caribbean", "CHALLENGER PALLET SUPPLY": "challenger", "CHICAGO PALLET SERVICES": "chicagopallet", "CHINOOK WOOD PRODUCTS": "chinook", "COMMERCIAL LUMBER AND PALLET": "clc", "CONCANNON LUMBER": "concannon", "CONSORCIO MADERERO": "comsa", "CRESSWOOD SHREDDING MACHINERY": "cresswood", "CUSTOM CRATES PALLETS": "customcrates", "DANTZLER": "dantzler", "DURAWOOD": "durawood", "ESTIBAS OP": "estibasop", "ESTIBAS O P LA FABRICA ESTIBAS NIT 900 725 887 2": "estibasop", "EMBALATEC INDUSTRIAL": "embalatec", "FORESTAL RIO BLANCO": "rioblanco", "FREIGHTNOVA LOGISTICS": "freightnova", "FATAMI": "fatami", "FIRST NATIONS PALLET SOLUTIONS": "firstnations", "FOREIGN AGRICULTURAL SERVICE FAS": "fas", "FROY TRANSPORT": "froy", "FROYTRANSPORT DBA FROYPALLETS": "froy", "GIRARD WOOD PRODUCTS": "girard", "GRUPO MADERERO CHIHUAHUA": "grumach", "GRUPO TECMA": "tecma", "HS TIMBER": "hstimber", "IGT": "igt", "IMPORTADORA PATHROS": "pathros", "INDUSTRIALIZADORA MADERAS": "delvalle", "INDUSTRIALIZADORA MADERAS DEL VALLE": "delvalle", "INMANSA": "inmansa", "ISK BIOCIDES": "isk", "ITALIAN DRYING": "idg", "INDUSTRIALIZADORA MADERA Y EMPAQUE EL MARTILLO": "elmartillo", "INDUSTRIAS SICOMORO": "sicomoro", "JIMENEZ PALLETS": "jimenez", "KYOCERA SENCO INDUSTRIAL TOOLS": "senco", "SENCO LATIN AMERICA": "senco", "KAMPS": "kamps", "KAYAK PACKAGING": "kayak", "LUMBER PLYWOOD SERVICES AND SUPPLY": "lumberplywood", "LOSIFRA": "losifra", "MACOPISA EMBALAJES Y TARIMAS": "macopisa", "MAZTER MADERAS": "mazter", "MJB TABLEROS Y MADERAS": "mjb", "MADERA TRADING": "maderatrading", "MADERAS LA FE": "maderaslafe", "MADERAS Y TRIPLAY JS": "triplayjs", "MADERERIA LA VILLA": "lavilla", "MADERERIA NASA": "nasa", "MARAGA INDUSTRIAL SUPPLY": "maraga", "MENDOCINO FOREST PRODUCTS": "mendocino", "NAHUA": "nahua", "NATURAL TRADE": "nt", "OPP FILM EL SALVADOR": "oppfilm", "ORGANIZACION LB": "orglb", "PRS": "prs", "PALLET ALLIANCE MNXICO": "tpai", "PALLET CONNECT": "palletconnect", "PRODUCTORA DEL TARIMAS DEL SUR": "protsur", "RGM TARIMAS Y EMBALAJES": "rgm", "RIGMA PALLETS": "rigma", "RECIPAK PACKAGING": "recipak", "RELOGISTICS SERVICES": "relogistics", "SUJETADORES ACERO SUASA": "suasa", "SERRABRAS": "serrabras", "SILCA LOGISTICA AGENCIA ADUANAL": "silca", "SILVARIS": "silvaris", "SOFTWOOD EXPORT COUNCIL": "sec", "STORTI": "storti", "TABEL PALLET": "tabel", "TARIMAS Y EMPAQUES INDUSTRIALES TOLUCA": "toluca", "TIMBERBASE": "timberbase", "TARIMAS EMBALAJE Y DESARROLLO PROYECTOS": "tpm", "VIKING ENGINEERING DEVELOPMENT": "viking", "WEIMA MASCHINENBAU GMBH": "weima", "WALK": "walkglobal", "WOOD MIZER": "woodmizer", "WOODPACK": "woodpack", "ESTIBAS O P LA FABRICA ESTIBAS": "estibasop", "MJB TABLEROS Y MADERAS R L": "mjb", "DURAWOOD GRUPO MADERERO LA REFORMA": "durawood", "CARIBBEAN PALLET R L": "caribbean", "ALTEX PACKAGING API": "altex", "PALLET ALLIANCE MEXICO TPAI": "tpai", "FROY TRANSPORT FROY PALLETS": "froy", "MADERERIA NASA GRUPO MN": "nasa", "INDUSTRIAS SICOMORO AINCO INDUSTRIES": "sicomoro", "PRODUCTORA TARIMAS DEL SUR": "protsur", "TARIMERA EL RAYO CANAINMA": "elrayo", "TARIMAS EMBALAJE Y DESARROLLO PROYECTOS R L": "tpm", "COMERCIALIZADORA G OCCIDENTE MADEPAL GRUPO CEBRA": "cgocc", "TIMBERBASE UFP INDUSTRIES": "timberbase", "IGT INTERNATIONAL TRADING": "igt", "CHINOOK WOOD PRODUCTS PNW LUMBER": "chinook", "CONSORCIO MADERERO COMSA": "comsa", "ARAUCO ARAUCOMEX": "arauco", "KYOCERA SENCO INDUSTRIAL TOOLS SENCO LATIN AMERICA": "senco", "CAPE MECANICA CAPE L": "cape", "GIACOMELLI INDUSTRIA MAQUINAS": "giacomelli", "PRS PALLET REPAIR SYSTEMS": "prs", "OPP FILM EL SALVADOR GRUPO OBEN": "oppfilm", "FOREIGN AGRICULTURAL SERVICE USDA FAS": "fas", "SOFTWOOD EXPORT COUNCIL SEC": "sec", "NATURAL TRADE FOREST": "nt", "LB PALLETS CRATES DEL POTOSI": "orglb", "NT LBPALLETS": "orglb", "GRUPO MADERERO LA REFORMA": "durawood", "AINCO INDUSTRIES": "sicomoro", "MADERAS Y COMPLEMENTOS EL PINO": "macopisa", "GRUPO MN": "nasa", "NASAPACK": "nasa", "CG GRUPO FORESTAL": "cgocc", "MADEPAL": "cgocc", "GRUPO CEBRA": "cgocc", "UFP INDUSTRIES": "timberbase", "TECFOR": "idg"};
+const TOKENSETS = {"arpallets": [["R", "PALLETS"]], "altatec": [["ALTA", "TECNOLOGIA", "EN", "MAQUINARIA"]], "altex": [["ALTEX", "PACKAGING"], ["ALTEX", "PACKAGING", "API"]], "americanpallets": [["AMERICAN", "PALLETS"]], "anchorbay": [["ANCHOR", "BAY", "PACKAGING"]], "arauco": [["ARAUCO"], ["ARAUCOMEX"], ["ARAUCO", "ARAUCOMEX"]], "bpwood": [["BPWOOD"]], "balticblock": [["BALTIC", "BLOCK"]], "bettaway": [["BETTAWAY", "PALLET", "SYSTEMS"]], "bigondry": [["BIGONDRY"]], "binderholz": [["BINDERHOLZ", "TIMBER"]], "boise": [["BOISE", "CASCADE"], ["BOISE", "CASCADE"]], "chep": [["BRAMBLES", "CHEP"]], "brasimex": [["BRASIMEX", "MADERAS", "Y", "EMBALAJES"]], "elrayo": [["CANAINMA", "TARIMERA", "EL", "RAYO"], ["TARIMERA", "EL", "RAYO"], ["TARIMERA", "EL", "RAYO"], ["TARIMERA", "EL", "RAYO", "CANAINMA"]], "cape": [["CAPE"], ["CAPE", "MECANICA", "CAPE", "L"]], "cgocc": [["CCO950220HGA"], ["COMERCIALIZADORA", "G", "OCCIDENTE", "CCO950220HGA"], ["COMERCIALIZADORA", "CG", "OCCIDENTE"], ["COMERCIALIZADORA", "G", "OCCIDENTE", "MADEPAL", "GRUPO", "CEBRA"], ["CG", "GRUPO", "FORESTAL"], ["MADEPAL"], ["GRUPO", "CEBRA"]], "cwpca": [["CANADIAN", "WOOD", "PALLET", "CONTAINER", "ASSOCIATION"]], "caribbean": [["CARIBBEAN", "PALLET"], ["CARIBBEAN", "PALLET", "R", "L"]], "challenger": [["CHALLENGER", "PALLET", "SUPPLY"]], "chicagopallet": [["CHICAGO", "PALLET", "SERVICES"]], "chinook": [["CHINOOK", "WOOD", "PRODUCTS"], ["CHINOOK", "WOOD", "PRODUCTS", "PNW", "LUMBER"]], "clc": [["COMMERCIAL", "LUMBER", "AND", "PALLET"], ["COMMERCIAL", "LUMBER", "AND", "PALLET"]], "concannon": [["CONCANNON", "LUMBER"]], "comsa": [["CONSORCIO", "MADERERO"], ["CONSORCIO", "MADERERO", "COMSA"]], "cresswood": [["CRESSWOOD", "SHREDDING", "MACHINERY"]], "customcrates": [["CUSTOM", "CRATES", "PALLETS"]], "dantzler": [["DANTZLER"]], "durawood": [["DURAWOOD"], ["DURAWOOD", "GRUPO", "MADERERO", "LA", "REFORMA"], ["GRUPO", "MADERERO", "LA", "REFORMA"]], "estibasop": [["ESTIBAS", "OP"], ["ESTIBAS", "O", "P", "LA", "FABRICA", "ESTIBAS", "NIT", "900", "725", "887", "2"], ["ESTIBAS", "O", "P", "LA", "FABRICA", "ESTIBAS"]], "embalatec": [["EMBALATEC", "INDUSTRIAL"]], "rioblanco": [["FORESTAL", "RIO", "BLANCO"], ["FORESTAL", "RIO", "BLANCO"]], "freightnova": [["FREIGHTNOVA", "LOGISTICS"]], "fatami": [["FATAMI"]], "firstnations": [["FIRST", "NATIONS", "PALLET", "SOLUTIONS"]], "fas": [["FOREIGN", "AGRICULTURAL", "SERVICE", "FAS"], ["FOREIGN", "AGRICULTURAL", "SERVICE", "USDA", "FAS"]], "froy": [["FROY", "TRANSPORT"], ["FROYTRANSPORT", "DBA", "FROYPALLETS"], ["FROY", "TRANSPORT", "FROY", "PALLETS"]], "girard": [["GIRARD", "WOOD", "PRODUCTS"]], "grumach": [["GRUPO", "MADERERO", "CHIHUAHUA"]], "tecma": [["GRUPO", "TECMA"]], "hstimber": [["HS", "TIMBER"]], "igt": [["IGT"], ["IGT", "INTERNATIONAL", "TRADING"]], "pathros": [["IMPORTADORA", "PATHROS"]], "delvalle": [["INDUSTRIALIZADORA", "MADERAS"], ["INDUSTRIALIZADORA", "MADERAS", "DEL", "VALLE"]], "inmansa": [["INMANSA"]], "isk": [["ISK", "BIOCIDES"], ["ISK", "BIOCIDES"]], "idg": [["ITALIAN", "DRYING"], ["TECFOR"]], "elmartillo": [["INDUSTRIALIZADORA", "MADERA", "Y", "EMPAQUE", "EL", "MARTILLO"]], "sicomoro": [["INDUSTRIAS", "SICOMORO"], ["INDUSTRIAS", "SICOMORO", "AINCO", "INDUSTRIES"], ["AINCO", "INDUSTRIES"]], "jimenez": [["JIMENEZ", "PALLETS"]], "senco": [["KYOCERA", "SENCO", "INDUSTRIAL", "TOOLS"], ["KYOCERA", "SENCO", "INDUSTRIAL", "TOOLS"], ["KYOCERA", "SENCO", "INDUSTRIAL", "TOOLS"], ["SENCO", "LATIN", "AMERICA"], ["SENCO", "LATIN", "AMERICA"], ["KYOCERA", "SENCO", "INDUSTRIAL", "TOOLS", "SENCO", "LATIN", "AMERICA"]], "kamps": [["KAMPS"]], "kayak": [["KAYAK", "PACKAGING"]], "lumberplywood": [["LUMBER", "PLYWOOD", "SERVICES", "AND", "SUPPLY"]], "losifra": [["LOSIFRA"], ["LOSIFRA"]], "macopisa": [["MACOPISA", "EMBALAJES", "Y", "TARIMAS"], ["MADERAS", "Y", "COMPLEMENTOS", "EL", "PINO"]], "mazter": [["MAZTER", "MADERAS"]], "mjb": [["MJB", "TABLEROS", "Y", "MADERAS"], ["MJB", "TABLEROS", "Y", "MADERAS", "R", "L"]], "maderatrading": [["MADERA", "TRADING"]], "maderaslafe": [["MADERAS", "LA", "FE"]], "triplayjs": [["MADERAS", "Y", "TRIPLAY", "JS"]], "lavilla": [["MADERERIA", "LA", "VILLA"]], "nasa": [["MADERERIA", "NASA"], ["MADERERIA", "NASA", "GRUPO", "MN"], ["GRUPO", "MN"], ["NASAPACK"]], "maraga": [["MARAGA", "INDUSTRIAL", "SUPPLY"]], "mendocino": [["MENDOCINO", "FOREST", "PRODUCTS"]], "nahua": [["NAHUA"]], "nt": [["NATURAL", "TRADE"], ["NATURAL", "TRADE"], ["NATURAL", "TRADE", "FOREST"]], "oppfilm": [["OPP", "FILM", "EL", "SALVADOR"], ["OPP", "FILM", "EL", "SALVADOR", "GRUPO", "OBEN"]], "orglb": [["ORGANIZACION", "LB"], ["LB", "PALLETS", "CRATES", "DEL", "POTOSI"], ["NT", "LBPALLETS"]], "prs": [["PRS"], ["PRS", "PALLET", "REPAIR", "SYSTEMS"]], "tpai": [["PALLET", "ALLIANCE", "MNXICO"], ["PALLET", "ALLIANCE", "MEXICO", "TPAI"]], "palletconnect": [["PALLET", "CONNECT"]], "protsur": [["PRODUCTORA", "DEL", "TARIMAS", "DEL", "SUR"], ["PRODUCTORA", "TARIMAS", "DEL", "SUR"]], "rgm": [["RGM", "TARIMAS", "Y", "EMBALAJES"]], "rigma": [["RIGMA", "PALLETS"]], "recipak": [["RECIPAK", "PACKAGING"]], "relogistics": [["RELOGISTICS", "SERVICES"]], "suasa": [["SUJETADORES", "ACERO", "SUASA"]], "serrabras": [["SERRABRAS"]], "silca": [["SILCA", "LOGISTICA", "AGENCIA", "ADUANAL"]], "silvaris": [["SILVARIS"]], "sec": [["SOFTWOOD", "EXPORT", "COUNCIL"], ["SOFTWOOD", "EXPORT", "COUNCIL", "SEC"]], "storti": [["STORTI"]], "tabel": [["TABEL", "PALLET"]], "toluca": [["TARIMAS", "Y", "EMPAQUES", "INDUSTRIALES", "TOLUCA"]], "timberbase": [["TIMBERBASE"], ["TIMBERBASE", "UFP", "INDUSTRIES"], ["UFP", "INDUSTRIES"]], "tpm": [["TARIMAS", "EMBALAJE", "Y", "DESARROLLO", "PROYECTOS"], ["TARIMAS", "EMBALAJE", "Y", "DESARROLLO", "PROYECTOS", "R", "L"]], "viking": [["VIKING", "ENGINEERING", "DEVELOPMENT"]], "weima": [["WEIMA", "MASCHINENBAU", "GMBH"]], "walkglobal": [["WALK"]], "woodmizer": [["WOOD", "MIZER"]], "woodpack": [["WOODPACK"]], "giacomelli": [["GIACOMELLI", "INDUSTRIA", "MAQUINAS"]]};
+const DOMAINS = {"salesarpalletsllc.com": "arpallets", "api4design.com": "altex", "americanpallets.mx": "americanpallets", "anchorbaypackaging.com": "anchorbay", "arauco.com": "arauco", "balticblock.com": "balticblock", "bettaway.com": "bettaway", "bigondry.com": "bigondry", "binderholz.com": "binderholz", "bc.com": "boise", "bpwood.com": "bpwood", "chep.com": "chep", "brasimex.com": "brasimex", "canadianpallets.com": "cwpca", "tarimeraelrayo.com": "elrayo", "cape.es": "cape", "caribbeanpallet.com": "caribbean", "madepal.mx": "cgocc", "grupocebra.com.mx": "cgocc", "cpspallet.com": "challenger", "chicagopallet.com": "chicagopallet", "pnwlumber.com": "chinook", "clcpallets.com": "clc", "concannonlumber.com": "concannon", "comsa.cl": "comsa", "cresswood.com": "cresswood", "ccprtx.com": "customcrates", "dantzler1865.com": "dantzler", "grumare.com": "durawood", "bgswood.com.br": "embalatec", "embalatec.com.br": "embalatec", "estibasop.com": "estibasop", "fatami.com.mx": "fatami", "firstnationspalletsolutions.com": "firstnations", "skanoh.com.mx": "firstnations", "rioblanco.com.gt": "rioblanco", "freightnova.mx": "freightnova", "froytransport.com": "froy", "giacomelli.ind.br": "giacomelli", "girardwoodproducts.com": "girard", "grumach.com.mx": "grumach", "tecma.com.mx": "tecma", "hs.at": "hstimber", "igtrading.net": "igt", "importadorapathros.com": "pathros", "elmartillo.mx": "elmartillo", "tarimasdelvalle.com": "delvalle", "indsicomoro.com": "sicomoro", "inmansagt.com": "inmansa", "tecfor.com.mx": "idg", "idgsrl.com": "idg", "jimenezpallets.com": "jimenez", "kampspallets.com": "kamps", "kayakpackaging.com": "kayak", "kyocera-senco.com": "senco", "senco.co": "senco", "losifra.com": "losifra", "lumber-plywood.com": "lumberplywood", "macopisa.com": "macopisa", "maderatrades.com": "maderatrading", "maderaslafe.com.mx": "maderaslafe", "maderasjs.com": "triplayjs", "nasapack.com": "nasa", "grupomn.com.mx": "nasa", "maraga.com.mx": "maraga", "maztermaderas.com": "mazter", "mendoco.com": "mendocino", "mjbtm.com": "mjb", "nahua.com.mx": "nahua", "naturaltrade.ca": "nt", "globalforest.com.mx": "nt", "obengroup.com": "oppfilm", "organizacionlb.com": "orglb", "tpai.com": "tpai", "palletconnect.com": "palletconnect", "protsur.com": "protsur", "prsgroupinc.com": "prs", "recipak.com.mx": "recipak", "relogistics.com": "relogistics", "rgm-tarimas.com": "rgm", "rgm-tarimas.net": "rgm", "serrabras.com": "serrabras", "silca.com.mx": "silca", "silvaris.com": "silvaris", "softwood.org": "sec", "storti.it": "storti", "sujetadoresdeacero.com": "suasa", "tabelpallet.com.mx": "tabel", "tpmproyectos.com": "tpm", "ufpi.com": "timberbase", "vikingeng.com": "viking", "walkglobal.com": "walkglobal", "woodmizer.com": "woodmizer", "woodpackglobal.org": "woodpack", "palletcentral.com": "woodpack", "lbpallets.com": "orglb"};
+const BASE_LABEL = "lista oficial de Woodpack Global del 3-ago-2026";
+
+const GROUPS = [
+  ["sinclasificar", "Nuevos por clasificar",
+   "Empresas que aparecieron en la lista cargada y no estaban en el analisis original. Clasificalas y se van solas a su grupo."],
+  ["prospecto", "Prospectos potenciales",
+   "Fabricantes de tarima y embalaje que compran madera y todavia no nos compran. Aqui esta el dinero del evento."],
+  ["cliente", "Clientes",
+   "Cruzados contra el padron de NetSuite: facturacion, ultima venta y fichas duplicadas o sin movimiento."],
+  ["competencia", "Competencia y productores",
+   "Quien vende madera a los mismos compradores que nosotros, mas los productores que ya nos venden a nosotros."],
+  ["otro", "Otros proveedores - descartados",
+   "Maquinaria, herramienta, quimicos, software, logistica e instituciones. Identificados y fuera del embudo comercial."],
+  ["organizador", "Woodpack Global - organizadores",
+   "El anfitrion. Somos patrocinador Platino."],
+  ["nosotros", "Natural Trade / Global Forest",
+   "Nuestra propia delegacion."],
+];
+const GNAME = {sinclasificar:"Sin clasificar", prospecto:"Prospecto", cliente:"Cliente",
+  competencia:"Competencia", otro:"Otro proveedor", organizador:"Organizador", nosotros:"Nosotros"};
+const GPLURAL = {sinclasificar:"Por clasificar", prospecto:"Prospectos", cliente:"Clientes",
+  competencia:"Competencia", otro:"Otros proveedores", organizador:"Organizadores", nosotros:"Nosotros"};
+const TIERS = {
+  prospecto:[["A","Prioridad A"],["B","Prioridad B"]],
+  cliente:[["AAA","Cuenta AAA"],["AA","Cuenta AA"],["A","Cuenta A"],["B","Dormida"]],
+  competencia:[["Competencia directa","Competencia directa"],["Productor","Productor"],
+               ["Producto sustituto","Producto sustituto"],["Proveedor nuestro","Proveedor nuestro"]],
+  otro:[["Maquinaria","Maquinaria"],["Herramienta y fijación","Herramienta y fijacion"],
+        ["Insumo","Insumo"],["Químico","Quimico"],["Software","Software"],["Servicio","Servicio"],
+        ["Logística","Logistica"],["Institución","Institucion"],["Empaque no madera","Empaque no madera"]],
+};
+const STATUS = {pendiente:"Pendiente", correo:"Correo enviado", agendado:"Cita agendada", cerrado:"Cerrado / no seguir"};
+
+/* ===== estado persistente ===== */
+const STORE = "wpg2026.v2";
+let S = {ov:{}, roster:null, newco:{}, src:null};
+try {
+  const raw = JSON.parse(localStorage.getItem(STORE) || "null");
+  if (raw && typeof raw === "object") S = Object.assign(S, raw);
+} catch(e){}
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(S)); } catch(e){ toast("No pude guardar: el almacenamiento del navegador esta lleno.", true); } }
+function ov(k){ return (S.ov[k] = S.ov[k] || {}); }
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isAlert = t => /ALERTA|OJO|CUIDADO|EX-CLIENTE|REACTIVACION|CORRECCION/i.test(t || "");
+
+let toastT;
+function toast(msg, bad){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.toggle("bad", !!bad); el.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), bad ? 6500 : 3200);
+}
+
+/* ===== modelo efectivo ===== */
+const BASEMAP = new Map(BASE.map(d => [d.k, d]));
+function allKeys(){
+  const ks = BASE.map(d => d.k);
+  Object.keys(S.newco).forEach(k => { if (!BASEMAP.has(k)) ks.push(k); });
+  return ks;
+}
+function rec(k){
+  const b = BASEMAP.get(k) || S.newco[k];
+  const o = S.ov[k] || {};
+  const roster = S.roster;
+  const p = roster ? (roster[k] || []) : (b.p || []);
+  return {
+    k, n: b.n, loc: o.loc || b.loc, w: b.w, ns: b.ns, a: b.a,
+    g: o.g || b.g, t: (o.g && o.g !== b.g) ? (o.t || "") : (o.t || b.t || ""),
+    moved: !!(o.g && o.g !== b.g),
+    isNew: !BASEMAP.has(k),
+    gone: !!roster && p.length === 0,
+    p,
+  };
+}
+function records(){ return allKeys().map(rec); }
+
+/* ===== normalizacion y emparejado ===== */
+const STOP = new Set(["SA","DE","CV","SAC","SACV","S","A","C","V","INC","LLC","LTD","LTDA","CORP",
+  "CORPORATION","COMPANY","CO","THE","GROUP","SPA","SRL","SAS","GLOBAL","RL"]);
+function tok(s){
+  return String(s || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase().replace(/\uFFFD/g, "N").replace(/[^A-Z0-9 ]/g, " ")
+    .split(/\s+/).filter(t => t && !STOP.has(t));
+}
+function matchCompany(company, emails){
+  const t = tok(company);
+  if (!t.length) return null;
+  const key = t.join(" ");
+  if (ALIASES[key]) return ALIASES[key];
+  for (const e of emails){
+    const at = String(e || "").toLowerCase().indexOf("@");
+    if (at < 0) continue;
+    const d = e.toLowerCase().slice(at + 1).trim();
+    if (DOMAINS[d]) return DOMAINS[d];
+  }
+  const set = new Set(t);
+  let best = null, bestScore = 0;
+  for (const [k, lists] of Object.entries(TOKENSETS)){
+    for (const list of lists){
+      const other = new Set(list);
+      let inter = 0;
+      for (const x of set) if (other.has(x)) inter++;
+      if (!inter) continue;
+      const sub = (inter === set.size && set.size >= 2) || (inter === other.size && other.size >= 2);
+      const score = inter / new Set([...set, ...other]).size;
+      if (sub && score > bestScore){ bestScore = score; best = k; }
+    }
+  }
+  return bestScore >= 0.55 ? best : null;
+}
+
+/* ===== lectura de archivos ===== */
+function colIdx(letters){
+  let n = 0;
+  for (const ch of letters) n = n * 26 + (ch.charCodeAt(0) - 64);
+  return n - 1;
+}
+function xmlText(node){
+  if (!node) return "";
+  let out = "";
+  for (const t of node.getElementsByTagName("t")) out += t.textContent;
+  return out;
+}
+async function unzipEntry(u8, dv, e){
+  if (!e.csize && e.usize) throw new Error("El .xlsx viene en un formato que no puedo leer. Guardalo como CSV y subelo asi.");
+  const nlen = dv.getUint16(e.lho + 26, true);
+  const elen = dv.getUint16(e.lho + 28, true);
+  const start = e.lho + 30 + nlen + elen;
+  const raw = u8.subarray(start, start + e.csize);
+  if (e.method === 0) return new TextDecoder("utf-8").decode(raw);
+  if (e.method !== 8) throw new Error("El .xlsx usa una compresion que no reconozco. Guardalo como CSV.");
+  if (typeof DecompressionStream === "undefined")
+    throw new Error("Este navegador no puede descomprimir .xlsx. Guarda la lista como CSV y subela asi.");
+  const stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return await new Response(stream).text();
+}
+async function readXlsx(buf){
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  let eocd = -1;
+  const floor = Math.max(0, u8.length - 66000);
+  for (let i = u8.length - 22; i >= floor; i--){
+    if (dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("Ese archivo no parece un .xlsx valido.");
+  const count = dv.getUint16(eocd + 10, true);
+  let off = dv.getUint32(eocd + 16, true);
+  const ents = {};
+  for (let i = 0; i < count; i++){
+    if (off + 46 > u8.length || dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true);
+    const csize  = dv.getUint32(off + 20, true);
+    const usize  = dv.getUint32(off + 24, true);
+    const nlen   = dv.getUint16(off + 28, true);
+    const elen   = dv.getUint16(off + 30, true);
+    const clen   = dv.getUint16(off + 32, true);
+    const lho    = dv.getUint32(off + 42, true);
+    const name   = new TextDecoder().decode(u8.subarray(off + 46, off + 46 + nlen));
+    ents[name] = {method, csize, usize, lho};
+    off += 46 + nlen + elen + clen;
+  }
+  let sheetName = Object.keys(ents).filter(n => /^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort()[0];
+  if (!sheetName) throw new Error("No encontre ninguna hoja dentro del .xlsx.");
+  let shared = [];
+  if (ents["xl/sharedStrings.xml"]){
+    const doc = new DOMParser().parseFromString(await unzipEntry(u8, dv, ents["xl/sharedStrings.xml"]), "application/xml");
+    shared = [...doc.getElementsByTagName("si")].map(xmlText);
+  }
+  const doc = new DOMParser().parseFromString(await unzipEntry(u8, dv, ents[sheetName]), "application/xml");
+  if (doc.getElementsByTagName("parsererror").length) throw new Error("La hoja del .xlsx esta corrupta o no la pude leer.");
+  const rows = [];
+  for (const r of doc.getElementsByTagName("row")){
+    const cells = [];
+    for (const c of r.getElementsByTagName("c")){
+      const ref = (c.getAttribute("r") || "").replace(/[0-9]/g, "");
+      const idx = ref ? colIdx(ref) : cells.length;
+      const t = c.getAttribute("t");
+      let v = "";
+      if (t === "inlineStr"){ v = xmlText(c.getElementsByTagName("is")[0]); }
+      else {
+        const vEl = c.getElementsByTagName("v")[0];
+        const raw = vEl ? vEl.textContent : "";
+        v = (t === "s") ? (shared[Number(raw)] || "") : raw;
+      }
+      cells[idx] = String(v).trim();
+    }
+    rows.push(cells);
+  }
+  return rows;
+}
+function readCsv(text){
+  const rows = []; let row = [], cell = "", q = false;
+  text = text.replace(/^\uFEFF/, "");
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (q){
+      if (c === '"'){ if (text[i+1] === '"'){ cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === "," || c === ";" || c === "\t"){ row.push(cell.trim()); cell = ""; }
+    else if (c === "\n"){ row.push(cell.trim()); rows.push(row); row = []; cell = ""; }
+    else if (c !== "\r") cell += c;
+  }
+  if (cell || row.length){ row.push(cell.trim()); rows.push(row); }
+  return rows;
+}
+
+/* ===== mapeo de encabezados ===== */
+const HDR = {
+  company:["company","empresa","compania","organizacion","organization","razon social"],
+  first:["first name","firstname","nombre(s)","primer nombre"],
+  last:["last name","lastname","apellidos","apellido paterno"],
+  name:["name","nombre","attendee","asistente"],
+  surname:["surname","apellido","apellidos"],
+  email:["email","e mail","correo","correo electronico","mail"],
+  phone:["phone number","phone","telefono","tel","celular","movil"],
+  city:["city","ciudad"],
+  state:["state","estado","provincia"],
+  country:["country","pais"],
+};
+const flat = s => String(s || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+function mapHeaders(row){
+  const map = {}, used = new Set();
+  const norm = row.map(flat);
+  for (const [field, names] of Object.entries(HDR)){
+    for (const nm of names){
+      const i = norm.findIndex((h, idx) => h === nm && !used.has(idx));
+      if (i >= 0){ map[field] = i; used.add(i); break; }
+    }
+  }
+  return map;
+}
+function findHeaderRow(rows){
+  for (let i = 0; i < Math.min(rows.length, 12); i++){
+    const m = mapHeaders(rows[i] || []);
+    if (m.company != null && m.email != null) return {i, m};
+  }
+  return null;
+}
+
+/* ===== ingesta ===== */
+function ingest(rows, fileName){
+  const hdr = findHeaderRow(rows);
+  if (!hdr) throw new Error("No encontre las columnas. La lista debe traer al menos un encabezado «Company» y uno «Email».");
+  const {i: hi, m} = hdr;
+  const buckets = {}, unmatched = {};
+  let people = 0, blank = 0;
+  for (let r = hi + 1; r < rows.length; r++){
+    const row = rows[r] || [];
+    const get = f => (m[f] != null ? (row[m[f]] || "") : "").trim();
+    const company = get("company");
+    const email = get("email");
+    const nm = [get("name"), get("surname")].filter(Boolean).join(" ").trim()
+            || [get("first"), get("last")].filter(Boolean).join(" ").trim();
+    if (!company && !nm && !email){ blank++; continue; }
+    if (!company){ blank++; continue; }
+    people++;
+    const person = {
+      n: nm || "(sin nombre)", e: email, t: get("phone"), alt: [],
+      loc: [get("city"), get("state"), get("country")].filter(Boolean).join(", "),
+      raw: company,
+    };
+    let key = matchCompany(company, [email]);
+    if (!key){
+      const slug = tok(company).join("_").toLowerCase().slice(0, 48);
+      key = "x_" + (slug || "fila" + r);
+      unmatched[key] = unmatched[key] || {n: company, loc: person.loc};
+    }
+    (buckets[key] = buckets[key] || []).push(person);
+  }
+  if (!people) throw new Error("El archivo se leyo pero no traia ninguna fila con empresa.");
+
+  // dedupe por persona dentro de cada empresa
+  const roster = {};
+  for (const [k, list] of Object.entries(buckets)){
+    const seen = new Map(), out = [];
+    for (const p of list){
+      const t = tok(p.n);
+      const id = (t[0] || "").slice(0,3) + "|" + (t[t.length-1] || "");
+      if (seen.has(id)){
+        const prev = seen.get(id);
+        if (p.e && p.e.toLowerCase() !== (prev.e || "").toLowerCase() && !prev.alt.includes(p.e)) prev.alt.push(p.e);
+        continue;
+      }
+      seen.set(id, p); out.push(p);
+    }
+    roster[k] = out;
+  }
+  // empresas nuevas
+  const newco = {};
+  for (const [k, info] of Object.entries(unmatched)){
+    newco[k] = {
+      k, n: info.n, g: "sinclasificar", t: "",
+      loc: (roster[k] && roster[k][0] && roster[k][0].loc) || info.loc || "Ubicacion no indicada",
+      w: "Empresa nueva: venia en la lista actualizada y no estaba en el analisis original, asi que no tiene investigacion todavia. Clasificala con el selector de abajo y anota lo que sepas.",
+      ns: "No verificada contra NetSuite. El cruce original se corrio el 3-ago-2026; esta empresa no existia en esa lista.",
+      a: "Pendiente: definir si es prospecto, cliente, competencia u otro proveedor.",
+      p: [],
+    };
+  }
+  const totalPeople = Object.values(roster).reduce((s, l) => s + l.length, 0);
+  const known = Object.keys(roster).filter(k => BASEMAP.has(k)).length;
+  return {roster, newco, stats:{people: totalPeople, rawRows: people, blank,
+    companies: Object.keys(roster).length, known, nuevas: Object.keys(newco).length, fileName}};
+}
+
+async function handleFile(file){
+  try {
+    toast("Leyendo " + file.name + "...");
+    let rows;
+    if (/\.csv$|\.tsv$|\.txt$/i.test(file.name)) rows = readCsv(await file.text());
+    else rows = await readXlsx(await file.arrayBuffer());
+    const {roster, newco, stats} = ingest(rows, file.name);
+    S.roster = roster;
+    S.newco = newco;
+    // las reclasificaciones y notas que ya hayas hecho se conservan solas:
+    // viven en S.ov y siempre le ganan al grupo base de la empresa.
+    S.src = {file: stats.fileName, when: new Date().toISOString(), people: stats.people,
+             companies: stats.companies, nuevas: stats.nuevas};
+    save(); render();
+    const bits = [stats.companies + " empresas con asistentes", stats.people + " personas"];
+    if (stats.nuevas) bits.push(stats.nuevas + " NUEVAS por clasificar");
+    const bajas = BASE.filter(b => !(roster[b.k] || []).length).length;
+    if (bajas) bits.push(bajas + " ya no vienen");
+    toast("Lista actualizada: " + bits.join(" · "));
+    if (stats.nuevas) document.querySelector('section[data-g="sinclasificar"]')?.scrollIntoView({behavior:"smooth", block:"start"});
+  } catch(err){
+    toast(err.message || "No pude leer el archivo.", true);
+  }
+}
+
+/* ===== correo ===== */
+function mailto(d){
+  const to = d.p.map(p => p.e).filter(Boolean).join(",");
+  const subj = "Natural Trade & Global Forest — nos vemos en Woodpack Global";
+  const body = "Estimado equipo de " + d.n + ":\n\n"
+    + "Vi que estaran en la conferencia de Woodpack Global este septiembre. Natural Trade / Global Forest participa como patrocinador Platino y me gustaria apartar unos minutos con ustedes en el piso.\n\n"
+    + "Somos una comercializadora de madera con oficina en Vancouver y operacion en Mexico: abastecemos pino SPF y SYP de Norteamerica por furgon, y pino de Sudamerica por contenedor, entregando en frontera o puesto en planta. Trabajamos con varios de los fabricantes de tarima mas grandes de Mexico y podriamos hacer lo mismo por ustedes.\n\n"
+    + "Si les interesa, les llevo una cotizacion indicativa para sus medidas y volumenes habituales, para que la comparen contra su costo actual.\n\n"
+    + "Les acomoda que nos veamos en el evento?\n\nSaludos,\nJorge Chinchilla\nNatural Trade, Ltd. / Global Forest\njorge@naturaltrade.ca";
+  return "mailto:" + to + "?subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body);
+}
+
+/* ===== render ===== */
+let filter = "todos", query = "";
+
+function metrics(recs){
+  const el = document.getElementById("metrics");
+  el.innerHTML = GROUPS.filter(([g]) => g !== "sinclasificar" || recs.some(d => d.g === g))
+    .map(([g]) => {
+      const rows = recs.filter(d => d.g === g);
+      const pax = rows.reduce((s, d) => s + d.p.length, 0);
+      const short = {sinclasificar:"Por clasificar", prospecto:"Prospectos", cliente:"Clientes",
+        competencia:"Competencia", otro:"Otros prov.", organizador:"Woodpack", nosotros:"Natural Trade"}[g];
+      return '<div class="metric is-' + g + '"><span class="num">' + rows.length + '</span>'
+        + '<span class="lbl">' + short + '</span>'
+        + '<span class="sub">' + pax + (pax === 1 ? " persona" : " personas") + '</span></div>';
+    }).join("");
+}
+
+function srcline(recs){
+  const el = document.getElementById("srcline");
+  const pax = recs.reduce((s, d) => s + d.p.length, 0);
+  const conPax = recs.filter(d => d.p.length).length;
+  const gone = recs.filter(d => d.gone).length;
+  const nuevas = recs.filter(d => d.isNew).length;
+  const edited = Object.values(S.ov).filter(o => o.g).length;
+  const noted = Object.values(S.ov).filter(o => o.n).length;
+  let out;
+  if (S.src){
+    const when = new Date(S.src.when).toLocaleString("es-MX", {dateStyle:"medium", timeStyle:"short"});
+    out = '<span class="ok">&#9679;</span> <b>Lista cargada:</b> ' + esc(S.src.file) + ' &middot; ' + when
+        + ' <span>' + conPax + ' empresas con asistentes &middot; ' + pax + ' personas</span>';
+    if (nuevas) out += ' <span class="warn">' + nuevas + ' nuevas por clasificar</span>';
+    if (gone) out += ' <span class="warn">' + gone + ' ya no vienen</span>';
+    out += ' <button class="btn" id="reset" style="padding:3px 9px;font-size:11.5px">Volver a la lista base</button>';
+  } else {
+    out = '<span><b>Lista base:</b> ' + esc(BASE_LABEL) + ' &middot; ' + conPax + ' empresas &middot; ' + pax + ' personas</span>';
+  }
+  if (edited) out += ' <span class="warn">' + edited + ' reclasificadas por ti</span>';
+  if (noted) out += ' <span>' + noted + ' con notas</span>';
+  el.innerHTML = out;
+}
+
+function card(d){
+  const o = S.ov[d.k] || {};
+  const open = o.open ? " open" : "";
+  const cls = (o.s === "cerrado" ? " gone" : "") + (d.gone ? " gone" : "") + (d.moved ? " moved" : "");
+  const tierLabel = d.t ? (d.g === "prospecto" ? "Prioridad " + d.t : d.g === "cliente" ? (TIERS.cliente.find(x=>x[0]===d.t)||[,d.t])[1] : d.t) : "";
+  const tiers = TIERS[d.g] || null;
+  const opts = (list, val) => list.map(([v, l]) =>
+    '<option value="' + esc(v) + '"' + (v === val ? " selected" : "") + '>' + esc(l) + '</option>').join("");
+  const ppl = d.p.length ? d.p.map(p =>
+      '<tr><td class="nm">' + esc(p.n) + '</td><td>'
+      + (p.e ? '<a href="mailto:' + esc(p.e) + '">' + esc(p.e) + '</a>'
+             + (p.alt || []).map(a => '<div class="alt">tmb. ' + esc(a) + '</div>').join("")
+             : '<span class="alt">sin correo</span>')
+      + '</td><td class="tel">' + esc(p.t || "—") + '</td></tr>').join("")
+    : '<tr><td colspan="3" class="alt">No aparece nadie de esta empresa en la lista cargada.</td></tr>';
+  const canMail = d.p.some(p => p.e);
+  return '<article class="card' + open + cls + '" data-g="' + d.g + '" data-k="' + esc(d.k) + '">'
+  + '<button class="card-hd" aria-expanded="' + (o.open ? "true" : "false") + '">'
+  +   '<div><h3>' + esc(d.n) + '</h3><div class="meta-line">'
+  +     '<span class="chip g-' + d.g + '">' + esc(GNAME[d.g]) + '</span>'
+  +     (tierLabel ? '<span class="chip g-' + d.g + '">' + esc(tierLabel) + '</span>' : "")
+  +     (d.moved ? '<span class="chip edit">Reclasificada</span>' : "")
+  +     (d.isNew ? '<span class="chip g-sinclasificar">Nueva en la lista</span>' : "")
+  +     (d.gone ? '<span class="chip alert">Ya no viene en la lista</span>' : "")
+  +     (isAlert(d.ns) ? '<span class="chip alert">Revisar NetSuite</span>' : "")
+  +     '<span>' + esc(d.loc) + '</span>'
+  +     (o.s && o.s !== "pendiente" ? '<span class="chip g-cliente">' + esc(STATUS[o.s] || o.s) + '</span>' : "")
+  +   '</div></div>'
+  +   '<div class="pax"><span class="n">' + d.p.length + '</span> pax <span class="caret">&#9654;</span></div>'
+  + '</button>'
+  + '<div class="card-bd">'
+  +   '<div class="block"><span class="k">Que hacen</span><p>' + esc(d.w) + '</p></div>'
+  +   '<div class="block"><span class="k">Estatus en NetSuite</span><p class="ns' + (isAlert(d.ns) ? " is-alert" : "") + '">' + esc(d.ns) + '</p></div>'
+  +   '<div class="block"><span class="k">Que hacemos con ellos</span><p class="strong">' + esc(d.a) + '</p></div>'
+  +   '<div class="block"><span class="k">Asistentes registrados</span><div class="tscroll"><table class="ppl">'
+  +     '<thead><tr><th>Nombre</th><th>Correo</th><th>Telefono</th></tr></thead><tbody>' + ppl + '</tbody>'
+  +   '</table></div></div>'
+  +   '<div class="track">'
+  +     '<label class="fld"><span>Clasificacion</span><select class="sel-g">'
+  +       opts(GROUPS.map(([g]) => [g, GNAME[g]]), d.g) + '</select></label>'
+  +     (tiers ? '<label class="fld"><span>Detalle</span><select class="sel-t">'
+  +       '<option value="">Sin especificar</option>' + opts(tiers, d.t) + '</select></label>' : "")
+  +     '<label class="fld"><span>Seguimiento</span><select class="sel-s">'
+  +       opts(Object.entries(STATUS), o.s || "pendiente") + '</select></label>'
+  +   '</div>'
+  +   '<div class="acts">'
+  +     (canMail ? '<a class="btn btn-accent" href="' + mailto(d) + '">Redactar correo de presentacion</a>' : "")
+  +     '<span class="saved">guardado</span>'
+  +   '</div>'
+  +   '<textarea class="nt" placeholder="Notas: quien lo atiende, que se acordo, volumenes, medidas...">' + esc(o.n || "") + '</textarea>'
+  + '</div></article>';
+}
+
+function matches(d){
+  if (filter !== "todos" && d.g !== filter) return false;
+  if (!query) return true;
+  const hay = [d.n, d.loc, d.w, d.ns, d.a, ...d.p.map(p => p.n + " " + p.e)].join(" ").toLowerCase();
+  return hay.includes(query);
+}
+function sortRecs(list){
+  const gi = g => GROUPS.findIndex(x => x[0] === g);
+  const ti = d => {
+    if (d.g === "prospecto") return d.t === "A" ? 0 : 1;
+    if (d.g === "cliente") return ({AAA:0, AA:1, A:2, B:3})[d.t] ?? 4;
+    return 0;
+  };
+  return list.sort((a, b) => gi(a.g) - gi(b.g) || ti(a) - ti(b) || b.p.length - a.p.length
+    || a.n.localeCompare(b.n, "es"));
+}
+function render(){
+  const recs = sortRecs(records());
+  metrics(recs); srcline(recs);
+  const pills = document.getElementById("pills");
+  const shown = GROUPS.filter(([g]) => g !== "sinclasificar" || recs.some(d => d.g === g));
+  pills.innerHTML = [["todos", "Todos"]].concat(shown.map(([g]) => [g, GPLURAL[g]]))
+    .map(([v, l]) => '<button class="pill" data-v="' + v + '" aria-pressed="' + (v === filter) + '">' + esc(l) + '</button>').join("");
+  let out = "", any = false;
+  for (const [g, title, note] of GROUPS){
+    const rows = recs.filter(d => d.g === g && matches(d));
+    if (!rows.length) continue;
+    any = true;
+    const pax = rows.reduce((s, d) => s + d.p.length, 0);
+    out += '<section data-g="' + g + '"><div class="sec-hd"><h2>' + esc(title) + '</h2>'
+        + '<span class="count">' + rows.length + ' empresas &middot; ' + pax + ' personas</span></div>'
+        + '<p class="sec-note">' + esc(note) + '</p>'
+        + '<div class="cards">' + rows.map(card).join("") + '</div></section>';
+  }
+  document.getElementById("main").innerHTML = any ? out
+    : '<div class="empty">Nada coincide con lo que buscas.</div>';
+}
+
+/* ===== eventos ===== */
+const main = document.getElementById("main");
+main.addEventListener("click", e => {
+  const hd = e.target.closest(".card-hd"); if (!hd) return;
+  const c = hd.closest(".card"), o = ov(c.dataset.k);
+  o.open = !c.classList.contains("open");
+  c.classList.toggle("open");
+  hd.setAttribute("aria-expanded", o.open ? "true" : "false");
+  save();
+});
+main.addEventListener("change", e => {
+  const c = e.target.closest(".card"); if (!c) return;
+  const k = c.dataset.k, o = ov(k);
+  if (e.target.classList.contains("sel-g")){
+    const from = GNAME[rec(k).g];
+    o.g = e.target.value; o.t = "";
+    save(); render();
+    toast(rec(k).n + ": " + from + " → " + GNAME[o.g]);
+    const el = document.querySelector('.card[data-k="' + k.replace(/"/g, '\\"') + '"]');
+    el?.scrollIntoView({behavior:"smooth", block:"center"});
+  } else if (e.target.classList.contains("sel-t")){
+    o.t = e.target.value; save(); render();
+  } else if (e.target.classList.contains("sel-s")){
+    o.s = e.target.value; save(); render();
+  }
+});
+main.addEventListener("input", e => {
+  if (!e.target.classList.contains("nt")) return;
+  const c = e.target.closest(".card");
+  ov(c.dataset.k).n = e.target.value; save();
+  const s = c.querySelector(".saved"); s.classList.add("on");
+  clearTimeout(s._t); s._t = setTimeout(() => s.classList.remove("on"), 1200);
+});
+document.getElementById("pills").addEventListener("click", e => {
+  const b = e.target.closest(".pill"); if (!b) return;
+  filter = b.dataset.v; render();
+});
+document.getElementById("q").addEventListener("input", e => {
+  query = e.target.value.toLowerCase().trim(); render();
+});
+document.getElementById("srcline").addEventListener("click", e => {
+  if (e.target.id !== "reset") return;
+  if (!confirm("Volver a la lista base del 3-ago-2026. Tus notas y reclasificaciones se conservan. Continuar?")) return;
+  S.roster = null; S.newco = {}; S.src = null; save(); render();
+  toast("De vuelta en la lista base.");
+});
+document.getElementById("file").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) handleFile(f);
+  e.target.value = "";
+});
+["dragover","drop"].forEach(ev => document.addEventListener(ev, e => {
+  e.preventDefault();
+  if (ev === "drop" && e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+}));
+
+let allOpen = false;
+document.getElementById("expand").addEventListener("click", e => {
+  allOpen = !allOpen;
+  records().forEach(d => { ov(d.k).open = allOpen; });
+  save(); render();
+  e.target.textContent = allOpen ? "Cerrar todo" : "Abrir todo";
+});
+document.getElementById("export").addEventListener("click", () => {
+  const recs = sortRecs(records());
+  let md = "# Woodpack Global 2026 - triaje de asistentes\n\n";
+  md += "Fuente: " + (S.src ? S.src.file + " (cargada " + new Date(S.src.when).toLocaleString("es-MX") + ")" : BASE_LABEL) + "\n";
+  md += "Generado: " + new Date().toLocaleString("es-MX") + "\n\n";
+  for (const [g, title] of GROUPS){
+    const rows = recs.filter(d => d.g === g);
+    if (!rows.length) continue;
+    md += "## " + title + " (" + rows.length + " empresas, " + rows.reduce((s,d)=>s+d.p.length,0) + " personas)\n\n";
+    rows.forEach(d => {
+      const o = S.ov[d.k] || {};
+      md += "### " + d.n + " - " + d.p.length + " pax - " + d.loc + "\n";
+      if (d.t) md += "- Detalle: " + d.t + "\n";
+      if (d.moved){
+        const orig = BASEMAP.get(d.k);
+        md += "- RECLASIFICADA a mano (original: " + (orig ? GNAME[orig.g] : "empresa nueva de la lista") + ")\n";
+      }
+      md += "- Seguimiento: " + (STATUS[o.s] || "Pendiente") + "\n";
+      md += "- NetSuite: " + d.ns + "\n";
+      md += "- Accion: " + d.a + "\n";
+      d.p.forEach(p => { md += "  - " + p.n + " | " + (p.e || "sin correo") + " | " + (p.t || "-") + "\n"; });
+      if (o.n) md += "- NOTAS: " + o.n + "\n";
+      md += "\n";
+    });
+  }
+  dl(new Blob([md], {type:"text/markdown;charset=utf-8"}), "woodpack-2026-triaje.md");
+  toast("Reporte descargado.");
+});
+document.getElementById("savestate").addEventListener("click", () => {
+  dl(new Blob([JSON.stringify(S, null, 1)], {type:"application/json"}), "woodpack-2026-mis-notas.json");
+  toast("Respaldo descargado. Ese archivo lo puedes pasar a alguien mas del equipo.");
+});
+document.getElementById("loadstate").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const inc = JSON.parse(await f.text());
+    if (!inc || typeof inc !== "object" || !inc.ov) throw new Error("Ese JSON no es un respaldo de esta herramienta.");
+    if (!confirm("Cargar el respaldo reemplaza tus notas y reclasificaciones actuales. Continuar?")) return;
+    S = Object.assign({ov:{}, roster:null, newco:{}, src:null}, inc);
+    save(); render(); toast("Respaldo cargado.");
+  } catch(err){ toast(err.message || "No pude leer el respaldo.", true); }
+});
+function dl(blob, name){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+render();
+
+</script>
+</body>
+</html>
