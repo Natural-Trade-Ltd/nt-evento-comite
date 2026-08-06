@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Descarga la NT App para el evento del 1 de septiembre de 2026 — iPhone y Android.">
+<meta name="robots" content="noindex, nofollow">
+<title>NT App · Descárgala</title>
+<style>
+/* ── Dueto Tierra (sistema oficial NT/GF) ── */
+:root{
+  --bg:#F2EDE3; --card:#FBF8F1; --line:#E0D8C8;
+  --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+  --acc:#587F6B; --accInk:#F6FBF7; --acc2:#8A6F5B;
+  --infoBg:#E4EDF6; --info:#3D6F9E; --alertaBg:#F5EBD6; --alerta:#9A6A12;
+  --shadow:0 1px 2px rgba(58,49,41,.05), 0 10px 30px rgba(58,49,41,.07);
+  --placa:transparent;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+    --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+    --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+    --infoBg:#1C2836; --info:#7FA8D8; --alertaBg:#33291A; --alerta:#E0B463;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+    --placa:#F7F5EC;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+  --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+  --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+  --infoBg:#1C2836; --info:#7FA8D8; --alertaBg:#33291A; --alerta:#E0B463;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+  --placa:#F7F5EC;
+}
+
+*{box-sizing:border-box}
+/* El 700 por defecto del navegador rompe la regla de peso del sistema. */
+b,strong{font-weight:600}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px; line-height:1.55; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:560px; margin:0 auto; padding:30px 20px 64px}
+
+/* Logos: en día van directos; en noche, sobre placa marfil (regla del sistema) */
+.marcas{display:flex; align-items:center; gap:16px; margin-bottom:26px}
+.marcas span{background:var(--placa); border-radius:8px; padding:4px 6px; line-height:0}
+.marcas img{height:30px; width:auto; display:block}
+
+.eyebrow{font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin:0 0 8px}
+h1{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-weight:400; font-size:34px; line-height:1.18; letter-spacing:-.01em;
+  margin:0; text-wrap:balance;
+}
+.rule{width:60px; height:3px; background:var(--acc2); border-radius:999px; margin:16px 0 14px}
+.lede{color:var(--sub); margin:0 0 26px}
+
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; padding:17px 20px; border-radius:12px; border:1px solid transparent;
+  background:var(--acc); color:var(--accInk);
+  font-size:17px; font-weight:600; text-decoration:none; text-align:center;
+}
+.btn.ghost{background:transparent; color:var(--acc); border-color:var(--line); font-size:15px; padding:13px 18px}
+.btn + .btn{margin-top:10px}
+
+.pasos{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:22px 24px; margin:24px 0; box-shadow:var(--shadow);
+}
+.pasos h2{font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin:0 0 14px}
+ol{margin:0; padding-left:0; list-style:none; counter-reset:p}
+ol li{
+  counter-increment:p; position:relative; padding-left:38px; margin-bottom:14px;
+}
+ol li:last-child{margin-bottom:0}
+ol li::before{
+  content:counter(p); position:absolute; left:0; top:1px;
+  width:25px; height:25px; border-radius:999px; background:var(--acc); color:var(--accInk);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600;
+}
+ol li b{font-weight:600}
+
+.nota{
+  background:var(--infoBg); color:var(--info); border-radius:12px;
+  padding:14px 16px; font-size:14px; margin:18px 0;
+}
+.nota.aviso{background:var(--alertaBg); color:var(--alerta)}
+.otra{margin-top:28px; padding-top:22px; border-top:1px solid var(--line)}
+.otra p{color:var(--sub); font-size:14px; margin:0 0 12px}
+footer{margin-top:32px; color:var(--faint); font-size:13px; line-height:1.7}
+a{color:var(--acc)}
+.hide{display:none}
+@media (max-width:420px){ h1{font-size:29px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="marcas">
+    <span><img src="img/nt.png" alt="Natural Trade"></span>
+    <span><img src="img/gf.png" alt="Global Forest"></span>
+  </div>
+
+  <p class="eyebrow">Evento · 1 de septiembre de 2026</p>
+  <h1 id="titulo">Llévate la app</h1>
+  <div class="rule"></div>
+  <p class="lede" id="lede">
+    Tus ofertas, tus precios y el estado de tus embarques, en el teléfono.
+    Instálala aquí y pruébala esta noche.
+  </p>
+
+  <!-- iPhone -->
+  <section id="ios" class="hide">
+    <a class="btn" id="btnIos" href="https://testflight.apple.com/join/mbkdhXAr">Instalar en iPhone</a>
+    <div class="pasos">
+      <h2>Tres pasos</h2>
+      <ol>
+        <li>Toca el botón. Si te pide instalar <b>TestFlight</b> primero, instálalo y
+            <b>vuelve a tocar el botón</b> — es el instalador de Apple para versiones de prueba.</li>
+        <li>Dentro de TestFlight, toca <b>Instalar</b> en NT App.</li>
+        <li>Abre la app y escribe tu <b>nombre y celular</b>. Listo, ya estás dentro.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Android -->
+  <section id="android" class="hide">
+    <a class="btn" id="btnAnd" href="https://play.google.com/apps/testing/com.naturaltrade.ntapp">Instalar en Android</a>
+    <div class="pasos">
+      <h2>Tres pasos</h2>
+      <ol>
+        <li>Toca el botón y acepta <b>ser probador</b> (es un botón que dice "Convertirme en tester").</li>
+        <li>Toca <b>Descargar en Google Play</b> e instala NT App.</li>
+        <li>Abre la app y escribe tu <b>nombre y celular</b>. Listo, ya estás dentro.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Computadora o teléfono no reconocido -->
+  <section id="ambos" class="hide">
+    <a class="btn" href="https://testflight.apple.com/join/mbkdhXAr">Instalar en iPhone</a>
+    <a class="btn" href="https://play.google.com/apps/testing/com.naturaltrade.ntapp">Instalar en Android</a>
+    <div class="nota">Abre esta página desde tu teléfono para que el botón correcto salga solo.</div>
+  </section>
+
+  <div class="otra" id="otra"></div>
+
+  <footer>
+    Lo que verás es un <b>recorrido de demostración</b>: precios y embarques de ejemplo,
+    ninguna cuenta real. Si ya eres cliente y quieres tu información de verdad,
+    dínoslo esta noche y te damos de alta.
+  </footer>
+
+</div>
+
+<script>
+// Qué teléfono trae el invitado. iPadOS moderno se reporta como Mac, por eso
+// el segundo criterio: un "Macintosh" con pantalla táctil es un iPad.
+const ua = navigator.userAgent || '';
+const esIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+const esAndroid = /Android/.test(ua);
+
+const ver = (id) => document.getElementById(id).classList.remove('hide');
+const OTRO = {
+  ios:     ['¿Traes Android?', 'https://play.google.com/apps/testing/com.naturaltrade.ntapp', 'Instalar en Android'],
+  android: ['¿Traes iPhone?',  'https://testflight.apple.com/join/mbkdhXAr',                  'Instalar en iPhone'],
+};
+
+if (esIOS)        { ver('ios');     pintarOtra('ios'); }
+else if (esAndroid){ ver('android'); pintarOtra('android'); }
+else               { ver('ambos'); }
+
+function pintarOtra(plat) {
+  const [titulo, href, texto] = OTRO[plat];
+  document.getElementById('otra').innerHTML =
+    `<p>${titulo}</p><a class="btn ghost" href="${href}">${texto}</a>`;
+}
+</script>
+</body>
+</html>
