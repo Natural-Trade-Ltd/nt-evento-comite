@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Padrón en vivo de invitados que entraron a la NT App durante el evento del 1 de septiembre de 2026.">
+<meta name="robots" content="noindex, nofollow">
+<title>NT App · Quién entró en el evento</title>
+<style>
+/* ── Dueto Tierra (sistema oficial NT/GF, 3-ago-2026) ─────────────────────────
+   Salvia + café tierra sobre marfil cálido. Ningún peso tipográfico arriba de 600. */
+:root{
+  --bg:#F2EDE3; --card:#FBF8F1; --line:#E0D8C8;
+  --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+  --acc:#587F6B; --accInk:#F6FBF7; --acc2:#8A6F5B;
+  --riesgo:#AE4E2B; --alerta:#9A6A12; --info:#3D6F9E;
+  --okBg:#E4EDE7; --alertaBg:#F5EBD6; --riesgoBg:#F6E3DA; --infoBg:#E4EDF6;
+  --shadow:0 1px 2px rgba(58,49,41,.05), 0 10px 30px rgba(58,49,41,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+    --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+    --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+    --riesgo:#E0785A; --alerta:#E0B463; --info:#7FA8D8;
+    --okBg:#1E2E24; --alertaBg:#33291A; --riesgoBg:#33211B; --infoBg:#1C2836;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+  --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+  --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+  --riesgo:#E0785A; --alerta:#E0B463; --info:#7FA8D8;
+  --okBg:#1E2E24; --alertaBg:#33291A; --riesgoBg:#33211B; --infoBg:#1C2836;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:15px; line-height:1.55; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:26px 18px 60px}
+
+/* ── Encabezado ── */
+header{display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap}
+.eyebrow{
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin:0 0 6px;
+}
+h1{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-weight:400; font-size:31px; line-height:1.2; letter-spacing:-.01em;
+  margin:0; text-wrap:balance;
+}
+.rule{width:60px; height:3px; background:var(--acc2); border-radius:999px; margin:14px 0 10px}
+.lede{color:var(--sub); margin:0; max-width:62ch}
+.spacer{flex:1}
+
+/* ── Portón de clave ── */
+.gate{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:24px; box-shadow:var(--shadow); max-width:420px; margin:26px 0;
+}
+label{display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin-bottom:7px}
+input[type=password],input[type=search]{
+  width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:12px;
+  background:var(--bg); color:var(--ink); font:inherit;
+}
+input:focus{outline:2px solid var(--acc); outline-offset:1px; border-color:transparent}
+button{
+  font:inherit; font-weight:600; cursor:pointer; border-radius:12px;
+  border:1px solid transparent; padding:11px 18px;
+  background:var(--acc); color:var(--accInk);
+}
+button.ghost{background:transparent; color:var(--acc); border-color:var(--line)}
+button:disabled{opacity:.5; cursor:default}
+.err{color:var(--riesgo); font-size:13px; margin:10px 0 0; min-height:18px}
+
+/* ── Estado del registro ── */
+.estado{
+  display:inline-flex; align-items:center; gap:8px; border-radius:999px;
+  padding:6px 14px; font-size:13px; font-weight:600; border:1px solid transparent;
+}
+.estado.on{background:var(--okBg); color:var(--acc); border-color:var(--acc)}
+.estado.off{background:var(--alertaBg); color:var(--alerta); border-color:var(--alerta)}
+.dot{width:7px; height:7px; border-radius:999px; background:currentColor}
+
+/* ── KPIs ── */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:22px 0}
+.kpi{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px}
+.kpi .n{
+  font-size:30px; font-weight:600; font-variant-numeric:tabular-nums;
+  line-height:1.1; color:var(--ink);
+}
+.kpi .n.acc{color:var(--acc)}
+.kpi .l{font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin-top:5px}
+
+/* ── Barra de herramientas ── */
+.tools{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 14px}
+.tools input[type=search]{flex:1; min-width:200px}
+.meta{color:var(--faint); font-size:12px}
+
+/* ── Tabla ── */
+.tablaWrap{overflow-x:auto; border:1px solid var(--line); border-radius:16px; background:var(--card)}
+table{border-collapse:collapse; width:100%; min-width:760px}
+th{
+  text-align:left; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); padding:13px 14px; border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+td{padding:13px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+tr:last-child td{border-bottom:none}
+.nom{font-weight:600}
+.emp{color:var(--sub); font-size:13px}
+.tel{font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace; font-size:13px; color:var(--sub); white-space:nowrap}
+.hora{color:var(--sub); font-size:13px; white-space:nowrap}
+.chip{
+  display:inline-block; border-radius:999px; padding:3px 10px; font-size:11.5px;
+  font-weight:600; background:var(--okBg); color:var(--acc); margin:2px 4px 2px 0;
+  white-space:nowrap;
+}
+.chip.plat{background:var(--infoBg); color:var(--info)}
+.chip.compra{background:var(--acc); color:var(--accInk)}
+.chip.nada{background:transparent; color:var(--faint); border:1px dashed var(--line)}
+.vacio{padding:44px 20px; text-align:center; color:var(--sub)}
+footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
+.hide{display:none}
+@media (max-width:560px){ h1{font-size:26px} .wrap{padding:20px 14px 50px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Evento · 1 de septiembre de 2026</p>
+      <h1>Quién entró a la NT App</h1>
+      <div class="rule"></div>
+      <p class="lede">
+        Cada invitado que abre la app en el salón deja su nombre y celular, y la app va marcando
+        qué llegó a probar. Esto es el padrón en vivo: sirve para dar seguimiento al día siguiente.
+      </p>
+    </div>
+    <div class="spacer"></div>
+    <div id="estadoBox"></div>
+  </header>
+
+  <!-- Portón: la clave se valida en el servidor, nunca vive en esta página -->
+  <section class="gate" id="gate">
+    <label for="clave">Clave del tablero</label>
+    <input type="password" id="clave" autocomplete="current-password" placeholder="••••••••••••">
+    <p class="err" id="gateErr"></p>
+    <button id="entrar">Ver el padrón</button>
+  </section>
+
+  <section id="panel" class="hide">
+    <div class="kpis">
+      <div class="kpi"><div class="n acc" id="kTotal">0</div><div class="l">Invitados</div></div>
+      <div class="kpi"><div class="n" id="kNav">0</div><div class="l">Sí navegaron</div></div>
+      <div class="kpi"><div class="n" id="kCompra">0</div><div class="l">Llegaron a comprar</div></div>
+      <div class="kpi"><div class="n" id="kIos">0</div><div class="l">iPhone</div></div>
+      <div class="kpi"><div class="n" id="kAnd">0</div><div class="l">Android</div></div>
+    </div>
+
+    <div class="tools">
+      <input type="search" id="buscar" placeholder="Buscar por nombre, empresa o celular…">
+      <button class="ghost" id="csv">Bajar Excel</button>
+      <button class="ghost" id="refrescar">Actualizar</button>
+      <span class="meta" id="sello"></span>
+    </div>
+
+    <div class="tablaWrap">
+      <table>
+        <thead><tr>
+          <th>Invitado</th><th>Celular</th><th>Entró</th><th>Veces</th><th>Qué probó</th>
+        </tr></thead>
+        <tbody id="filas"></tbody>
+      </table>
+      <div class="vacio hide" id="vacio">Todavía no entra nadie. En cuanto un invitado abra la app, aparece aquí.</div>
+    </div>
+
+    <footer>
+      El registro se enciende y se apaga desde la base (<code>app_config.modo_evento</code>);
+      la lectura de este tablero sigue disponible aunque el registro ya esté cerrado.<br>
+      No confundir con las confirmaciones de asistencia al cocktail (esas viven en el portal del comité):
+      aquí solo aparece quien <em>abrió la app</em>.
+    </footer>
+  </section>
+
+</div>
+
+<script>
+const FN = 'https://borouviqngtdzfvlmlur.supabase.co/functions/v1/evento-registro';
+const LS = 'nt_evento_clave';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Etiquetas legibles de cada marca del recorrido.
+const HITOS = {
+  ofertas:'Ofertas', detalle:'Abrió una oferta', compra:'Confirmó compra',
+  mercado:'Tu Mercado', credito:'Crédito', asistente:'Asistente NT',
+  trader:'Panel del trader', pedidos:'Pedidos',
+};
+const ORDEN = ['ofertas','detalle','compra','mercado','credito','asistente','pedidos','trader'];
+
+let datos = [];
+let clave = '';
+let timer = null;
+
+const hora = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+};
+
+async function pedir(cl) {
+  const r = await fetch(FN, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'resumen', clave: cl }),
+  });
+  if (r.status === 401) throw new Error('clave');
+  if (!r.ok) throw new Error('servidor');
+  return r.json();
+}
+
+function pintarEstado(abierto) {
+  $('estadoBox').innerHTML = abierto
+    ? '<span class="estado on"><span class="dot"></span>Registro abierto</span>'
+    : '<span class="estado off"><span class="dot"></span>Registro cerrado</span>';
+}
+
+function pintar(j) {
+  datos = j.asistentes || [];
+  pintarEstado(j.abierto);
+  $('kTotal').textContent  = j.total;
+  $('kNav').textContent    = j.navegaron;
+  $('kCompra').textContent = j.compraron;
+  $('kIos').textContent    = j.ios;
+  $('kAnd').textContent    = j.android;
+  $('sello').textContent   = 'Actualizado ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+  filtrar();
+}
+
+function filtrar() {
+  const q = $('buscar').value.trim().toLowerCase();
+  const vis = q
+    ? datos.filter((a) => [a.nombre, a.empresa, a.phone].some((v) => String(v ?? '').toLowerCase().includes(q)))
+    : datos;
+
+  $('vacio').classList.toggle('hide', vis.length > 0);
+  $('filas').innerHTML = vis.map((a) => {
+    const h = a.hitos || {};
+    const chips = ORDEN.filter((k) => h[k]).map((k) =>
+      `<span class="chip${k === 'compra' ? ' compra' : ''}">${HITOS[k]}</span>`).join('');
+    const plat = a.plataforma
+      ? `<span class="chip plat">${a.plataforma === 'ios' ? 'iPhone' : a.plataforma === 'android' ? 'Android' : 'Web'}</span>`
+      : '';
+    return `<tr>
+      <td><div class="nom">${esc(a.nombre)}</div>${a.empresa ? `<div class="emp">${esc(a.empresa)}</div>` : ''}${plat}</td>
+      <td class="tel">${esc(a.phone)}</td>
+      <td class="hora">${hora(a.primer_acceso)}</td>
+      <td class="hora">${a.accesos ?? 1}</td>
+      <td>${chips || '<span class="chip nada">Solo entró</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function cargar() {
+  try {
+    pintar(await pedir(clave));
+  } catch (e) {
+    if (e.message === 'clave') { salir(); $('gateErr').textContent = 'La clave dejó de ser válida.'; }
+  }
+}
+
+function salir() {
+  localStorage.removeItem(LS);
+  clave = '';
+  if (timer) { clearInterval(timer); timer = null; }
+  $('panel').classList.add('hide');
+  $('gate').classList.remove('hide');
+}
+
+async function entrar(cl) {
+  $('gateErr').textContent = '';
+  $('entrar').disabled = true;
+  try {
+    const j = await pedir(cl);
+    clave = cl;
+    localStorage.setItem(LS, cl);
+    $('gate').classList.add('hide');
+    $('panel').classList.remove('hide');
+    pintar(j);
+    // Durante el evento el padrón cambia cada minuto; refrescar solo mientras esté abierto.
+    if (j.abierto && !timer) timer = setInterval(cargar, 30000);
+  } catch (e) {
+    $('gateErr').textContent = e.message === 'clave' ? 'Clave incorrecta.' : 'No se pudo conectar. Reintenta.';
+  } finally {
+    $('entrar').disabled = false;
+  }
+}
+
+$('entrar').addEventListener('click', () => entrar($('clave').value.trim()));
+$('clave').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar($('clave').value.trim()); });
+$('buscar').addEventListener('input', filtrar);
+$('refrescar').addEventListener('click', cargar);
+
+$('csv').addEventListener('click', () => {
+  const cab = ['Nombre','Empresa','Celular','Plataforma','Primer acceso','Ultimo acceso','Veces','Que probo'];
+  const cel = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const filas = datos.map((a) => [
+    a.nombre, a.empresa, a.phone, a.plataforma,
+    hora(a.primer_acceso), hora(a.ultimo_acceso), a.accesos ?? 1,
+    ORDEN.filter((k) => (a.hitos || {})[k]).map((k) => HITOS[k]).join(' · '),
+  ].map(cel).join(','));
+  // BOM para que Excel en español abra los acentos bien.
+  const blob = new Blob(['﻿' + [cab.map(cel).join(','), ...filas].join('\r\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'NT_App_Evento_Asistentes.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+// Sesión recordada: si ya entró antes en este navegador, no vuelve a pedir la clave.
+const guardada = localStorage.getItem(LS);
+if (guardada) entrar(guardada); else $('clave').focus();
+</script>
+</body>
+</html>
