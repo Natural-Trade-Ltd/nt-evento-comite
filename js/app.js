@@ -303,6 +303,7 @@ $('#btnTheme').onclick = () => {
 };
 if (localStorage.getItem('ev_theme') === 'light') document.documentElement.classList.add('light');
 $('#btnAyuda').onclick = ayuda;
+$('#btnInvitar').onclick = () => invitarMenu();
 
 /* ============================================================== MODAL */
 function modal(titulo, cuerpo, pie) {
@@ -875,6 +876,21 @@ function nuevaPersona() {
 
 /* ------------------------------------------------------- invitaciones */
 const URL_PORTAL = 'https://natural-trade-ltd.github.io/nt-evento-comite/';
+function invitarMenu() {
+  const pend = D.persona.filter(p => !p.visto_en);
+  modal('Invitar al portal', `
+    <p class="mut tiny" style="margin:0 0 12px">La invitación se abre ya escrita: la mandas desde Gmail,
+      desde tu app de correo, o la copias para WhatsApp.</p>
+    ${pend.length ? `<h3 style="margin:0 0 8px;font-size:14px">Aún no entran · ${pend.length}</h3>
+      <div class="row wrap" style="margin-bottom:16px">${pend.map(p => `
+        <button class="chip click" data-act="invitar" data-v="${esc(p.email)}"
+          title="${esc(p.email)}">✉ ${esc(p.nombre)}</button>`).join('')}</div>`
+      : `<div class="empty" style="margin-bottom:16px">Todo el comité ya entró 🎉</div>`}
+    <h3 style="margin:0 0 6px;font-size:14px">¿Alguien nuevo? (traders, más equipo)</h3>
+    <p class="mut tiny" style="margin:0 0 10px">Dalo de alta con su correo de Natural Trade o Global Forest
+      y su invitación se abre sola al guardar.</p>
+    <button class="btn p" data-act="nuevaPersona">＋ Agregar persona</button>`);
+}
 function invitar(email) {
   const p = pMap()[email] || { nombre: email.split('@')[0], email };
   const primer = String(p.nombre || '').split(' ')[0];
@@ -1500,4 +1516,19 @@ sb.auth.onAuthStateChange((ev, session) => {
 });
 route();
 setInterval(pintaCuenta, 60000);
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+// Auto-actualización: cuando hay una versión nueva del portal, se recarga sola una vez.
+// (Sin esto, el CDN de Pages + el service worker dejaban a la gente viendo la app vieja.)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    reg.update();
+    reg.addEventListener('updatefound', () => {
+      const w = reg.installing;
+      w?.addEventListener('statechange', () => {
+        if (w.state === 'activated' && navigator.serviceWorker.controller) {
+          toast('Actualizando el portal…');
+          setTimeout(() => location.reload(), 900);
+        }
+      });
+    });
+  }).catch(() => {});
+}
