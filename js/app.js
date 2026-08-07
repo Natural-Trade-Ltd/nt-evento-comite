@@ -68,10 +68,75 @@ const TABS = [
   { k:'mensajes',    t:'Mensajes clave',n:() => D.mensaje.filter(m => m.estado !== 'descartado').length },
   { k:'programa',    t:'Programa',      n:() => D.bloque.length },
   { k:'videos',      t:'Videos',        n:() => D.video.length },
+  { k:'audiovisuales', t:'Audiovisuales', n:() => AV.reduce((s, g) => s + g.piezas.length, 0) },
   { k:'interaccion', t:'Encuesta y mago', n:() => D.pregunta.length + D.acto.length },
   { k:'reparto',     t:'Reparto',       n:() => D.participacion.length },
   { k:'repositorio', t:'Repositorio',   n:() => D.asset.length },
   { k:'ideas',       t:'Ideas',         n:() => D.idea.filter(i => i.estado !== 'descartada').length }
+];
+
+/* ------------------------------------------------- AUDIOVISUALES FINALES
+   Archivos terminados, en Drive: «1. NT-GF PRESENTACION SEPTIEMBRE /
+   Audiovisuales finales». Al agregar una pieza nueva basta con sumarla aquí
+   con su id de Drive; los enlaces se arman solos.                        */
+const AV_CARPETA = '1zbKycCriNAg5yXBFCGWFGp7etzb3fMjQ';
+const AV = [
+  { g: 'Videos para la pantalla', d: 'Los dos loops, sin audio, de 60 segundos. El corte de 1080p es el que va al proyector; el de 720p es para verlo y compartirlo desde el celular.', piezas: [
+    { n: 'De Vancouver al mundo — 1080p',
+      f: 'De_Vancouver_al_Mundo_60s_NOCHE_1080p.mp4', id: '1h8WYmsiHXRJaj1puuaUf5SjsW8-zGH9l',
+      c: ['MP4 1920×1080', '60 s en loop', '40 MB'],
+      t: 'De dónde viene la madera. El mapa se abre en Vancouver en el año 2000 y va sumando los 21 países de origen y los 19 de destino hasta 2026. Las rutas marítimas rodean por mar de verdad: ningún barco cruza tierra.' },
+    { n: 'De Vancouver al mundo — 720p para celular',
+      f: 'De_Vancouver_al_Mundo_60s_NOCHE_720p_movil.mp4', id: '1p-hnOuPqgH5k0Z7iW4AklmIocfoSax6t',
+      c: ['MP4 1280×720', '60 s en loop', '12.5 MB'],
+      t: 'Mismo video, más ligero. Para revisarlo en el teléfono o mandarlo por WhatsApp.' },
+    { n: 'Puertos de entrada a México — 1080p',
+      f: 'Puertos_Entrada_Mexico_60s_NOCHE_1080p.mp4', id: '1dmd8Co6Bmmpol2M2xLoIdYDbFAp9dTX1',
+      c: ['MP4 1920×1080', '60 s en loop', '24 MB'],
+      t: 'Por dónde entra y a dónde llega. Cuatro actos: los 11 cruces terrestres, los 7 puertos marítimos, el reparto a las 45 ciudades y las 12 bodegas y oficinas propias. Los estados se van encendiendo hasta completar los 32.' },
+    { n: 'Puertos de entrada a México — 720p para celular',
+      f: 'Puertos_Entrada_Mexico_60s_NOCHE_720p_movil.mp4', id: '1Jw5Jpw5FvOknFKSa0ZG_ul1DMSO_6Pei',
+      c: ['MP4 1280×720', '60 s en loop', '10 MB'],
+      t: 'Mismo video, más ligero.' },
+  ]},
+  { g: 'Reproductores para revisar', d: 'Un solo archivo HTML que se abre en cualquier navegador, sin instalar nada. Sirve para pausar, mover el tiempo cuadro a cuadro y comparar el tema oscuro con el claro.', piezas: [
+    { n: 'De Vancouver al mundo — reproductor',
+      f: 'De_Vancouver_al_Mundo_LOOP_60s.html', id: '1XHK9cq2B62NU1mcVJFMzM3c0ZMCTm8N0',
+      c: ['HTML', 'se abre solo', '173 KB'],
+      t: 'Teclas: espacio pausa · flechas mueven el tiempo · F pantalla completa · T cambia noche/día · R graba un WebM.' },
+    { n: 'Puertos de entrada a México — reproductor',
+      f: 'Puertos_Entrada_Mexico_LOOP_60s.html', id: '1ayQd3NKQnsbcNGGcdDC6EJ1neDNmhq19',
+      c: ['HTML', 'se abre solo', '274 KB'],
+      t: 'Mismas teclas. Útil para congelar un momento y sacar una lámina para la presentación.' },
+  ]},
+  { g: 'Láminas fijas', d: 'El último cuadro de cada video, en alta resolución. Sirven de fondo, de portada o de respaldo si falla el video.', piezas: [
+    { n: 'Cierre — De Vancouver al mundo',
+      f: 'De_Vancouver_al_Mundo_cierre_NOCHE.png', id: '1Z84d4dNQVlNGRgrPXOsZ-mQpWBBn1UH8',
+      c: ['PNG 1920×1080', '464 KB'],
+      t: '21 países de origen · 19 de destino · 26 años, con los dos logotipos.' },
+    { n: 'Cierre — Puertos de entrada a México',
+      f: 'Puertos_Entrada_Mexico_cierre_NOCHE.png', id: '1WNjqbkuYEPLyMeT4MhV0ftWLIG9NUNNu',
+      c: ['PNG 1920×1080', '457 KB'],
+      t: '18 puertos de entrada · 45 ciudades de destino · 32 estados, con el filete tricolor.' },
+  ]},
+  { g: 'Los datos detrás', d: 'De dónde salió cada cifra. Todo viene de NetSuite salvo lo que está marcado como estimado o declarado.', piezas: [
+    { n: 'Matriz puertos de entrada → destinos',
+      f: 'Matriz_Puertos_Entrada_Mexico_V3.xlsx', id: '1_02K_sQPiGEpC6d8mU5MHtbXKJ3KmRgG',
+      c: ['Excel', '7 hojas', '28 KB'],
+      t: 'Los 18 puertos con su volumen, los 45 destinos agrupados por zona metropolitana, la matriz de 122 carriles reales, las 12 bodegas y los medios de transporte. Marca cuáles de los 32 estados tienen dato de NetSuite y cuáles los declaró Jorge.' },
+    { n: 'Volumen movido 2000-2026',
+      f: 'Volumen_Movido_2000-2026_NT-GF.xlsx', id: '1yJMQObsZI11BcIQJhAyp52TelxeR8y3P',
+      c: ['Excel', 'con gráfica', '12 KB'],
+      t: '35,383 camiones equivalentes y 1,078 millones de pies nominales en 26 años. De 2018 en adelante es dato de NetSuite; 2000 lo capturó Jorge y los años intermedios se interpolan con parámetros editables.' },
+    { n: 'Países de origen y destino 2000-2026',
+      f: 'Reporte_Paises_y_Timeline_Video_NT-GF_2000-2026.xlsx', id: '1upMX09YHQVMvDcXpmp3W2o_aKh52MgdC',
+      c: ['Excel', '21 KB'],
+      t: 'Año de primer embarque por país y continuidad año por año. Es la fuente del primer video.' },
+    { n: 'Guion del video en loop',
+      f: 'Guion_Video_Loop_Evento_NT-GF_30seg.pdf', id: '1PyyMVBVQhtAQgbN0JRcpoDdpjjRoared',
+      c: ['PDF', '332 KB', 'desactualizado'],
+      t: 'Describe el corte original de 30 segundos y una sola versión de tema. El video final quedó en 60 segundos y ya son dos. Sirve para entender el criterio, no como referencia exacta.' },
+  ]},
 ];
 
 const TIPO_BLOQUE = {
@@ -356,11 +421,44 @@ function render() {
   $$('.sec').forEach(s => s.classList.toggle('on', s.dataset.sec === TAB));
   const el = $(`.sec[data-sec="${TAB}"]`);
   ({ inicio: rInicio, mensajes: rMensajes, programa: rPrograma, videos: rVideos,
+     audiovisuales: rAudiovisuales,
      interaccion: rInteraccion, reparto: rReparto, repositorio: rRepositorio,
      ideas: rIdeas, tareas: rTareas })[TAB](el);
 }
 const head = (t, p, extra = '') => `<div class="secheadwrap"><div class="sechead">
   <div class="grow"><h2>${t}</h2><p>${p}</p></div>${extra}</div></div>`;
+
+/* -------------------------------------------------- N. AUDIOVISUALES */
+const avBaja = id => `https://drive.google.com/uc?export=download&id=${id}`;
+const avVer  = id => `https://drive.google.com/file/d/${id}/view`;
+function rAudiovisuales(el) {
+  const n = AV.reduce((s, g) => s + g.piezas.length, 0);
+  el.innerHTML = head('Audiovisuales finales',
+    `Las ${n} piezas terminadas del evento, con enlace directo de descarga. Viven en una sola carpeta de Drive
+     — <b>Audiovisuales finales</b>, dentro de «1. NT-GF PRESENTACION SEPTIEMBRE» — y aquí siempre apunta
+     a la versión más reciente: cuando se actualiza un archivo, el enlace no cambia.`,
+    `<a class="btn" href="https://drive.google.com/drive/folders/${AV_CARPETA}" target="_blank" rel="noopener">Abrir la carpeta</a>`) +
+    `<div class="hint" style="margin-bottom:14px">Si un enlace te pide permiso, avísale a Jorge: la carpeta se
+      comparte a mano. «Descargar» baja el archivo directo; «Ver en Drive» lo abre en el navegador, que es lo
+      cómodo para los videos y los reproductores HTML.</div>` +
+    AV.map(g => `
+      <div class="secheadwrap" style="margin-top:6px">
+        <div class="sechead"><div class="grow"><h2 style="font-size:1.05rem">${esc(g.g)}</h2><p>${esc(g.d)}</p></div></div>
+      </div>
+      <div class="grid g2">${g.piezas.map(p => `
+        <div class="card">
+          <h3>${esc(p.n)}</h3>
+          <div class="row wrap" style="gap:6px;margin:6px 0 8px">
+            ${p.c.map(c => `<span class="chip${c === 'desactualizado' ? ' warn' : ''}">${esc(c)}</span>`).join('')}
+          </div>
+          <div class="mut tiny">${esc(p.t)}</div>
+          <div class="mut2 tiny" style="margin-top:8px;word-break:break-all">${esc(p.f)}</div>
+          <div class="row wrap" style="gap:8px;margin-top:10px">
+            <a class="btn p sm" href="${avBaja(p.id)}">Descargar</a>
+            <a class="btn sm" href="${avVer(p.id)}" target="_blank" rel="noopener">Ver en Drive</a>
+          </div>
+        </div>`).join('')}</div>`).join('');
+}
 
 /* ---------------------------------------------------------- 1. INICIO */
 const suma = tipos => D.bloque.filter(x => tipos.includes(x.tipo))
