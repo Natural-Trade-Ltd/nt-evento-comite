@@ -56,6 +56,14 @@ li b{color:var(--ink)}
 .celda{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px}
 .celda h4{margin:0 0 6px; font-size:17px; font-weight:600}
 .celda p{margin:0; color:var(--sub); font-size:15px}
+
+/* Lámina del QR: el código va sobre blanco puro siempre (lectura de cámara) */
+.qrCaja{
+  flex:0 0 auto; width:min(360px,38vw); background:#FFFFFF; border-radius:16px;
+  border:1px solid var(--line); box-shadow:var(--shadow); padding:18px;
+}
+.qrCaja img{display:block; width:100%; height:auto}
+@media (max-width:1100px){ .qrCaja{width:250px; align-self:center} }
 .ayuda{margin:38px 0 0; color:var(--faint); font-size:13.5px}
 .ayuda b{color:var(--sub)}
 
@@ -206,6 +214,24 @@ body.negro{background:#000}
     <div class="rule"></div>
     <div class="rejilla">
       <div class="celda"><h4>Acceso personal</h4><p>Solo números autorizados, código de un solo uso y biometría en el teléfono.</p></div><div class="celda"><h4>Marca de agua</h4><p>Cada pantalla lleva la identidad de quien la está viendo, en toda la superficie.</p></div><div class="celda"><h4>Uso registrado</h4><p>Si alguien toma una captura, queda registrado quién, en qué pantalla y a qué hora.</p></div><div class="celda"><h4>Nada sensible en el teléfono</h4><p>Costos, márgenes y el motor de precios viven en el servidor. El teléfono solo muestra.</p></div>
+    </div>
+  </section>
+
+  <!-- Lámina final: el QR del salón. Un solo código para iPhone y Android;
+       la página de destino detecta el teléfono y muestra el botón correcto. -->
+  <section class="slide">
+    <div class="qrCaja"><img src="img/app/15_qr.png" alt="Código QR para descargar la NT App"></div>
+    <div class="txt">
+      <p class="eyebrow">Llévatela hoy</p>
+      <h2>Descarga la NT App</h2>
+      <p class="frase">Un solo código para iPhone y Android.</p>
+      <h3>Tres pasos</h3>
+      <ul>
+        <li><b>Apunta tu cámara</b> al código — la página reconoce tu teléfono y te lleva a la tienda correcta.</li>
+        <li><b>Instala.</b> En iPhone te pedirá primero TestFlight, el instalador de Apple: instálalo y vuelve a tocar el botón.</li>
+        <li>Abre la app, toca <b>“Soy invitado del evento”</b> y escribe tu nombre, empresa y celular. Sin códigos ni contraseñas — entras al instante.</li>
+      </ul>
+      <div class="importa"><h3>Lo que verás</h3><p>El recorrido completo con datos de demostración. ¿Quieres tu información real? Dínoslo esta noche y te damos de alta.</p></div>
     </div>
   </section>
 
