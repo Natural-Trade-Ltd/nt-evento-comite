@@ -250,7 +250,7 @@ function pintar(j) {
 function filtrar() {
   const q = $('buscar').value.trim().toLowerCase();
   const vis = q
-    ? datos.filter((a) => [a.nombre, a.empresa, a.phone].some((v) => String(v ?? '').toLowerCase().includes(q)))
+    ? datos.filter((a) => [a.nombre, a.empresa, a.phone, a.correo].some((v) => String(v ?? '').toLowerCase().includes(q)))
     : datos;
 
   $('vacio').classList.toggle('hide', vis.length > 0);
@@ -262,7 +262,7 @@ function filtrar() {
       ? `<span class="chip plat">${a.plataforma === 'ios' ? 'iPhone' : a.plataforma === 'android' ? 'Android' : 'Web'}</span>`
       : '';
     return `<tr>
-      <td><div class="nom">${esc(a.nombre)}</div>${a.empresa ? `<div class="emp">${esc(a.empresa)}</div>` : ''}${plat}</td>
+      <td><div class="nom">${esc(a.nombre)}</div>${a.empresa ? `<div class="emp">${esc(a.empresa)}</div>` : ''}${a.correo ? `<div class="emp">${esc(a.correo)}</div>` : ''}${plat}</td>
       <td class="tel">${esc(a.phone)}</td>
       <td class="hora">${hora(a.primer_acceso)}</td>
       <td class="hora">${a.accesos ?? 1}</td>
@@ -312,7 +312,7 @@ $('buscar').addEventListener('input', filtrar);
 $('refrescar').addEventListener('click', cargar);
 
 $('csv').addEventListener('click', () => {
-  const cab = ['Nombre','Empresa','Celular','Plataforma','Primer acceso','Ultimo acceso','Veces','Que probo'];
+  const cab = ['Nombre','Empresa','Correo','Celular','Plataforma','Primer acceso','Ultimo acceso','Veces','Que probo'];
   const cel = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const filas = datos.map((a) => [
     a.nombre, a.empresa, a.phone, a.plataforma,
