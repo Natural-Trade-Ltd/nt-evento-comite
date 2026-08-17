@@ -83,12 +83,12 @@ const AV_CARPETA = '1zbKycCriNAg5yXBFCGWFGp7etzb3fMjQ';
 const AV = [
   { g: 'Videos para la pantalla', d: 'Los dos loops, sin audio, de 60 segundos. El corte de 1080p es el que va al proyector; el de 720p es para verlo y compartirlo desde el celular.', piezas: [
     { n: 'De Vancouver al mundo — 1080p',
-      f: 'De_Vancouver_al_Mundo_60s_NOCHE_1080p.mp4', id: '1h8WYmsiHXRJaj1puuaUf5SjsW8-zGH9l',
-      c: ['MP4 1920×1080', '60 s en loop', '40 MB'],
-      t: 'De dónde viene la madera. El mapa se abre en Vancouver en el año 2000 y va sumando los 21 países de origen y los 19 de destino hasta 2026. Las rutas marítimas rodean por mar de verdad: ningún barco cruza tierra.' },
+      f: 'De_Vancouver_al_Mundo_70s_NOCHE_1080p.mp4', id: '1h8WYmsiHXRJaj1puuaUf5SjsW8-zGH9l',
+      c: ['MP4 1920×1080', '70 s en loop', '46 MB'],
+      t: 'De dónde viene la madera. El mapa se abre en Vancouver en el año 2000 y va sumando los 21 países de origen y los 19 de destino hasta 2026. Cierra con diez segundos donde las 34 rutas se recorren a la vez. Las rutas marítimas rodean por mar de verdad: ningún barco cruza tierra.' },
     { n: 'De Vancouver al mundo — 720p para celular',
-      f: 'De_Vancouver_al_Mundo_60s_NOCHE_720p_movil.mp4', id: '1p-hnOuPqgH5k0Z7iW4AklmIocfoSax6t',
-      c: ['MP4 1280×720', '60 s en loop', '12.5 MB'],
+      f: 'De_Vancouver_al_Mundo_70s_NOCHE_720p_movil.mp4', id: '1p-hnOuPqgH5k0Z7iW4AklmIocfoSax6t',
+      c: ['MP4 1280×720', '70 s en loop', '18 MB'],
       t: 'Mismo video, más ligero. Para revisarlo en el teléfono o mandarlo por WhatsApp.' },
     { n: 'Puertos de entrada a México — 1080p',
       f: 'Puertos_Entrada_Mexico_60s_NOCHE_1080p.mp4', id: '1dmd8Co6Bmmpol2M2xLoIdYDbFAp9dTX1',
@@ -101,8 +101,8 @@ const AV = [
   ]},
   { g: 'Reproductores para revisar', d: 'Un solo archivo HTML que se abre en cualquier navegador, sin instalar nada. Sirve para pausar, mover el tiempo cuadro a cuadro y comparar el tema oscuro con el claro.', piezas: [
     { n: 'De Vancouver al mundo — reproductor',
-      f: 'De_Vancouver_al_Mundo_LOOP_60s.html', id: '1XHK9cq2B62NU1mcVJFMzM3c0ZMCTm8N0',
-      c: ['HTML', 'se abre solo', '173 KB'],
+      f: 'De_Vancouver_al_Mundo_LOOP_70s.html', id: '1XHK9cq2B62NU1mcVJFMzM3c0ZMCTm8N0',
+      c: ['HTML', 'se abre solo', '172 KB'],
       t: 'Teclas: espacio pausa · flechas mueven el tiempo · F pantalla completa · T cambia noche/día · R graba un WebM.' },
     { n: 'Puertos de entrada a México — reproductor',
       f: 'Puertos_Entrada_Mexico_LOOP_60s.html', id: '1ayQd3NKQnsbcNGGcdDC6EJ1neDNmhq19',
