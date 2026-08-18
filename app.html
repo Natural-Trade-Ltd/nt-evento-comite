@@ -130,6 +130,45 @@ tr:last-child td{border-bottom:none}
 .vacio{padding:44px 20px; text-align:center; color:var(--sub)}
 footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
 .hide{display:none}
+
+/* Pestañas del tablero */
+.tabs{display:flex; gap:8px; margin-bottom:18px}
+.tab{
+  font:inherit; font-size:14px; font-weight:600; cursor:pointer;
+  border:1px solid var(--line); background:transparent; color:var(--sub);
+  border-radius:999px; padding:8px 18px;
+}
+.tab.on{background:var(--acc); color:var(--accInk); border-color:var(--acc)}
+.secT{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif; font-weight:400; font-size:22px; margin:6px 0 12px}
+.secS{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:13px; color:var(--faint); font-weight:400}
+
+/* Editor de preguntas */
+.pregunta{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:14px 16px; margin-bottom:10px; display:grid; gap:8px;
+  grid-template-columns:64px 130px 1fr; align-items:start;
+}
+.pregunta.apagada{opacity:.55}
+.pregunta input[type=text], .pregunta input[type=number], .pregunta select{
+  width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:10px;
+  background:var(--bg); color:var(--ink); font:inherit; font-size:13.5px;
+}
+.pregunta .fila2{grid-column:1 / -1; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.pregunta .fila2 input{flex:1; min-width:220px}
+.mini{font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; border-radius:999px; padding:7px 14px; border:1px solid transparent}
+.mini.guardar{background:var(--acc); color:var(--accInk)}
+.mini.quitar{background:transparent; color:var(--riesgo); border-color:var(--line)}
+.mini.prender{background:transparent; color:var(--acc); border-color:var(--line)}
+.etiq{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--faint)}
+
+/* Respuestas por invitado */
+.resp{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:10px}
+.resp .quien{font-weight:600}
+.resp .datos{color:var(--sub); font-size:12.5px; margin-bottom:8px}
+.resp .par{display:flex; gap:8px; margin:4px 0; font-size:13.5px}
+.resp .par .q{color:var(--faint); min-width:40%; max-width:46%}
+.resp .par .r{color:var(--ink)}
+@media (max-width:700px){ .pregunta{grid-template-columns:1fr} }
 @media (max-width:560px){ h1{font-size:26px} .wrap{padding:20px 14px 50px} }
 </style>
 </head>
@@ -159,6 +198,13 @@ footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
   </section>
 
   <section id="panel" class="hide">
+    <!-- Pestañas: padrón del evento / cuestionario post-evento -->
+    <div class="tabs">
+      <button class="tab on" id="tabPadron">Padrón</button>
+      <button class="tab" id="tabEncuesta">Cuestionario</button>
+    </div>
+
+    <div id="secPadron">
     <div class="kpis">
       <div class="kpi"><div class="n acc" id="kTotal">0</div><div class="l">Invitados</div></div>
       <div class="kpi"><div class="n" id="kNav">0</div><div class="l">Sí navegaron</div></div>
@@ -190,6 +236,36 @@ footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
       No confundir con las confirmaciones de asistencia al cocktail (esas viven en el portal del comité):
       aquí solo aparece quien <em>abrió la app</em>.
     </footer>
+    </div><!-- /secPadron -->
+
+    <!-- ── CUESTIONARIO post-evento ─────────────────────────────────────────── -->
+    <div id="secEncuesta" class="hide">
+      <div class="kpis">
+        <div class="kpi"><div class="n acc" id="eContestaron">0</div><div class="l">Contestaron</div></div>
+        <div class="kpi"><div class="n" id="ePreguntas">0</div><div class="l">Preguntas activas</div></div>
+        <div class="kpi"><div class="n" id="eRespuestas">0</div><div class="l">Respuestas</div></div>
+      </div>
+
+      <h2 class="secT">Preguntas <span class="secS">— lo que el invitado ve en la app. Los cambios pegan al instante, sin publicar versiones.</span></h2>
+      <div id="editor"></div>
+      <div class="tools" style="margin-top:10px">
+        <button class="ghost" id="agregar">＋ Agregar pregunta</button>
+        <span class="meta">Tipos: opción (una) · múltiple (varias) · número · texto · escala 1-5. En opción/múltiple separa las opciones con comas.</span>
+      </div>
+
+      <h2 class="secT" style="margin-top:26px">Respuestas</h2>
+      <div class="tools">
+        <button class="ghost" id="csvEncuesta">Bajar Excel</button>
+        <button class="ghost" id="refrescarEncuesta">Actualizar</button>
+      </div>
+      <div id="respuestas"></div>
+
+      <footer>
+        Para encender el cuestionario después del evento:
+        <code>update app_config set etapa_invitado = 'encuesta' where id = 1;</code>
+        (los invitados que abran la app dejarán sus respuestas en vez de ver el demo).
+      </footer>
+    </div>
   </section>
 
 </div>
@@ -324,6 +400,150 @@ $('csv').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'NT_App_Evento_Asistentes.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+// ── Pestañas ──────────────────────────────────────────────────────────────────
+let encuestaCargada = false;
+const verTab = (cual) => {
+  $('tabPadron').classList.toggle('on', cual === 'padron');
+  $('tabEncuesta').classList.toggle('on', cual === 'encuesta');
+  $('secPadron').classList.toggle('hide', cual !== 'padron');
+  $('secEncuesta').classList.toggle('hide', cual !== 'encuesta');
+  if (cual === 'encuesta' && !encuestaCargada) cargarEncuesta();
+};
+$('tabPadron').addEventListener('click', () => verTab('padron'));
+$('tabEncuesta').addEventListener('click', () => verTab('encuesta'));
+
+// ── Cuestionario: editor de preguntas + respuestas ────────────────────────────
+// Las preguntas viven en el servidor; lo que se guarda aquí lo ve la app al instante.
+let ePreguntas = [];
+let eRespuestas = [];
+
+async function llamar(cuerpo) {
+  const r = await fetch(FN, { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ ...cuerpo, clave }) });
+  return r.json().catch(() => ({}));
+}
+
+async function cargarEncuesta() {
+  const j = await llamar({ action:'encuesta_resumen' });
+  if (!j.ok) return;
+  encuestaCargada = true;
+  ePreguntas = j.preguntas || [];
+  eRespuestas = j.respuestas || [];
+  $('eContestaron').textContent = j.contestaron ?? 0;
+  $('ePreguntas').textContent = ePreguntas.filter((p) => p.activa).length;
+  $('eRespuestas').textContent = eRespuestas.length;
+  pintarEditor();
+  pintarRespuestas();
+}
+
+const TIPOS = [['opcion','Opción (una)'],['multiple','Múltiple'],['numero','Número'],['texto','Texto'],['escala','Escala 1-5']];
+
+function filaPregunta(p) {
+  const conOpciones = p.tipo === 'opcion' || p.tipo === 'multiple';
+  return `<div class="pregunta ${p.activa === false ? 'apagada' : ''}" data-id="${p.id ?? ''}">
+    <div><div class="etiq">Orden</div><input type="number" class="pOrden" value="${p.orden ?? 100}"></div>
+    <div><div class="etiq">Tipo</div>
+      <select class="pTipo">${TIPOS.map(([v,l]) => `<option value="${v}" ${p.tipo===v?'selected':''}>${l}</option>`).join('')}</select>
+    </div>
+    <div><div class="etiq">Pregunta</div><input type="text" class="pTexto" maxlength="300" value="${esc(p.texto ?? '')}"></div>
+    <div class="fila2 pOpsFila" style="${conOpciones ? '' : 'display:none'}">
+      <div class="etiq">Opciones (separadas por coma)</div>
+      <input type="text" class="pOps" value="${esc((p.opciones ?? []).join(', '))}">
+    </div>
+    <div class="fila2">
+      <button class="mini guardar">Guardar</button>
+      ${p.id ? (p.activa === false
+        ? '<button class="mini prender">Volver a activar</button>'
+        : '<button class="mini quitar">Quitar</button>') : ''}
+      <span class="meta pEstado"></span>
+    </div>
+  </div>`;
+}
+
+function pintarEditor() {
+  $('editor').innerHTML = ePreguntas.map(filaPregunta).join('') ||
+    '<div class="vacio">Sin preguntas. Agrega la primera.</div>';
+  // Comportamiento por fila: mostrar opciones solo cuando el tipo las usa, guardar y apagar.
+  for (const el of $('editor').querySelectorAll('.pregunta')) {
+    const id = el.dataset.id ? Number(el.dataset.id) : null;
+    el.querySelector('.pTipo').addEventListener('change', (e) => {
+      const t = e.target.value;
+      el.querySelector('.pOpsFila').style.display = (t === 'opcion' || t === 'multiple') ? '' : 'none';
+    });
+    el.querySelector('.guardar').addEventListener('click', async () => {
+      const estado = el.querySelector('.pEstado');
+      estado.textContent = 'Guardando…';
+      const tipo = el.querySelector('.pTipo').value;
+      const ops = el.querySelector('.pOps').value.split(',').map((s) => s.trim()).filter(Boolean);
+      const j = await llamar({
+        action:'pregunta_guardar', id: id ?? undefined,
+        orden: Number(el.querySelector('.pOrden').value || 100),
+        tipo, texto: el.querySelector('.pTexto').value,
+        opciones: (tipo === 'opcion' || tipo === 'multiple') ? ops : null,
+        activa: true,
+      });
+      estado.textContent = j.ok ? 'Guardado ✓ (ya lo ve la app)' : ('No se guardó: ' + (j.error ?? ''));
+      if (j.ok) { encuestaCargada = false; cargarEncuesta(); }
+    });
+    el.querySelector('.quitar')?.addEventListener('click', async () => {
+      await llamar({ action:'pregunta_quitar', id });
+      encuestaCargada = false; cargarEncuesta();
+    });
+    el.querySelector('.prender')?.addEventListener('click', async () => {
+      const p = ePreguntas.find((x) => x.id === id);
+      await llamar({ action:'pregunta_guardar', id, orden:p.orden, tipo:p.tipo, texto:p.texto, opciones:p.opciones, activa:true });
+      encuestaCargada = false; cargarEncuesta();
+    });
+  }
+}
+
+$('agregar').addEventListener('click', () => {
+  ePreguntas.push({ id:null, orden:(Math.max(0,...ePreguntas.map(p=>p.orden||0)) + 10), tipo:'opcion', texto:'', opciones:[], activa:true });
+  pintarEditor();
+  $('editor').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+function pintarRespuestas() {
+  const porPhone = new Map();
+  for (const r of eRespuestas) {
+    if (!porPhone.has(r.phone)) porPhone.set(r.phone, { quien:r, pares:[] });
+    const preg = ePreguntas.find((p) => p.id === r.pregunta_id);
+    porPhone.get(r.phone).pares.push({
+      q: preg ? preg.texto : ('Pregunta ' + r.pregunta_id),
+      r: Array.isArray(r.respuesta) ? r.respuesta.join(' · ') : String(r.respuesta),
+      orden: preg ? preg.orden : 999,
+    });
+  }
+  const bloques = [...porPhone.values()].map((b) => `<div class="resp">
+      <div class="quien">${esc(b.quien.nombre ?? b.quien.phone)}</div>
+      <div class="datos">${esc([b.quien.empresa, b.quien.correo, b.quien.phone].filter(Boolean).join(' · '))}</div>
+      ${b.pares.sort((a, z) => a.orden - z.orden).map((p) => `<div class="par"><div class="q">${esc(p.q)}</div><div class="r">${esc(p.r)}</div></div>`).join('')}
+    </div>`);
+  $('respuestas').innerHTML = bloques.join('') || '<div class="vacio">Aún no hay respuestas. Aparecerán aquí en cuanto el cuestionario esté encendido y alguien conteste.</div>';
+}
+
+$('refrescarEncuesta').addEventListener('click', () => { encuestaCargada = false; cargarEncuesta(); });
+
+$('csvEncuesta').addEventListener('click', () => {
+  // Excel: una fila por invitado, una columna por pregunta (en su orden).
+  const activasPrimero = [...ePreguntas].sort((a, z) => (a.orden ?? 999) - (z.orden ?? 999));
+  const cel = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const cab = ['Nombre','Empresa','Correo','Celular', ...activasPrimero.map((p) => p.texto)];
+  const porPhone = new Map();
+  for (const r of eRespuestas) {
+    if (!porPhone.has(r.phone)) porPhone.set(r.phone, { quien:r, r:{} });
+    porPhone.get(r.phone).r[r.pregunta_id] = Array.isArray(r.respuesta) ? r.respuesta.join(' · ') : r.respuesta;
+  }
+  const filas = [...porPhone.values()].map((b) =>
+    [b.quien.nombre, b.quien.empresa, b.quien.correo, b.quien.phone, ...activasPrimero.map((p) => b.r[p.id] ?? '')].map(cel).join(','));
+  const blob = new Blob(['﻿' + [cab.map(cel).join(','), ...filas].join('\r\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'NT_App_Cuestionario_Respuestas.csv';
   a.click();
   URL.revokeObjectURL(a.href);
 });
