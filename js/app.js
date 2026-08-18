@@ -85,7 +85,7 @@ const AV = [
     { n: 'Teaser de 10 segundos',
       f: 'Teaser_10s_NT-GF_1080p.mp4', id: '1zBBAdgqXz-WPUJCCp33N1Ojf517GyBem',
       c: ['MP4 1920×1080', '10 s en loop', '6 MB', 'nuevo'],
-      t: 'Los dos videos en uno: cinco segundos del gran final de «De Vancouver al mundo» y cinco del reparto de «Puertos de entrada a México», con disolvencia entre ambos y entrada y salida por negro para dejarlo en loop. Los dos momentos se escogieron midiendo en qué segundos hay más movimiento en pantalla.' },
+      t: 'Los dos videos en uno: cinco segundos de cada mapa, con disolvencia entre ambos y entrada y salida por negro para dejarlo en loop. No es un recorte del video largo: aquí TODAS las rutas se recorren a la vez y a la misma velocidad, sin rótulos ni etiquetas, y las cifras van abajo sobre el mapa en movimiento — 21 orígenes y 19 destinos en el primero, 18 puertos, 45 ciudades y 32 estados en el segundo.' },
     { n: 'De Vancouver al mundo — 1080p',
       f: 'De_Vancouver_al_Mundo_65s_NOCHE_1080p.mp4', id: '1h8WYmsiHXRJaj1puuaUf5SjsW8-zGH9l',
       c: ['MP4 1920×1080', '65 s en loop', '44 MB'],
