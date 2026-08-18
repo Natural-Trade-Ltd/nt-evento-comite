@@ -5,7 +5,8 @@
       "name": "comite",
       "runtimeExecutable": "node",
       "runtimeArgs": ["serve.js"],
-      "port": 8099
+      "port": 8099,
+      "autoPort": true
     }
   ]
 }

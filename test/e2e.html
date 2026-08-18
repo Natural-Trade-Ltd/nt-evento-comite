@@ -3,10 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Comité · Evento 1-sep · Natural Trade / Global Forest</title>
-<meta name="description" content="Portal de trabajo del comité organizador del cóctel para clientes clave — 1 de septiembre de 2026, CDMX.">
+<title>PRUEBA LOCAL · Comité · Evento 1-sep</title>
+<!-- ==================================================================
+     ARNÉS DE PRUEBA E2E — no es el portal real.
+     Carga el MISMO js/app.js y css/app.css de producción, pero el import
+     map de abajo sustituye supabase-js por test/mock-supabase.js: datos
+     en memoria (los 15 bloques reales) y sesión ya iniciada, sin tocar
+     el proyecto cytopyytymxjwvfhosvg.
+     Usa ?premig=1 para simular la base SIN la migración 02.
+     ================================================================== -->
+<base href="../">
+<script type="importmap">
+{ "imports": { "https://esm.sh/@supabase/supabase-js@2.45.4": "./test/mock-supabase.js" } }
+</script>
 <meta name="theme-color" content="#0b1310">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/app.css?v=7">
 </head>
@@ -18,16 +28,12 @@
     <div class="brandmark">🌲</div>
     <h1>Comité organizador</h1>
     <p>Cóctel para clientes clave · 1 de septiembre de 2026<br>Presidente Polanco, CDMX · Salón «Feria»</p>
-    <button class="gbtn" id="gGoogle">
-      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.5 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-2.8-.4-4.1H24v8.1h12.6c-.3 2.1-1.6 5.2-4.6 7.3l7.6 5.9c4.5-4.2 6.5-10.2 6.5-17.2z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.3 0 20 0 24s1 7.7 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.6l-7.6-5.9c-2 1.4-4.7 2.4-7.7 2.4-6.3 0-11.7-3.7-13.6-9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
-      Continuar con Google
-    </button>
+    <button class="gbtn" id="gGoogle">Continuar con Google</button>
     <div class="sep">o con tu correo</div>
     <div class="row">
       <input type="email" id="gMail" placeholder="tu@naturaltrade.ca" autocomplete="email">
       <button class="btn" id="gLink">Enviar enlace</button>
     </div>
-    <p class="hint" style="margin-top:12px">Entran los correos <b>@naturaltrade.ca</b> y <b>@globalforest.com.mx</b>.</p>
     <div id="gErr" class="gerr hide"></div>
     <details style="margin-top:14px;text-align:left">
       <summary class="mut2" style="cursor:pointer">¿El enlace del correo no te regresó aquí?</summary>
@@ -84,6 +90,9 @@
 <div id="progFinal" class="hide"></div>
 
 <div id="toast"></div>
+<div style="position:fixed;bottom:8px;left:8px;z-index:999;background:#9A6A12;color:#fff;
+  padding:3px 10px;border-radius:8px;font:600 11px system-ui;pointer-events:none">
+  PRUEBA LOCAL · datos simulados</div>
 <script type="module" src="js/app.js?v=7"></script>
 </body>
 </html>

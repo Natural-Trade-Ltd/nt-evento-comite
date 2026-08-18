@@ -9,7 +9,8 @@ const SB_URL = 'https://cytopyytymxjwvfhosvg.supabase.co';
 const SB_KEY = 'sb_publishable_IjJWRYALvIWN-yzM11IYVw_GaVEf6RN';
 const DOMINIOS = ['naturaltrade.ca', 'globalforest.com.mx'];
 const EVENTO   = new Date('2026-09-01T19:00:00-06:00');
-const INICIO_PROGRAMA = 18 * 60 + 45;      // 18:45 en minutos
+const INICIO_EVENTO = 19 * 60;             // 7:00 pm — arranca el evento
+const FIN_EVENTO    = 21 * 60;             // 9:00 pm — hora comprometida de cierre
 // La junta acordó: 30 min de presentación + ~10 de preguntas. El mago va aparte.
 const PRESENTA = ['vivo', 'video', 'encuesta'];
 const META_PRESENTA = 30;
@@ -24,7 +25,16 @@ const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 const br  = s => esc(s).replace(/\n/g, '<br>');
 const pad = n => String(n).padStart(2, '0');
-const hhmm = m => `${pad(Math.floor(m / 60) % 24)}:${pad(Math.round(m) % 60)}`;
+const hhmm = m => { m = Math.round(m); return `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`; };
+/* Horas del programa: en la base son `time` (HH:MM:SS); aquí viven como
+   minutos desde medianoche y se muestran en 12 h, como se dice en México. */
+const mDe = t => { if (t == null || t === '') return null; const p = String(t).split(':'); return +p[0] * 60 + +p[1]; };
+const t24 = m => hhmm(m);                   // valor para <input type="time">
+const h12 = m => { m = ((Math.round(m) % 1440) + 1440) % 1440;
+  return `${Math.floor(m / 60) % 12 || 12}:${pad(m % 60)} ${Math.floor(m / 60) < 12 ? 'am' : 'pm'}`; };
+const rango12 = (a, b) => { const A = h12(a), B = h12(b);
+  return A.slice(-2) === B.slice(-2) ? `${A.slice(0, -3)}–${B}` : `${A} – ${B}`; };
+const fmtMin = n => Number.isInteger(Number(n)) ? Number(n) : Math.round(Number(n) * 10) / 10;
 const kb = b => !b ? '' : b < 1024 * 1024 ? `${Math.round(b / 1024)} KB` : `${(b / 1048576).toFixed(1)} MB`;
 const uniq = a => [...new Set(a)];
 const by = (k, dir = 1) => (a, b) => (a[k] > b[k] ? dir : a[k] < b[k] ? -dir : 0);
@@ -384,7 +394,21 @@ function modal(titulo, cuerpo, pie) {
 function cerrar() { $('#modal').classList.remove('on'); $('#mbox').classList.remove('wide'); }
 $('#mX').onclick = cerrar;
 $('#modal').onclick = e => { if (e.target.id === 'modal' || e.target.closest('[data-cerrar]')) cerrar(); };
-document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrar(); cerrarProgFinal(); } });
+
+/* Cambios de hora directos en la lista del programa */
+document.addEventListener('change', e => {
+  const inp = e.target.closest('input.tinp[data-hora]');
+  if (inp) guardaHoras(inp.dataset.id);
+});
+/* En el modal de bloque: inicio/fin ↔ minutos se recalculan en vivo */
+document.addEventListener('input', e => {
+  const t = e.target.id;
+  if (t !== 'bIni' && t !== 'bFin' && t !== 'bMin') return;
+  const ini = mDe(val('bIni')), fin = mDe(val('bFin'));
+  if (t === 'bMin') { if (ini != null) $('#bFin').value = t24(ini + Number(val('bMin') || 0)); }
+  else if (ini != null && fin != null) $('#bMin').value = fmtMin(Math.max(0, fin - ini));
+});
 
 function campo(id, etiqueta, valor = '', tipo = 'text', extra = '') {
   const v = esc(valor ?? '');
@@ -627,44 +651,85 @@ function nuevoMensaje() {
 }
 
 /* -------------------------------------------------------- 3. PROGRAMA */
+/* Horario efectivo de cada bloque: usa inicio/fin guardados; si a un bloque
+   le faltan, se encadena después del anterior (el primero arranca 7:00 pm). */
+function horario() {
+  let cursor = INICIO_EVENTO;
+  return D.bloque.map(b => {
+    const ini = mDe(b.inicio) ?? cursor;
+    const fin = mDe(b.fin) ?? (ini + Number(b.minutos || 0));
+    cursor = Math.max(ini, fin);
+    return { b, ini, fin, dur: Math.max(0, fin - ini), invalido: fin < ini };
+  });
+}
+/* Traslapes entre bloques: id -> [{con: título del otro, min: minutos}] */
+function traslapes(hs) {
+  const m = {};
+  for (let i = 0; i < hs.length; i++) for (let j = i + 1; j < hs.length; j++) {
+    const ov = Math.min(hs[i].fin, hs[j].fin) - Math.max(hs[i].ini, hs[j].ini);
+    if (ov > 0) {
+      (m[hs[i].b.id] ??= []).push({ con: hs[j].b.titulo, min: ov });
+      (m[hs[j].b.id] ??= []).push({ con: hs[i].b.titulo, min: ov });
+    }
+  }
+  return m;
+}
+
 function rPrograma(el) {
   const nu = nucleo();
   const sem = semaforoDe(nu.presenta);
-  let t = INICIO_PROGRAMA;
+  const hs = horario();
+  const enc = traslapes(hs);
+  const nEnc = Object.keys(enc).length;
+  const finReal = hs.length ? Math.max(...hs.map(h => h.fin)) : INICIO_EVENTO;
   el.innerHTML = head('Programa · run of show',
-    `El orden y los minutos que se desprenden de la junta: 30 de presentación + 10 de preguntas, intercalando
-     video y vivo, con el mago de bookend. Las horas se calculan solas desde las 18:45 — cambia un minuto y
-     todo se recorre. <b>Ajusta, reordena y asigna voces.</b>`,
-    `<button class="btn p" data-act="nuevoBloque">＋ Bloque</button>`) + `
+    `El evento corre de <b>7:00 a 9:00 pm</b>. Cada bloque lleva su hora de inicio y de fin — edítalas aquí
+     mismo y la duración se recalcula sola. Si dos bloques se enciman, se pintan en ámbar con los minutos
+     del traslape. Reordena con ↑↓; <b>⛓ Re-encadenar</b> acomoda cada bloque donde termina el anterior.`,
+    `<button class="btn" data-act="progFinal" title="Vista limpia para imprimir o compartir">🖨 Programa final</button>
+     <button class="btn" data-act="reencadenar" title="El inicio de cada bloque pasa a ser el fin del anterior; el primero conserva su hora">⛓ Re-encadenar</button>
+     <button class="btn p" data-act="nuevoBloque">＋ Bloque</button>`) + `
     <div class="timeline">
       <div class="row wrap" style="margin-bottom:10px">
         <span class="chip ${sem}">Presentación ${nu.presenta} min · meta ${META_PRESENTA}</span>
         <span class="chip gold">🎩 mago ${nu.mago}</span>
         <span class="chip">🙋 preguntas ${nu.preguntas}</span>
         <span class="chip">${nu.escena} min en escena</span>
-        <span class="chip">18:45 → ${hhmm(INICIO_PROGRAMA + D.bloque.reduce((s, b) => s + Number(b.minutos || 0), 0))}</span>
+        ${hs.length ? `<span class="chip">${rango12(hs[0].ini, finReal)}</span>` : ''}
+        ${finReal > FIN_EVENTO ? `<span class="chip enc">termina ${fmtMin(finReal - FIN_EVENTO)} min después de las 9:00 pm</span>` : ''}
+        ${nEnc ? `<span class="chip enc">⚠ ${nEnc} bloque${nEnc === 1 ? '' : 's'} encimado${nEnc === 1 ? '' : 's'}</span>` : ''}
         ${sem !== 'ok' ? `<span class="chip bad">sobran ${nu.presenta - META_PRESENTA} min</span>` : ''}
       </div>
       ${tlBar()}
     </div>` +
-    D.bloque.map((b, i) => {
-      const ini = t; t += Number(b.minutos || 0);
+    hs.map((h, i) => {
+      const b = h.b, ov = enc[b.id];
       const parts = D.participacion.filter(p => p.bloque_id === b.id);
-      return `<div class="bloque">
-        <div class="btime"><div class="m">${b.minutos}</div><div class="h">${hhmm(ini)}</div></div>
+      return `<div class="bloque${ov || h.invalido ? ' enc' : ''}">
+        <div class="btime">
+          <label class="tlbl" for="ti-${b.id}">inicia</label>
+          <input class="tinp" id="ti-${b.id}" type="time" value="${t24(h.ini)}" data-hora data-id="${b.id}">
+          <label class="tlbl" for="tf-${b.id}">termina</label>
+          <input class="tinp" id="tf-${b.id}" type="time" value="${t24(h.fin)}" data-hora data-id="${b.id}">
+          <div class="m">${fmtMin(h.dur)} min</div>
+        </div>
         <div class="bbar ${b.tipo}"></div>
         <div class="grow">
           <div class="row wrap" style="gap:7px">
             <span class="b">${esc(b.titulo)}</span>
+            <span class="chip">${rango12(h.ini, h.fin)}</span>
             <span class="chip">${TIPO_BLOQUE[b.tipo]?.i || ''} ${TIPO_BLOQUE[b.tipo]?.l || b.tipo}</span>
             ${chipEst(b.estado)}
             <span class="acts">
               <button class="mini" data-act="mvBloque" data-id="${b.id}" data-dir="-1" ${i === 0 ? 'disabled' : ''} title="Subir">↑</button>
-              <button class="mini" data-act="mvBloque" data-id="${b.id}" data-dir="1" ${i === D.bloque.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
+              <button class="mini" data-act="mvBloque" data-id="${b.id}" data-dir="1" ${i === hs.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
               ${cBtn('bloque', b.id, b.titulo)}
               <button class="mini" data-act="edBloque" data-id="${b.id}" title="Editar">✎</button>
             </span>
           </div>
+          ${h.invalido ? `<div class="encleg">⚠ El fin es antes del inicio — corrige la hora.</div>` : ''}
+          ${ov ? `<div class="encleg">⚠ ${ov.map(o =>
+            `se encima ${fmtMin(o.min)} min con «${esc(o.con)}»`).join(' · ')}</div>` : ''}
           ${b.objetivo ? `<div class="tiny" style="margin-top:5px"><span class="mut2">OBJETIVO ·</span> ${esc(b.objetivo)}</div>` : ''}
           ${b.descripcion ? `<div class="mut tiny" style="margin-top:4px">${br(b.descripcion)}</div>` : ''}
           ${b.pantalla ? `<div class="mut2" style="margin-top:4px">🖥 ${esc(b.pantalla)}</div>` : ''}
@@ -680,14 +745,25 @@ function rPrograma(el) {
 }
 function edBloque(id) {
   const b = id ? D.bloque.find(x => x.id === id) : {};
+  const hs = horario();
+  const h = id ? hs.find(x => x.b.id === id) : null;
+  const ini = h ? h.ini : (hs.at(-1)?.fin ?? INICIO_EVENTO);   // uno nuevo se encadena al final
+  const fin = h ? h.fin : ini + Number(b.minutos ?? 3);
   modal(id ? 'Editar bloque' : 'Nuevo bloque',
     campo('bTit', 'Título', b.titulo) +
     `<div class="row" style="gap:10px"><div class="grow">` +
       campo('bTipo', 'Tipo', '', 'select', opts(Object.entries(TIPO_BLOQUE).map(([k, v]) => [k, v.i + ' ' + v.l]), b.tipo || 'vivo')) +
-    `</div><div style="width:110px">` + campo('bMin', 'Minutos', b.minutos ?? 3, 'number', 'min="0" step="0.5"') +
     `</div><div style="width:130px">` +
       campo('bEst', 'Estado', '', 'select', opts(['idea', 'borrador', 'listo'], b.estado || 'idea')) +
     `</div></div>` +
+    `<div class="row" style="gap:10px"><div class="grow">` +
+      campo('bIni', 'Inicia', t24(ini), 'time') +
+    `</div><div class="grow">` +
+      campo('bFin', 'Termina', t24(fin), 'time') +
+    `</div><div style="width:110px">` +
+      campo('bMin', 'Minutos', fmtMin(Math.max(0, fin - ini)), 'number', 'min="0" step="0.5"') +
+    `</div></div>` +
+    `<div class="hint">Cambia inicio o fin y los minutos se recalculan; cambia los minutos y se recorre el fin.</div>` +
     campo('bObj', 'Objetivo — qué debe lograr este bloque', b.objetivo, 'area') +
     campo('bDes', 'Descripción / notas', b.descripcion, 'area') +
     campo('bPan', 'Qué se ve en pantalla', b.pantalla) +
@@ -695,6 +771,62 @@ function edBloque(id) {
     `<button class="btn" data-cerrar>Cancelar</button>
      ${id && b.creado_por === me.email ? `<button class="btn danger" data-act="delBloque" data-id="${id}">Borrar</button>` : ''}
      <button class="btn p" data-act="guardaBloque" data-id="${id || ''}">Guardar</button>`);
+}
+
+/* Guardado directo de horas desde la lista (los inputs de cada bloque) */
+async function guardaHoras(id) {
+  const ini = mDe($(`#ti-${id}`)?.value), fin = mDe($(`#tf-${id}`)?.value);
+  if (ini == null || fin == null) return;
+  const { error } = await sb.from('ev_bloque')
+    .update({ inicio: t24(ini), fin: t24(fin), minutos: Math.max(0, fin - ini) }).eq('id', id);
+  if (error) return errHoras(error);
+  await recargar('bloque'); pintaTabs(); render();
+}
+function errHoras(error) {
+  toast(error.code === 'PGRST204' && /'(inicio|fin)'/.test(error.message || '')
+    ? 'Faltan las columnas de horas: corre sql/02_horas_programa.sql en Supabase.'
+    : error.message, true);
+}
+
+/* ------------------------------------- programa final (imprimir / PDF) */
+function progFinal() {
+  const hs = horario(), enc = traslapes(hs);
+  const voces = b => D.participacion.filter(p => p.bloque_id === b.id)
+    .map(p => nombreDe(p.persona_email)).filter(Boolean).join(', ');
+  $('#progFinal').innerHTML = `
+    <div class="pfbar no-print">
+      <button class="btn" data-act="pfCerrar">← Volver al portal</button>
+      <span class="grow"></span>
+      <button class="btn p" data-act="pfImprimir">🖨 Imprimir / guardar PDF</button>
+    </div>
+    <div class="pfhoja">
+      <div class="pfeyebrow">Natural Trade · Global Forest</div>
+      <div class="pfregla"></div>
+      <h1>Programa del evento</h1>
+      <div class="pfsub">Martes 1 de septiembre de 2026 · 7:00–9:00 pm<br>
+        Presidente Polanco, CDMX · Salón «Feria»</div>
+      ${hs.map(h => `
+        <div class="pfrow">
+          <div class="pfhora">${h12(h.ini)}<span>a ${h12(h.fin)}</span></div>
+          <div class="grow">
+            <div class="pft">${esc(h.b.titulo)}</div>
+            <div class="pfm">${TIPO_BLOQUE[h.b.tipo]?.l || h.b.tipo} · ${fmtMin(h.dur)} min${
+              voces(h.b) ? ` · ${esc(voces(h.b))}` : ''}</div>
+            ${enc[h.b.id] ? `<div class="pfenc">⚠ se encima ${enc[h.b.id].map(o =>
+              `${fmtMin(o.min)} min con «${esc(o.con)}»`).join(' · ')}</div>` : ''}
+          </div>
+        </div>`).join('')}
+      <div class="pffoot">
+        <img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest">
+        <span>naturaltrade.ca · globalforest.com.mx</span>
+      </div>
+    </div>`;
+  $('#progFinal').classList.remove('hide');
+  document.body.classList.add('pfon');
+}
+function cerrarProgFinal() {
+  $('#progFinal').classList.add('hide');
+  document.body.classList.remove('pfon');
 }
 
 /* ---------------------------------------------------------- 4. VIDEOS */
@@ -1366,8 +1498,10 @@ function ayuda() {
     <dl class="kv">
       <dt>Mensajes clave</dt><dd>Empieza aquí. Escribe qué quieres que tu cliente se lleve en la cabeza y vota
         los de los demás. Es lo que bloquea el guion completo.</dd>
-      <dt>Programa</dt><dd>El run of show con minutos. Las horas se calculan solas desde las 18:45. El semáforo
-        te avisa si el bloque central pasa de 40 minutos.</dd>
+      <dt>Programa</dt><dd>El run of show con hora de inicio y fin por bloque, editables ahí mismo (el evento
+        corre de 7:00 a 9:00 pm). Si dos bloques se enciman se pintan en ámbar con los minutos del traslape;
+        ⛓ Re-encadenar acomoda cada bloque donde termina el anterior y 🖨 Programa final da la hoja limpia
+        para imprimir o compartir.</dd>
       <dt>Videos</dt><dd>Una mesa de trabajo por video. Abre el guion, edita escenas, y todo el material que
         etiquetes con ese código (V1…V6) aparece ahí.</dd>
       <dt>Encuesta y mago</dt><dd>El banco de preguntas del QR (registro, intercaladas, cierre) y los actos del
@@ -1423,8 +1557,11 @@ document.addEventListener('click', async e => {
     nuevoBloque: () => edBloque(null),
     edBloque:   () => edBloque(id),
     guardaBloque: async () => {
-      const row = { titulo: val('bTit'), tipo: val('bTipo'), minutos: Number(val('bMin') || 0),
-        estado: val('bEst'), objetivo: val('bObj') || null, descripcion: val('bDes') || null,
+      const ini = mDe(val('bIni')), fin = mDe(val('bFin'));
+      const row = { titulo: val('bTit'), tipo: val('bTipo'), estado: val('bEst'),
+        inicio: ini == null ? null : t24(ini), fin: fin == null ? null : t24(fin),
+        minutos: ini != null && fin != null ? Math.max(0, fin - ini) : Number(val('bMin') || 0),
+        objetivo: val('bObj') || null, descripcion: val('bDes') || null,
         pantalla: val('bPan') || null, guion: val('bGui') || null };
       if (!row.titulo) return toast('Ponle título', true);
       const ok = id ? await upd('bloque', id, row)
@@ -1439,7 +1576,26 @@ document.addEventListener('click', async e => {
       await sb.from('ev_bloque').update({ orden: a2.orden }).eq('id', a1.id);
       await sb.from('ev_bloque').update({ orden: a1.orden }).eq('id', a2.id);
       await recargar('bloque'); render();
+      if (D.bloque.some(x => x.inicio != null))
+        toast('Orden cambiado. Las horas no se mueven solas: pica ⛓ Re-encadenar si quieres que sigan al orden.');
     },
+    reencadenar: async () => {
+      const hs = horario();
+      if (!hs.length) return;
+      let cursor = hs[0].ini;                       // el primer bloque conserva su hora
+      for (const h of hs) {
+        const d = h.invalido ? Number(h.b.minutos || 0) : h.dur;
+        const { error } = await sb.from('ev_bloque')
+          .update({ inicio: t24(cursor), fin: t24(cursor + d), minutos: d }).eq('id', h.b.id);
+        if (error) return errHoras(error);
+        cursor += d;
+      }
+      await recargar('bloque'); pintaTabs(); render();
+      toast(`Bloques encadenados: ${rango12(hs[0].ini, cursor)}.`);
+    },
+    progFinal:  progFinal,
+    pfCerrar:   cerrarProgFinal,
+    pfImprimir: () => window.print(),
 
     nuevoVideo: () => edVideo(null),
     edVideo:    () => edVideo(id),

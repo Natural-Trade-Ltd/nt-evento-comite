@@ -23,7 +23,7 @@ y además no ve nada por RLS.
 |---|---|
 | **Inicio** | Semáforo de tiempos, lo que urge esta semana, mensajes más votados, decisiones pendientes. |
 | **Mensajes clave** | La lluvia de ideas de «qué quiero que mi cliente se lleve». Se vota y lo más votado se marca acordado. Bloquea todo el guion. |
-| **Programa** | Run of show con minutos. Las horas se calculan solas desde las 18:45. Semáforo: presentación vs. meta de 30 min, más mago y preguntas aparte. |
+| **Programa** | Run of show con **hora de inicio y fin por bloque**, editables en la lista o en el modal (el evento corre 7:00–9:00 pm). Los traslapes se pintan en ámbar con los minutos encimados; ↑↓ reordena, «⛓ Re-encadenar» acomoda cada bloque donde termina el anterior y «🖨 Programa final» da la hoja limpia para imprimir/compartir. Semáforo: presentación vs. meta de 30 min. |
 | **Videos** | Una mesa de trabajo por video (V1–V6): concepto, guion escena por escena y el material etiquetado con ese código. |
 | **Encuesta y mago** | Banco de preguntas del QR (registro / intercaladas / cierre) y los actos del mago con lo que necesita de nosotros. |
 | **Reparto** | Quién habla en qué bloque; cada quien escribe su propio guion. |
@@ -82,13 +82,17 @@ index.html                 shell + gate de login
 css/app.css                estilos (claro/oscuro, marca NT #469466)
 js/app.js                  toda la app (módulo ES, sin build)
 sql/01_schema.sql          esquema completo, RLS y bucket (referencia)
+sql/02_horas_programa.sql  migración aplicada: inicio/fin por bloque del programa
 manifest.webmanifest       PWA instalable
 sw.js                      service worker (solo el shell; los datos siempre van a la red)
 serve.js                   servidor estático para desarrollo local
+test/e2e.html              arnés de prueba: la app real con Supabase simulado en memoria
+test/mock-supabase.js      el mock (sesión lista y los bloques reales; ?premig=1 simula base vieja)
 ```
 
 Sin build, sin dependencias instaladas: `supabase-js` se importa de esm.sh.
-Para desarrollo local: `node serve.js` → http://localhost:8099
+Para desarrollo local: `node serve.js` → http://localhost:8099 (o `PORT=xxxx` para otro puerto).
+Para probar sin login ni datos reales: la misma URL + `/test/e2e.html`.
 
 ## Convención del repositorio de material
 

@@ -12,4 +12,4 @@ http.createServer((req, res) => {
   }
   res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' });
   fs.createReadStream(f).pipe(res);
-}).listen(8099, () => console.log('http://localhost:8099'));
+}).listen(process.env.PORT || 8099, function () { console.log('http://localhost:' + this.address().port); });
