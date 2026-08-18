@@ -81,11 +81,31 @@ Todas las tablas `ev_*` tienen RLS. Probado simulando identidades:
 index.html                 shell + gate de login
 css/app.css                estilos (claro/oscuro, marca NT #469466)
 js/app.js                  toda la app (módulo ES, sin build)
+constructor.html           constructor de la presentación principal (clave compartida)
+presentar.html             modo presentar del constructor (mismo motor que presentacion.html)
+presentacion.html          NT App pantalla por pantalla (deck aparte, estático)
 sql/01_schema.sql          esquema completo, RLS y bucket (referencia)
+sql/02_constructor.sql     esquema del constructor: ev_lamina + clave + bucket (referencia)
 manifest.webmanifest       PWA instalable
 sw.js                      service worker (solo el shell; los datos siempre van a la red)
 serve.js                   servidor estático para desarrollo local
 ```
+
+## Constructor de la presentación
+
+`constructor.html` es donde el comité arma la presentación principal de la noche: láminas con
+título, puntos, imagen opcional, quién la presenta, minutos y notas, agrupadas en seis secciones
+fijas (bienvenida → quiénes somos → diferenciadores → portal → app → cierre). Se reordena con
+flechas y hay una vista «por presentador» con los tiempos de cada quien contra la meta de 30 min.
+`presentar.html` proyecta ese deck con el mismo motor de `presentacion.html` (clicker Av/Re Pág,
+flechas, **B** pantalla en negro, **F** pantalla completa, **N** notas del presentador, impresión
+a PDF).
+
+Acceso por **clave compartida** (no requiere el login de Google del portal): la clave vive en
+`ev_secret.constructor_clave` y se valida en la edge function `constructor` — nunca en el HTML.
+Las láminas (`ev_lamina`, RLS sin policies) y las imágenes (bucket público de solo lectura
+`laminas`) viven en el mismo proyecto Supabase del comité; las imágenes se suben como archivo
+vía la edge function, nunca en base64 dentro de la página.
 
 Sin build, sin dependencias instaladas: `supabase-js` se importa de esm.sh.
 Para desarrollo local: `node serve.js` → http://localhost:8099

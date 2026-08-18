@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Constructor de la presentación principal del evento del 1 de septiembre de 2026: el comité arma, asigna y ordena las láminas.">
+<meta name="robots" content="noindex, nofollow">
+<title>Constructor · Presentación del evento</title>
+<style>
+/* ── Dueto Tierra (sistema oficial NT/GF, 3-ago-2026) ─────────────────────────
+   Salvia + café tierra sobre marfil cálido. Ningún peso tipográfico arriba de 600. */
+:root{
+  --bg:#F2EDE3; --card:#FBF8F1; --line:#E0D8C8;
+  --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+  --acc:#587F6B; --accInk:#F6FBF7; --acc2:#8A6F5B;
+  --riesgo:#AE4E2B; --alerta:#9A6A12; --info:#3D6F9E;
+  --okBg:#E4EDE7; --alertaBg:#F5EBD6; --riesgoBg:#F6E3DA; --infoBg:#E4EDF6;
+  --shadow:0 1px 2px rgba(58,49,41,.05), 0 10px 30px rgba(58,49,41,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+    --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+    --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+    --riesgo:#E0785A; --alerta:#E0B463; --info:#7FA8D8;
+    --okBg:#1E2E24; --alertaBg:#33291A; --riesgoBg:#33211B; --infoBg:#1C2836;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+  --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+  --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+  --riesgo:#E0785A; --alerta:#E0B463; --info:#7FA8D8;
+  --okBg:#1E2E24; --alertaBg:#33291A; --riesgoBg:#33211B; --infoBg:#1C2836;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box} b,strong{font-weight:600}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:15px; line-height:1.55; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:26px 18px 60px}
+
+/* ── Encabezado ── */
+header{display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap}
+.eyebrow{
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin:0 0 6px;
+}
+h1{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-weight:400; font-size:31px; line-height:1.2; letter-spacing:-.01em;
+  margin:0; text-wrap:balance;
+}
+.rule{width:60px; height:3px; background:var(--acc2); border-radius:999px; margin:14px 0 10px}
+.lede{color:var(--sub); margin:0; max-width:62ch}
+.spacer{flex:1}
+
+/* ── Portón de clave ── */
+.gate{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:24px; box-shadow:var(--shadow); max-width:420px; margin:26px 0;
+}
+label{display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin-bottom:7px}
+input,select,textarea{
+  width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:12px;
+  background:var(--bg); color:var(--ink); font:inherit;
+}
+textarea{resize:vertical; min-height:44px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc); outline-offset:1px; border-color:transparent}
+button{
+  font:inherit; font-weight:600; cursor:pointer; border-radius:12px;
+  border:1px solid transparent; padding:11px 18px;
+  background:var(--acc); color:var(--accInk);
+}
+button.ghost{background:transparent; color:var(--acc); border-color:var(--line)}
+button.peligro{background:transparent; color:var(--riesgo); border-color:var(--line)}
+button:disabled{opacity:.5; cursor:default}
+.err{color:var(--riesgo); font-size:13px; margin:10px 0 0; min-height:18px}
+
+/* ── Barra de herramientas ── */
+.tools{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:22px 0 8px}
+.meta{color:var(--faint); font-size:12px}
+.chipMin{
+  display:inline-flex; align-items:center; gap:7px; border-radius:999px;
+  padding:7px 14px; font-size:13px; font-weight:600; border:1px solid transparent;
+  background:var(--okBg); color:var(--acc); border-color:var(--acc);
+  font-variant-numeric:tabular-nums;
+}
+.chipMin.pasado{background:var(--alertaBg); color:var(--alerta); border-color:var(--alerta)}
+
+/* ── Secciones y láminas ── */
+.seccion{margin:22px 0 6px}
+.secHead{display:flex; align-items:baseline; gap:10px; padding:0 2px 8px}
+.secHead h2{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-weight:400; font-size:21px; margin:0;
+}
+.secHead .n{color:var(--faint); font-size:12.5px; font-variant-numeric:tabular-nums}
+.secHead .mini{
+  font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+  background:transparent; color:var(--acc); border:none; padding:0;
+}
+.lamina{
+  display:flex; gap:14px; align-items:center;
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:13px 16px; margin-bottom:10px; box-shadow:var(--shadow);
+}
+.lamina .num{
+  flex:0 0 30px; text-align:center; color:var(--faint); font-size:13px;
+  font-variant-numeric:tabular-nums;
+}
+.lamina .thumb{
+  flex:0 0 58px; width:58px; height:42px; border-radius:10px; overflow:hidden;
+  border:1px solid var(--line); background:var(--bg);
+}
+.lamina .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+.lamina .cont{flex:1; min-width:0; cursor:pointer}
+.lamina .tit{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.lamina .fra{color:var(--sub); font-size:13px; font-style:italic;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.lamina .chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:5px}
+.chip{
+  display:inline-block; border-radius:999px; padding:2px 10px; font-size:11.5px;
+  font-weight:600; background:var(--okBg); color:var(--acc); white-space:nowrap;
+}
+.chip.tiempo{background:transparent; color:var(--faint); border:1px solid var(--line)}
+.chip.libre{background:var(--alertaBg); color:var(--alerta)}
+.acciones{display:flex; gap:6px; flex:0 0 auto}
+.acciones button{
+  padding:7px 10px; font-size:14px; line-height:1; border-radius:10px;
+  background:transparent; color:var(--sub); border:1px solid var(--line);
+}
+.acciones button:hover{color:var(--acc); border-color:var(--acc)}
+.acciones button.x:hover{color:var(--riesgo); border-color:var(--riesgo)}
+.vacioSec{color:var(--faint); font-size:13px; padding:4px 2px 10px; font-style:italic}
+
+/* ── Vista por presentador ── */
+.pres{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:18px 20px; margin-bottom:12px; box-shadow:var(--shadow);
+}
+.pres .cab{display:flex; align-items:baseline; gap:10px; margin-bottom:8px}
+.pres .cab h2{font-size:17px; font-weight:600; margin:0}
+.pres .cab .t{color:var(--faint); font-size:12.5px; font-variant-numeric:tabular-nums}
+.pres ol{margin:0; padding:0; list-style:none}
+.pres li{display:flex; gap:10px; padding:7px 0; border-top:1px solid var(--line); align-items:baseline}
+.pres li:first-child{border-top:none}
+.pres .pn{color:var(--faint); font-size:12.5px; flex:0 0 26px; text-align:right; font-variant-numeric:tabular-nums}
+.pres .pt{flex:1}
+.pres .pm{color:var(--sub); font-size:12.5px; white-space:nowrap; font-variant-numeric:tabular-nums}
+
+/* ── Editor (hoja superpuesta) ── */
+.velo{
+  position:fixed; inset:0; display:none; z-index:30;
+  background:rgba(58,49,41,.38); backdrop-filter:blur(2px);
+  align-items:flex-start; justify-content:center; overflow-y:auto; padding:34px 14px;
+}
+.velo.abierto{display:flex}
+.hoja{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  box-shadow:var(--shadow); width:100%; max-width:640px; padding:24px;
+}
+.hoja h2{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-weight:400; font-size:24px; margin:0 0 16px;
+}
+.campo{margin-bottom:14px}
+.fila2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.pista{color:var(--faint); font-size:12px; margin-top:5px}
+.imgZona{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.imgPrev{
+  width:120px; height:82px; border-radius:12px; overflow:hidden;
+  border:1px solid var(--line); background:var(--bg);
+}
+.imgPrev img{width:100%; height:100%; object-fit:cover; display:block}
+.hoja .botones{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap}
+.hoja .botones .spacer{flex:1}
+
+/* ── Aviso flotante ── */
+#aviso{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+  background:var(--ink); color:var(--bg); border-radius:999px; padding:9px 20px;
+  font-size:13.5px; font-weight:600; box-shadow:var(--shadow); z-index:50;
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+#aviso.ver{opacity:1}
+footer{margin-top:30px; color:var(--faint); font-size:12px; line-height:1.7}
+.hide{display:none}
+@media (max-width:640px){
+  h1{font-size:26px} .wrap{padding:20px 14px 50px}
+  .lamina{flex-wrap:wrap} .lamina .num{display:none}
+  .fila2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Evento · 1 de septiembre de 2026</p>
+      <h1>Constructor de la presentación</h1>
+      <div class="rule"></div>
+      <p class="lede">
+        Aquí el comité arma la presentación principal de la noche: láminas con texto e
+        imagen, quién presenta cada una y en qué orden. Lo que se guarda aquí es lo que
+        sale en el <b>modo presentar</b>.
+      </p>
+    </div>
+    <div class="spacer"></div>
+  </header>
+
+  <!-- Portón: la clave se valida en el servidor, nunca vive en esta página -->
+  <section class="gate" id="gate">
+    <label for="clave">Clave del comité</label>
+    <input type="password" id="clave" autocomplete="current-password" placeholder="••••••••••••">
+    <p class="err" id="gateErr"></p>
+    <button id="entrar">Entrar al constructor</button>
+  </section>
+
+  <section id="panel" class="hide">
+    <div class="tools">
+      <button id="nueva">+ Nueva lámina</button>
+      <button class="ghost" id="verReparto">Por presentador</button>
+      <button class="ghost" onclick="location.href='presentar.html'">▶ Presentar</button>
+      <span class="chipMin" id="chipMin"></span>
+      <span class="spacer"></span>
+      <button class="ghost" id="refrescar">Actualizar</button>
+      <button class="ghost" id="salir">Salir</button>
+    </div>
+    <p class="meta" id="sello"></p>
+
+    <div id="vistaDeck"></div>
+    <div id="vistaReparto" class="hide"></div>
+
+    <footer>
+      La clave y las láminas viven en la base del comité; esta página no guarda nada más que la
+      clave en este navegador. El recorrido pantalla por pantalla de la NT App es aparte
+      (<a href="presentacion.html" style="color:var(--acc)">presentacion.html</a>) y se abre desde
+      el bloque de la app — no lo dupliques en láminas.
+    </footer>
+  </section>
+
+</div>
+
+<!-- Editor de lámina -->
+<div class="velo" id="velo">
+  <div class="hoja">
+    <h2 id="edTitulo">Nueva lámina</h2>
+    <div class="fila2">
+      <div class="campo">
+        <label for="fSeccion">Sección</label>
+        <select id="fSeccion"></select>
+      </div>
+      <div class="campo">
+        <label for="fMinutos">Minutos</label>
+        <input type="number" id="fMinutos" min="0" max="60" step="0.5" value="2">
+      </div>
+    </div>
+    <div class="campo">
+      <label for="fTitulo">Título</label>
+      <input type="text" id="fTitulo" maxlength="140" placeholder="Lo que dice la lámina en grande">
+    </div>
+    <div class="campo">
+      <label for="fFrase">Frase (opcional)</label>
+      <input type="text" id="fFrase" maxlength="220" placeholder="Subtítulo en cursiva, una sola línea">
+    </div>
+    <div class="campo">
+      <label for="fCuerpo">Puntos</label>
+      <textarea id="fCuerpo" rows="6" placeholder="Un punto por línea"></textarea>
+      <p class="pista">Un punto por línea · **negritas** entre dobles asteriscos · vacío = lámina de portada</p>
+    </div>
+    <div class="campo">
+      <label>Imagen (opcional)</label>
+      <div class="imgZona">
+        <div class="imgPrev" id="imgPrev"><img id="imgPrevImg" alt="" class="hide"></div>
+        <input type="file" id="fImagen" accept="image/jpeg,image/png,image/webp" class="hide">
+        <button class="ghost" id="btnImagen" type="button">Subir imagen…</button>
+        <button class="ghost hide" id="btnQuitarImg" type="button">Quitar</button>
+      </div>
+      <p class="pista">Se reduce sola antes de subir; queda como archivo en el bucket, no dentro de la página.</p>
+    </div>
+    <div class="fila2">
+      <div class="campo">
+        <label for="fPresentador">Presenta</label>
+        <input type="text" id="fPresentador" maxlength="80" list="dlPres" placeholder="Nombre de quien la presenta">
+        <datalist id="dlPres"></datalist>
+      </div>
+      <div class="campo">
+        <label for="fNotas">Notas del presentador</label>
+        <textarea id="fNotas" rows="3" placeholder="Solo se ven con la tecla N al presentar"></textarea>
+      </div>
+    </div>
+    <p class="err" id="edErr"></p>
+    <div class="botones">
+      <button id="guardar">Guardar lámina</button>
+      <button class="ghost" id="cancelar" type="button">Cancelar</button>
+      <span class="spacer"></span>
+      <button class="peligro hide" id="eliminar" type="button">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="aviso"></div>
+
+<script>
+const FN = 'https://cytopyytymxjwvfhosvg.supabase.co/functions/v1/constructor';
+const LS = 'nt_constructor_clave';
+const META_MIN = 30;   // meta del comité: presentación de 30 minutos
+
+const SEC = [
+  ['bienvenida',      'Bienvenida'],
+  ['quienes_somos',   'Quiénes somos'],
+  ['diferenciadores', 'Qué nos diferencia'],
+  ['portal',          'Portal de clientes'],
+  ['app',             'NT App'],
+  ['cierre',          'Cierre'],
+];
+const secIdx   = (s) => Math.max(0, SEC.findIndex((x) => x[0] === s));
+const secLabel = (s) => (SEC.find((x) => x[0] === s) || ['', s])[1];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let clave = '';
+let laminas = [];
+let editando = null;      // fila en edición (null = nueva)
+let imagenUrl = null;     // imagen elegida en el editor
+
+// ── API: todo pasa por la edge function; la clave viaja en el cuerpo ──
+async function api(action, extra = {}) {
+  const r = await fetch(FN, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, clave, ...extra }),
+  });
+  if (r.status === 401) throw new Error('clave');
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(j.error || 'servidor');
+  return j;
+}
+
+function aviso(txt) {
+  const a = $('aviso');
+  a.textContent = txt;
+  a.classList.add('ver');
+  clearTimeout(aviso.t);
+  aviso.t = setTimeout(() => a.classList.remove('ver'), 2600);
+}
+
+// Orden real del deck: sección (en su orden fijo) y luego orden dentro de la sección.
+const deck = () => [...laminas].sort((a, b) =>
+  secIdx(a.seccion) - secIdx(b.seccion) || a.orden - b.orden ||
+  String(a.creado_en).localeCompare(String(b.creado_en)));
+
+async function cargar() {
+  const j = await api('listar');
+  laminas = j.laminas || [];
+  render();
+  $('sello').textContent = 'Actualizado ' +
+    new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) +
+    ' · ' + laminas.length + ' láminas';
+}
+
+function render() {
+  const total = laminas.reduce((s, l) => s + Number(l.minutos || 0), 0);
+  const chip = $('chipMin');
+  chip.textContent = total + ' min · meta ' + META_MIN;
+  chip.classList.toggle('pasado', total > META_MIN);
+
+  // datalist de presentadores ya usados
+  const noms = [...new Set(laminas.map((l) => (l.presentador || '').trim()).filter(Boolean))];
+  $('dlPres').innerHTML = noms.map((n) => `<option value="${esc(n)}">`).join('');
+
+  renderDeck();
+  renderReparto();
+}
+
+function renderDeck() {
+  const d = deck();
+  $('vistaDeck').innerHTML = SEC.map(([key, label]) => {
+    const filas = d.filter((l) => l.seccion === key);
+    const min = filas.reduce((s, l) => s + Number(l.minutos || 0), 0);
+    const cards = filas.length ? filas.map((l) => {
+      const n = d.indexOf(l) + 1;
+      const i = filas.indexOf(l);
+      return `<div class="lamina" data-id="${l.id}">
+        <div class="num">${n}</div>
+        ${l.imagen_url ? `<div class="thumb"><img src="${esc(l.imagen_url)}" alt=""></div>` : ''}
+        <div class="cont" onclick="abrirEditor('${l.id}')">
+          <div class="tit">${esc(l.titulo)}</div>
+          ${l.frase ? `<div class="fra">${esc(l.frase)}</div>` : ''}
+          <div class="chips">
+            ${l.presentador ? `<span class="chip">${esc(l.presentador)}</span>` : '<span class="chip libre">Sin asignar</span>'}
+            <span class="chip tiempo">${Number(l.minutos || 0)} min</span>
+            ${l.notas ? '<span class="chip tiempo">notas ✓</span>' : ''}
+          </div>
+        </div>
+        <div class="acciones">
+          <button title="Subir" ${i === 0 ? 'disabled' : ''} onclick="mover('${l.id}',-1)">↑</button>
+          <button title="Bajar" ${i === filas.length - 1 ? 'disabled' : ''} onclick="mover('${l.id}',1)">↓</button>
+          <button title="Editar" onclick="abrirEditor('${l.id}')">✎</button>
+          <button title="Eliminar" class="x" onclick="borrar('${l.id}')">×</button>
+        </div>
+      </div>`;
+    }).join('') : '<p class="vacioSec">Sin láminas todavía.</p>';
+    return `<div class="seccion">
+      <div class="secHead">
+        <h2>${label}</h2>
+        <span class="n">${filas.length} · ${min} min</span>
+        <button class="mini" onclick="abrirEditor(null,'${key}')">+ lámina aquí</button>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+}
+
+function renderReparto() {
+  const d = deck();
+  const grupos = new Map();
+  d.forEach((l) => {
+    const k = (l.presentador || '').trim() || 'Sin asignar';
+    if (!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(l);
+  });
+  const total = d.reduce((s, l) => s + Number(l.minutos || 0), 0);
+  $('vistaReparto').innerHTML = [...grupos.entries()].map(([nom, filas]) => {
+    const min = filas.reduce((s, l) => s + Number(l.minutos || 0), 0);
+    return `<div class="pres">
+      <div class="cab"><h2>${esc(nom)}</h2>
+        <span class="t">${filas.length} lámina${filas.length === 1 ? '' : 's'} · ${min} min</span></div>
+      <ol>${filas.map((l) => `<li>
+        <span class="pn">${d.indexOf(l) + 1}</span>
+        <span class="pt">${esc(l.titulo)}</span>
+        <span class="pm">${secLabel(l.seccion)} · ${Number(l.minutos || 0)} min</span>
+      </li>`).join('')}</ol>
+    </div>`;
+  }).join('') + `<p class="meta">Total de la presentación: ${total} min (meta ${META_MIN}).
+    El mago y las preguntas van aparte, como en el programa del portal.</p>`;
+}
+
+// ── Reordenar: renumera la sección con las posiciones intercambiadas ──
+async function mover(id, dir) {
+  const l = laminas.find((x) => x.id === id);
+  if (!l) return;
+  const filas = deck().filter((x) => x.seccion === l.seccion);
+  const i = filas.indexOf(l);
+  const j = i + dir;
+  if (j < 0 || j >= filas.length) return;
+  [filas[i], filas[j]] = [filas[j], filas[i]];
+  const ordenes = filas.map((x, n) => ({ id: x.id, orden: (n + 1) * 10 }));
+  ordenes.forEach((o) => { laminas.find((x) => x.id === o.id).orden = o.orden; });
+  render();   // primero se ve, luego se confirma
+  try { await api('reordenar', { ordenes }); }
+  catch (e) { manejar(e); await cargar().catch(() => {}); }
+}
+
+// ── Editor ──
+function abrirEditor(id, seccionPreset) {
+  editando = id ? laminas.find((x) => x.id === id) : null;
+  imagenUrl = editando?.imagen_url || null;
+  $('edTitulo').textContent = editando ? 'Editar lámina' : 'Nueva lámina';
+  $('fSeccion').innerHTML = SEC.map(([k, lab]) =>
+    `<option value="${k}">${lab}</option>`).join('');
+  $('fSeccion').value = editando?.seccion || seccionPreset || 'bienvenida';
+  $('fTitulo').value = editando?.titulo || '';
+  $('fFrase').value = editando?.frase || '';
+  $('fCuerpo').value = editando?.cuerpo || '';
+  $('fPresentador').value = editando?.presentador || '';
+  $('fMinutos').value = editando?.minutos ?? 2;
+  $('fNotas').value = editando?.notas || '';
+  $('edErr').textContent = '';
+  $('eliminar').classList.toggle('hide', !editando);
+  pintarImagen();
+  $('velo').classList.add('abierto');
+  $('fTitulo').focus();
+}
+function cerrarEditor() { $('velo').classList.remove('abierto'); }
+
+function pintarImagen() {
+  const img = $('imgPrevImg');
+  img.classList.toggle('hide', !imagenUrl);
+  if (imagenUrl) img.src = imagenUrl;
+  $('btnQuitarImg').classList.toggle('hide', !imagenUrl);
+  $('btnImagen').textContent = imagenUrl ? 'Cambiar imagen…' : 'Subir imagen…';
+}
+
+async function guardar() {
+  const titulo = $('fTitulo').value.trim();
+  if (titulo.length < 2) { $('edErr').textContent = 'Ponle un título a la lámina.'; return; }
+  $('guardar').disabled = true;
+  try {
+    await api('guardar', {
+      id: editando?.id,
+      seccion: $('fSeccion').value,
+      titulo,
+      frase: $('fFrase').value,
+      cuerpo: $('fCuerpo').value,
+      imagen_url: imagenUrl,
+      presentador: $('fPresentador').value,
+      minutos: Number($('fMinutos').value || 0),
+      notas: $('fNotas').value,
+    });
+    cerrarEditor();
+    await cargar();
+    aviso(editando ? 'Lámina guardada' : 'Lámina agregada');
+  } catch (e) { manejar(e, 'edErr'); }
+  finally { $('guardar').disabled = false; }
+}
+
+async function borrar(id) {
+  const l = laminas.find((x) => x.id === id);
+  if (!l) return;
+  if (!confirm(`¿Eliminar la lámina «${l.titulo}»?`)) return;
+  try {
+    await api('borrar', { id });
+    cerrarEditor();
+    await cargar();
+    aviso('Lámina eliminada');
+  } catch (e) { manejar(e); }
+}
+
+// ── Imagen: se reduce en el navegador y se sube como archivo al bucket ──
+async function subirImagen(file) {
+  $('btnImagen').disabled = true;
+  $('btnImagen').textContent = 'Subiendo…';
+  try {
+    const { mime, base64 } = await reducir(file);
+    const j = await api('subir_imagen', { mime, base64, nombre: file.name });
+    imagenUrl = j.url;
+    pintarImagen();
+  } catch (e) { manejar(e, 'edErr'); }
+  finally { $('btnImagen').disabled = false; pintarImagen(); }
+}
+
+// Máximo 1600 px por lado y JPEG .85: suficiente para proyectar, ligero para subir.
+async function reducir(file) {
+  if (file.size <= 300 * 1024) {
+    const base64 = await aBase64(file);
+    return { mime: file.type, base64 };
+  }
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * k);
+  c.height = Math.round(bmp.height * k);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.85));
+  const base64 = await aBase64(blob);
+  return { mime: 'image/jpeg', base64 };
+}
+const aBase64 = (blob) => new Promise((res, rej) => {
+  const r = new FileReader();
+  r.onload = () => res(String(r.result).split(',')[1]);
+  r.onerror = rej;
+  r.readAsDataURL(blob);
+});
+
+// ── Sesión ──
+function manejar(e, dondeErr) {
+  if (e.message === 'clave') { salir(); $('gateErr').textContent = 'La clave dejó de ser válida.'; return; }
+  const msg = 'No se pudo guardar. Revisa tu conexión y reintenta.';
+  if (dondeErr) $(dondeErr).textContent = msg; else aviso(msg);
+}
+
+function salir() {
+  localStorage.removeItem(LS);
+  clave = '';
+  $('panel').classList.add('hide');
+  $('gate').classList.remove('hide');
+  cerrarEditor();
+}
+
+async function entrar(cl) {
+  $('gateErr').textContent = '';
+  $('entrar').disabled = true;
+  try {
+    clave = cl;
+    await cargar();
+    localStorage.setItem(LS, cl);
+    $('gate').classList.add('hide');
+    $('panel').classList.remove('hide');
+  } catch (e) {
+    clave = '';
+    $('gateErr').textContent = e.message === 'clave' ? 'Clave incorrecta.' : 'No se pudo conectar. Reintenta.';
+  } finally {
+    $('entrar').disabled = false;
+  }
+}
+
+// ── Cableado ──
+$('entrar').addEventListener('click', () => entrar($('clave').value.trim()));
+$('clave').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar($('clave').value.trim()); });
+$('nueva').addEventListener('click', () => abrirEditor(null));
+$('refrescar').addEventListener('click', () => cargar().catch(manejar));
+$('salir').addEventListener('click', salir);
+$('guardar').addEventListener('click', guardar);
+$('cancelar').addEventListener('click', cerrarEditor);
+$('eliminar').addEventListener('click', () => editando && borrar(editando.id));
+$('btnImagen').addEventListener('click', () => $('fImagen').click());
+$('fImagen').addEventListener('change', (e) => {
+  if (e.target.files[0]) subirImagen(e.target.files[0]);
+  e.target.value = '';
+});
+$('btnQuitarImg').addEventListener('click', () => { imagenUrl = null; pintarImagen(); });
+$('velo').addEventListener('click', (e) => { if (e.target === $('velo')) cerrarEditor(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarEditor(); });
+
+$('verReparto').addEventListener('click', () => {
+  const rep = $('vistaReparto').classList.toggle('hide');
+  $('vistaDeck').classList.toggle('hide', !rep);
+  $('verReparto').textContent = rep ? 'Por presentador' : 'Ver el deck';
+});
+
+// Sesión recordada; si ya entró al tablero del padrón con la misma clave, se aprovecha.
+const guardada = localStorage.getItem(LS) || localStorage.getItem('nt_evento_clave');
+if (guardada) { $('clave').value = guardada; entrar(guardada); } else $('clave').focus();
+</script>
+</body>
+</html>
