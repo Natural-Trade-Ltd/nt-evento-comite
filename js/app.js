@@ -82,10 +82,10 @@ const TABS = [
 const AV_CARPETA = '1zbKycCriNAg5yXBFCGWFGp7etzb3fMjQ';
 const AV = [
   { g: 'Videos para la pantalla', d: 'Los loops, sin audio. El corte de 1080p es el que va al proyector; el de 720p es para verlo y compartirlo desde el celular.', piezas: [
-    { n: 'Teaser de 10 segundos',
+    { n: 'Teaser de los dos mapas',
       f: 'Teaser_10s_NT-GF_1080p.mp4', id: '1zBBAdgqXz-WPUJCCp33N1Ojf517GyBem',
-      c: ['MP4 1920×1080', '10 s en loop', '6 MB', 'nuevo'],
-      t: 'Los dos videos en uno: cinco segundos de cada mapa, con disolvencia entre ambos y entrada y salida por negro para dejarlo en loop. No es un recorte del video largo: aquí TODAS las rutas se recorren a la vez y a la misma velocidad, sin rótulos ni etiquetas, y las cifras van abajo sobre el mapa en movimiento — 21 orígenes y 19 destinos en el primero, 18 puertos, 45 ciudades y 32 estados en el segundo.' },
+      c: ['MP4 1920×1080', '12.5 s en loop', '6.6 MB', 'nuevo'],
+      t: 'Los dos mapas en uno, con disolvencia entre ambos y entrada y salida por negro para dejarlo en loop. No es un recorte del video largo: las rutas se recorren a la vez, sin rótulos ni etiquetas, con las cifras abajo sobre el mapa en movimiento. En «De Vancouver al mundo» corren las 34 rutas juntas (5 s); en «Puertos de entrada» sólo se ve el movimiento dentro del país —una referencia por puerto y por medio de transporte— con los barcos llegando a los siete puertos marítimos (7.5 s).' },
     { n: 'De Vancouver al mundo — 1080p',
       f: 'De_Vancouver_al_Mundo_65s_NOCHE_1080p.mp4', id: '1h8WYmsiHXRJaj1puuaUf5SjsW8-zGH9l',
       c: ['MP4 1920×1080', '65 s en loop', '44 MB'],
