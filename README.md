@@ -97,12 +97,19 @@ test/mock-supabase.js      el mock (sesión lista y los bloques reales; ?premig=
 ## Constructor de la presentación
 
 `constructor.html` es donde el comité arma la presentación principal de la noche: láminas con
-título, puntos, imagen opcional, quién la presenta, minutos y notas, agrupadas en seis secciones
-fijas (bienvenida → quiénes somos → diferenciadores → portal → app → cierre). Se reordena con
-flechas y hay una vista «por presentador» con los tiempos de cada quien contra la meta de 30 min.
-`presentar.html` proyecta ese deck con el mismo motor de `presentacion.html` (clicker Av/Re Pág,
-flechas, **B** pantalla en negro, **F** pantalla completa, **N** notas del presentador, impresión
-a PDF).
+título, puntos, imagen y **video** opcionales, quién la presenta, minutos y notas, agrupadas en
+seis secciones fijas (bienvenida → quiénes somos → diferenciadores → portal → app → cierre). Se
+reordena con flechas y hay una vista «por presentador» con los tiempos de cada quien contra la
+meta de 30 min. `presentar.html` proyecta ese deck con el mismo motor de `presentacion.html`
+(clicker Av/Re Pág, flechas, **B** pantalla en negro, **F** pantalla completa, **N** notas del
+presentador, **V** reproduce el video, impresión a PDF).
+
+**Video por lámina:** se pega un enlace de YouTube, Vimeo o Drive (va en iframe) o se sube el
+archivo MP4/WebM/MOV hasta 300 MB (va en `<video>` con controles). Una lámina de solo video se
+proyecta a pantalla casi completa; con puntos, el video queda al lado del texto. El video se
+carga al llegar a su lámina y se apaga al salir, para que no siga sonando detrás de otra. Los
+archivos suben **directo del navegador a Storage** con una URL firmada que emite la edge function
+— un video no cabe en el cuerpo de una función.
 
 Acceso por **clave compartida** (no requiere el login de Google del portal): la clave vive en
 `ev_secret.constructor_clave` y se valida en la edge function `constructor` — nunca en el HTML.

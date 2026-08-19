@@ -20,6 +20,7 @@ create table if not exists public.ev_lamina (
   frase          text,             -- subtítulo en cursiva (opcional)
   cuerpo         text,             -- puntos, uno por línea; **negritas** entre asteriscos
   imagen_url     text,             -- URL pública en el bucket 'laminas'
+  video_url      text,             -- enlace (YouTube/Vimeo/Drive/.mp4) o archivo del bucket
   presentador    text,             -- quién presenta esta lámina
   minutos        numeric not null default 2,
   notas          text,             -- notas del presentador (tecla N en modo presentar)
@@ -36,12 +37,13 @@ insert into public.ev_secret (clave, valor)
 select 'constructor_clave', '<CLAVE>'    -- el valor real vive solo en la base
 where not exists (select 1 from public.ev_secret where clave = 'constructor_clave');
 
--- Bucket público de SOLO lectura para imágenes de láminas.
--- Lectura: URL pública (no pasa por RLS). Escritura: únicamente la edge
--- function con service role — no hay policies de insert/update/delete.
+-- Bucket público de SOLO lectura para imágenes y videos de láminas.
+-- Lectura: URL pública (no pasa por RLS). Escritura: solo con service role —
+-- las imágenes las sube la edge function; los videos van directo del navegador
+-- con una URL firmada que la función emite (un video no cabe en base64).
 insert into storage.buckets (id, name, public, file_size_limit)
-values ('laminas', 'laminas', true, 8388608)   -- 8 MB por imagen
-on conflict (id) do update set public = true, file_size_limit = 8388608;
+values ('laminas', 'laminas', true, 314572800)   -- 300 MB por archivo (videos)
+on conflict (id) do update set public = true, file_size_limit = 314572800;
 
 -- =====================================================================
 -- Edge function 'constructor' (deployada aparte; acciones):
@@ -50,5 +52,9 @@ on conflict (id) do update set public = true, file_size_limit = 8388608;
 --   borrar        → elimina la fila y su imagen del bucket
 --   reordenar     → [{id, orden}] calculados por el cliente
 --   subir_imagen  → base64 → archivo en 'laminas' → URL pública
+--   subir_video   → URL firmada (vale 2 h); el navegador hace PUT ahí y el
+--                   archivo nunca pasa por la función
 -- Todas exigen { clave } en el cuerpo; 401 si no coincide.
+-- Al editar o borrar una lámina, la función limpia del bucket la imagen o el
+-- video que quedaron huérfanos (los enlaces externos no se tocan).
 -- =====================================================================

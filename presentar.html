@@ -35,6 +35,14 @@ body{
   border-radius:16px; border:1px solid var(--line); box-shadow:var(--shadow);
   background:var(--card);
 }
+.video{
+  flex:0 0 auto; width:min(760px,52vw); aspect-ratio:16/9;
+  border-radius:16px; overflow:hidden; border:1px solid var(--line);
+  box-shadow:var(--shadow); background:#000;
+}
+.video iframe,.video video{width:100%; height:100%; border:0; display:block; background:#000}
+.slide.videoSolo{justify-content:center}
+.slide.videoSolo .video{width:min(1180px,86vw)}
 .txt{flex:1 1 auto; max-width:620px}
 .slide.solo{justify-content:center}
 .slide.solo .txt{max-width:940px}
@@ -112,6 +120,7 @@ li b{color:var(--ink)}
   .slide.centro{align-items:center}
   .media{max-width:100%; align-self:center}
   .media img{max-height:44vh}
+  .video,.slide.videoSolo .video{width:100%; align-self:center}
   h2{font-size:31px} h1{font-size:44px} .slide.solo h2{font-size:36px}
 }
 
@@ -190,6 +199,21 @@ const rico = (s) => esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 let laminas = [];
 let i = 0;
 
+// YouTube / Vimeo / Drive van en iframe; cualquier otro enlace (o un archivo
+// del bucket) va en <video> con controles. El src se pone al llegar a la
+// lámina y se quita al salir: así no suena un video detrás de otra lámina.
+function embed(u) {
+  const url = String(u || '').trim();
+  let m;
+  if ((m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/)))
+    return `<iframe data-src="https://www.youtube.com/embed/${m[1]}?rel=0&modestbranding=1" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>`;
+  if ((m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/)))
+    return `<iframe data-src="https://player.vimeo.com/video/${m[1]}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  if ((m = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/)))
+    return `<iframe data-src="https://drive.google.com/file/d/${m[1]}/preview" allow="autoplay" allowfullscreen></iframe>`;
+  return `<video src="${esc(url)}" controls preload="metadata" playsinline></video>`;
+}
+
 async function pedir(clave) {
   const r = await fetch(FN, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -216,17 +240,21 @@ function construir() {
     const lista = puntos.length
       ? `<ul>${puntos.map((p) => `<li>${rico(p)}</li>`).join('')}</ul>` : '';
 
-    // Portada / cierre: sin puntos y sin imagen → lámina centrada.
-    if (!puntos.length && !l.imagen_url) {
+    // Portada / cierre: sin puntos y sin nada que proyectar → lámina centrada.
+    if (!puntos.length && !l.imagen_url && !l.video_url) {
       return `<section class="slide centro">
         ${n === 0 ? '<div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>' : ''}
         <p class="eyebrow">${esc(secLabel(l.seccion))}</p>
         <h1>${esc(l.titulo)}</h1>
         <div class="rule"></div>
         ${l.frase ? `<p class="lede">${rico(l.frase)}</p>` : ''}
-        ${n === 0 ? '<p class="ayuda">Avanza con el clicker, las flechas o clic en la lámina. <b>F</b> pantalla completa · <b>B</b> pantalla en negro · <b>N</b> notas.</p>' : ''}
+        ${n === 0 ? '<p class="ayuda">Avanza con el clicker, las flechas o clic en la lámina. <b>F</b> pantalla completa · <b>B</b> pantalla en negro · <b>N</b> notas · <b>V</b> video.</p>' : ''}
       </section>`;
     }
+
+    const media = l.video_url
+      ? `<div class="video">${embed(l.video_url)}</div>`
+      : l.imagen_url ? `<div class="media"><img src="${esc(l.imagen_url)}" alt=""></div>` : '';
 
     const txt = `<div class="txt">
       <p class="eyebrow">${esc(secLabel(l.seccion))}</p>
@@ -235,10 +263,12 @@ function construir() {
       ${lista}
     </div>`;
 
-    return l.imagen_url
-      ? `<section class="slide"><div class="media"><img src="${esc(l.imagen_url)}" alt=""></div>${txt}</section>`
-      : `<section class="slide solo">${txt}</section>`;
+    if (!media) return `<section class="slide solo">${txt}</section>`;
+    // Video sin puntos: la lámina es el video, a lo grande.
+    const soloVideo = l.video_url && !puntos.length;
+    return `<section class="slide${soloVideo ? ' videoSolo' : ''}">${media}${soloVideo ? '' : txt}</section>`;
   }).join('');
+  deck.querySelectorAll('.video').forEach((v) => v.addEventListener('click', (e) => e.stopPropagation()));
   pintar();
 }
 
@@ -247,13 +277,24 @@ function construir() {
 // La tecla B (o el botón de pantalla negra del clicker) apaga la proyección.
 const pintar = () => {
   const slides = [...document.querySelectorAll('.slide')];
-  slides.forEach((s, n) => s.classList.toggle('on', n === i));
+  slides.forEach((s, n) => {
+    const on = n === i;
+    s.classList.toggle('on', on);
+    const f = s.querySelector('iframe[data-src]');
+    if (f) {
+      if (on && !f.getAttribute('src')) f.setAttribute('src', f.dataset.src);
+      else if (!on && f.getAttribute('src')) f.removeAttribute('src');
+    }
+    const v = s.querySelector('video');
+    if (v && !on && !v.paused) v.pause();
+  });
   $('cuenta').textContent = (i + 1) + ' / ' + slides.length;
   $('pista').style.width = ((i + 1) / Math.max(1, slides.length) * 100) + '%';
   const l = laminas[i];
   $('pie').innerHTML = l
     ? (l.presentador ? `Presenta: <b>${esc(l.presentador)}</b> · ` : '') +
-      esc(secLabel(l.seccion)) + ' · ' + Number(l.minutos || 0) + ' min'
+      esc(secLabel(l.seccion)) + ' · ' + Number(l.minutos || 0) + ' min' +
+      (l.video_url ? ' · <b>V</b> reproduce' : '')
     : 'Evento 1-sep-2026 · Natural Trade / Global Forest';
   pintarNotas();
 };
@@ -285,6 +326,10 @@ document.addEventListener('keydown', (e) => {
   else if (k === 'b' || k === 'B' || k === '.') { document.body.classList.toggle('negro'); }
   else if (k === 'f' || k === 'F') { pantallaCompleta(); }
   else if (k === 'n' || k === 'N') { $('notas').classList.toggle('ver'); }
+  else if (k === 'v' || k === 'V') {
+    const v = document.querySelector('.slide.on video');
+    if (v) { e.preventDefault(); v.paused ? v.play().catch(() => {}) : v.pause(); }
+  }
 });
 
 // Clic en la lámina: mitad derecha avanza, mitad izquierda retrocede.

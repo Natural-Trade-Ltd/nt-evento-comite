@@ -130,6 +130,8 @@ button:disabled{opacity:.5; cursor:default}
 }
 .chip.tiempo{background:transparent; color:var(--faint); border:1px solid var(--line)}
 .chip.libre{background:var(--alertaBg); color:var(--alerta)}
+.chip.vid{background:var(--infoBg); color:var(--info)}
+.thumb.vid{display:flex; align-items:center; justify-content:center; color:var(--info); font-size:17px}
 .acciones{display:flex; gap:6px; flex:0 0 auto}
 .acciones button{
   padding:7px 10px; font-size:14px; line-height:1; border-radius:10px;
@@ -285,6 +287,17 @@ footer{margin-top:30px; color:var(--faint); font-size:12px; line-height:1.7}
       </div>
       <p class="pista">Se reduce sola antes de subir; queda como archivo en el bucket, no dentro de la página.</p>
     </div>
+    <div class="campo">
+      <label for="fVideo">Video (opcional)</label>
+      <input type="url" id="fVideo" maxlength="500" placeholder="Enlace de YouTube, Vimeo, Drive o .mp4">
+      <div class="imgZona" style="margin-top:10px">
+        <input type="file" id="fVideoArch" accept="video/mp4,video/webm,video/quicktime" class="hide">
+        <button class="ghost" id="btnVideo" type="button">Subir archivo…</button>
+        <button class="ghost hide" id="btnQuitarVideo" type="button">Quitar</button>
+        <span class="pista" id="videoEstado"></span>
+      </div>
+      <p class="pista">Pega el enlace o sube el archivo (hasta 300 MB). El video se proyecta dentro de la lámina; con <b>V</b> se reproduce al presentar.</p>
+    </div>
     <div class="fila2">
       <div class="campo">
         <label for="fPresentador">Presenta</label>
@@ -390,13 +403,15 @@ function renderDeck() {
       const i = filas.indexOf(l);
       return `<div class="lamina" data-id="${l.id}">
         <div class="num">${n}</div>
-        ${l.imagen_url ? `<div class="thumb"><img src="${esc(l.imagen_url)}" alt=""></div>` : ''}
+        ${l.imagen_url ? `<div class="thumb"><img src="${esc(l.imagen_url)}" alt=""></div>`
+          : l.video_url ? '<div class="thumb vid">▶</div>' : ''}
         <div class="cont" onclick="abrirEditor('${l.id}')">
           <div class="tit">${esc(l.titulo)}</div>
           ${l.frase ? `<div class="fra">${esc(l.frase)}</div>` : ''}
           <div class="chips">
             ${l.presentador ? `<span class="chip">${esc(l.presentador)}</span>` : '<span class="chip libre">Sin asignar</span>'}
             <span class="chip tiempo">${Number(l.minutos || 0)} min</span>
+            ${l.video_url ? '<span class="chip vid">▶ video</span>' : ''}
             ${l.notas ? '<span class="chip tiempo">notas ✓</span>' : ''}
           </div>
         </div>
@@ -473,6 +488,9 @@ function abrirEditor(id, seccionPreset) {
   $('fPresentador').value = editando?.presentador || '';
   $('fMinutos').value = editando?.minutos ?? 2;
   $('fNotas').value = editando?.notas || '';
+  $('fVideo').value = editando?.video_url || '';
+  $('videoEstado').textContent = '';
+  pintarVideo();
   $('edErr').textContent = '';
   $('eliminar').classList.toggle('hide', !editando);
   pintarImagen();
@@ -489,6 +507,45 @@ function pintarImagen() {
   $('btnImagen').textContent = imagenUrl ? 'Cambiar imagen…' : 'Subir imagen…';
 }
 
+function pintarVideo() {
+  $('btnQuitarVideo').classList.toggle('hide', !$('fVideo').value.trim());
+}
+
+// Un video no cabe en el cuerpo de la edge function: la función solo autoriza
+// el destino (URL firmada) y el archivo va del navegador directo a Storage.
+const MAX_VIDEO = 300 * 1024 * 1024;
+async function subirVideo(file) {
+  const mime = file.type || '';
+  if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(mime)) {
+    $('edErr').textContent = 'Formato no soportado. Usa MP4, WebM o MOV.'; return;
+  }
+  if (file.size > MAX_VIDEO) {
+    $('edErr').textContent = 'El video pasa de 300 MB. Súbelo a YouTube o Drive y pega el enlace.'; return;
+  }
+  $('edErr').textContent = '';
+  $('btnVideo').disabled = true;
+  try {
+    const j = await api('subir_video', { mime });
+    await new Promise((res, rej) => {
+      const x = new XMLHttpRequest();
+      x.open('PUT', j.subida);
+      x.setRequestHeader('Content-Type', mime);
+      x.upload.onprogress = (e) => {
+        if (e.lengthComputable) $('videoEstado').textContent = 'Subiendo… ' + Math.round(e.loaded / e.total * 100) + '%';
+      };
+      x.onload  = () => (x.status >= 200 && x.status < 300) ? res() : rej(new Error('subida'));
+      x.onerror = () => rej(new Error('subida'));
+      x.send(file);
+    });
+    $('fVideo').value = j.url;
+    $('videoEstado').textContent = 'Video listo · se guarda con la lámina';
+    pintarVideo();
+  } catch (e) {
+    $('videoEstado').textContent = '';
+    manejar(e, 'edErr');
+  } finally { $('btnVideo').disabled = false; }
+}
+
 async function guardar() {
   const titulo = $('fTitulo').value.trim();
   if (titulo.length < 2) { $('edErr').textContent = 'Ponle un título a la lámina.'; return; }
@@ -501,6 +558,7 @@ async function guardar() {
       frase: $('fFrase').value,
       cuerpo: $('fCuerpo').value,
       imagen_url: imagenUrl,
+      video_url: $('fVideo').value.trim(),
       presentador: $('fPresentador').value,
       minutos: Number($('fMinutos').value || 0),
       notas: $('fNotas').value,
@@ -607,6 +665,15 @@ $('fImagen').addEventListener('change', (e) => {
   e.target.value = '';
 });
 $('btnQuitarImg').addEventListener('click', () => { imagenUrl = null; pintarImagen(); });
+$('btnVideo').addEventListener('click', () => $('fVideoArch').click());
+$('fVideoArch').addEventListener('change', (e) => {
+  if (e.target.files[0]) subirVideo(e.target.files[0]);
+  e.target.value = '';
+});
+$('btnQuitarVideo').addEventListener('click', () => {
+  $('fVideo').value = ''; $('videoEstado').textContent = ''; pintarVideo();
+});
+$('fVideo').addEventListener('input', pintarVideo);
 $('velo').addEventListener('click', (e) => { if (e.target === $('velo')) cerrarEditor(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarEditor(); });
 
