@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Lámina de pantalla · Encuesta 1-sep</title>
+<style>
+/* Dueto Tierra en noche: es lo que se proyecta entre bloques del evento.
+   El QR va sobre placa marfil — regla del sistema y además así lee mejor. */
+:root{
+  --bg:#1A1713; --card:#241F1A; --line:#3A322A;
+  --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+  --acc:#8FB89F; --acc2:#C9A87F; --placa:#F7F5EC;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.barra{
+  position:fixed; top:0; left:0; right:0; display:flex; gap:10px; justify-content:flex-end;
+  padding:14px 18px; z-index:9; transition:opacity .3s ease;
+}
+body.limpio .barra{opacity:0; pointer-events:none}
+.btn{
+  border:1px solid var(--line); background:var(--card); color:var(--sub);
+  font:inherit; font-size:13.5px; font-weight:600; border-radius:12px;
+  padding:9px 14px; cursor:pointer; text-decoration:none;
+}
+.btn.p{background:var(--acc); border-color:var(--acc); color:#17241C}
+
+.lamina{
+  width:min(100vw, calc(100vh * 16 / 9)); height:min(100vh, calc(100vw * 9 / 16));
+  display:flex; align-items:center; gap:5vmin; padding:6vmin 7vmin;
+}
+.txt{flex:1; min-width:0}
+.eyebrow{
+  font-size:1.5vmin; letter-spacing:.28em; text-transform:uppercase;
+  font-weight:600; color:var(--faint); margin:0 0 2.4vmin;
+}
+h1{
+  font-family:var(--serif); font-weight:400; font-size:6.4vmin; line-height:1.06;
+  letter-spacing:-.01em; margin:0; text-wrap:balance;
+}
+.regla{width:9vmin; height:.5vmin; background:var(--acc2); border-radius:99px; margin:3vmin 0 2.6vmin}
+.lede{font-size:2.5vmin; line-height:1.5; color:var(--sub); margin:0 0 3.4vmin; max-width:26ch}
+.lede b{color:var(--ink); font-weight:600}
+.pasos{display:flex; gap:2.6vmin; margin:0; padding:0; list-style:none}
+.pasos li{font-size:1.75vmin; color:var(--sub); line-height:1.45; max-width:16ch}
+.pasos b{display:block; color:var(--acc); font-weight:600; font-size:2.1vmin; margin-bottom:.5vmin}
+.marco{
+  flex:none; background:var(--placa); border-radius:2.4vmin; padding:2.6vmin;
+  box-shadow:0 1px 2px rgba(0,0,0,.3), 0 2.4vmin 6vmin rgba(0,0,0,.45);
+}
+.marco img{display:block; width:34vmin; height:34vmin}
+.pie{
+  position:absolute; left:7vmin; bottom:4vmin; display:flex; align-items:center; gap:2.2vmin;
+}
+.pie span{background:var(--placa); border-radius:1vmin; padding:.6vmin .9vmin; line-height:0}
+.pie img{height:2.6vmin; width:auto; display:block}
+.pie .fecha{background:none; padding:0; font-size:1.4vmin; color:var(--faint); letter-spacing:.16em; line-height:1}
+@media (max-aspect-ratio:1/1){
+  .lamina{flex-direction:column; text-align:center; justify-content:center; height:100vh; width:100vw}
+  .lede{margin-left:auto; margin-right:auto}
+  .pasos{justify-content:center; flex-wrap:wrap}
+  .marco img{width:38vmin; height:38vmin}
+  .pie{position:static; margin-top:3vmin; justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <a class="btn" href="index.html">← Portal</a>
+  <button class="btn" id="btnLimpio">Ocultar botones</button>
+  <button class="btn p" id="btnFull">Pantalla completa</button>
+</div>
+
+<div class="lamina">
+  <div class="txt">
+    <p class="eyebrow">Natural Trade · Global Forest</p>
+    <h1>¿Nos cuentas cómo compras?</h1>
+    <div class="regla"></div>
+    <p class="lede">Ocho preguntas, <b>menos de tres minutos</b>. Con tus respuestas
+      te armamos ofertas a tu medida.</p>
+    <ul class="pasos">
+      <li><b>1</b> Abre la cámara de tu teléfono</li>
+      <li><b>2</b> Apúntala al código</li>
+      <li><b>3</b> Toca la liga que aparece</li>
+    </ul>
+  </div>
+  <div class="marco"><img src="img/qr-encuesta.png" alt="Código QR de la encuesta"></div>
+  <div class="pie">
+    <span><img src="img/nt.png" alt="Natural Trade"></span>
+    <span><img src="img/gf.png" alt="Global Forest"></span>
+    <span class="fecha">1 DE SEPTIEMBRE DE 2026</span>
+  </div>
+</div>
+
+<script>
+document.getElementById('btnFull').onclick = () =>
+  document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+document.getElementById('btnLimpio').onclick = () => document.body.classList.add('limpio');
+// mover el mouse trae los botones de vuelta
+addEventListener('mousemove', () => document.body.classList.remove('limpio'));
+addEventListener('keydown', e => { if (e.key === 'f' || e.key === 'F') document.getElementById('btnFull').click(); });
+</script>
+</body>
+</html>

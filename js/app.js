@@ -66,8 +66,9 @@ let me = null;                              // { email, nombre }
 const D = {
   persona: [], acuerdo: [], mensaje: [], bloque: [], video: [], escena: [],
   pregunta: [], acto: [], participacion: [], idea: [], tarea: [], asset: [],
-  voto: [], comentario: []
+  voto: [], comentario: [], dia: [], encuesta: []
 };
+let FORM = null;                            // cuestionario publicado de la encuesta
 let TAB = localStorage.getItem('ev_tab') || 'tareas';
 let signedCache = {};                       // storage_path -> url
 
@@ -82,7 +83,9 @@ const TABS = [
   { k:'interaccion', t:'Encuesta y mago', n:() => D.pregunta.length + D.acto.length },
   { k:'reparto',     t:'Reparto',       n:() => D.participacion.length },
   { k:'repositorio', t:'Repositorio',   n:() => D.asset.length },
-  { k:'ideas',       t:'Ideas',         n:() => D.idea.filter(i => i.estado !== 'descartada').length }
+  { k:'ideas',       t:'Ideas',         n:() => D.idea.filter(i => i.estado !== 'descartada').length },
+  { k:'dia',         t:'Día del evento',n:() => D.dia.filter(d => !d.hecho).length },
+  { k:'encuesta',    t:'Encuesta QR',   n:() => D.encuesta.filter(r => r.completada).length }
 ];
 
 /* ------------------------------------------------- AUDIOVISUALES FINALES
@@ -285,20 +288,24 @@ async function cargar() {
     ['persona', 'nombre'], ['acuerdo', 'orden'], ['mensaje', 'creado_en'], ['bloque', 'orden'],
     ['video', 'orden'], ['escena', 'orden'], ['pregunta', 'orden'], ['acto', 'orden'],
     ['participacion', 'creado_en'], ['idea', 'creado_en'], ['tarea', 'orden'],
-    ['asset', 'creado_en'], ['voto', 'creado_en'], ['comentario', 'creado_en']
+    ['asset', 'creado_en'], ['voto', 'creado_en'], ['comentario', 'creado_en'],
+    ['dia', 'orden'], ['encuesta', 'creado_en']
   ];
+  const desc = ['asset', 'encuesta'];
   const r = await Promise.all(t.map(([n, o]) =>
-    sb.from('ev_' + n).select('*').order(o, { ascending: n !== 'asset' })));
+    sb.from('ev_' + n).select('*').order(o, { ascending: !desc.includes(n) })));
   r.forEach((res, i) => {
     if (res.error) { console.error(t[i][0], res.error); toast('No pude leer ' + t[i][0], true); }
     D[t[i][0]] = res.data || [];
   });
+  await cargarForm();
 }
 async function recargar(tabla) {
   const ord = { asset:'creado_en', mensaje:'creado_en', idea:'creado_en', participacion:'creado_en',
-                comentario:'creado_en', voto:'creado_en', persona:'nombre' }[tabla] || 'orden';
+                comentario:'creado_en', voto:'creado_en', persona:'nombre',
+                encuesta:'creado_en' }[tabla] || 'orden';
   const { data, error } = await sb.from('ev_' + tabla).select('*')
-    .order(ord, { ascending: tabla !== 'asset' });
+    .order(ord, { ascending: !['asset', 'encuesta'].includes(tabla) });
   if (error) return toast('Error al recargar: ' + error.message, true);
   D[tabla] = data || [];
 }
@@ -451,7 +458,7 @@ function render() {
   ({ inicio: rInicio, mensajes: rMensajes, programa: rPrograma, videos: rVideos,
      audiovisuales: rAudiovisuales,
      interaccion: rInteraccion, reparto: rReparto, repositorio: rRepositorio,
-     ideas: rIdeas, tareas: rTareas })[TAB](el);
+     ideas: rIdeas, tareas: rTareas, dia: rDia, encuesta: rEncuesta })[TAB](el);
 }
 const head = (t, p, extra = '') => `<div class="secheadwrap"><div class="sechead">
   <div class="grow"><h2>${t}</h2><p>${p}</p></div>${extra}</div></div>`;
@@ -1488,6 +1495,420 @@ function edTarea(id) {
      <button class="btn p" data-act="guardaTarea" data-id="${id || ''}">Guardar</button>`);
 }
 
+/* ═══════════════════════════════════════════════════ 9. DÍA DEL EVENTO
+   La lista operativa del 1-sep: qué se hace, a qué hora, quién y palomeado
+   cuando queda listo. El orden se mueve con las flechas.                 */
+const MOMENTOS = [
+  ['montaje',  'Montaje',  'Antes de que llegue nadie'],
+  ['registro', 'Registro', 'Recepción y gafetes'],
+  ['evento',   'Evento',   'Con los invitados en el salón'],
+  ['cierre',   'Cierre',   'Al terminar y al día siguiente']
+];
+const momLbl = k => (MOMENTOS.find(m => m[0] === k) || [k, k])[1];
+let fMom = 'todos', fSoloMias = false, fVerHechas = true;
+
+function rDia(el) {
+  const todos = D.dia;
+  const hechas = todos.filter(d => d.hecho).length;
+  const sinDueno = todos.filter(d => !d.hecho && !d.responsable).length;
+  const mias = todos.filter(d => !d.hecho && d.responsable === me.email).length;
+
+  let items = [...todos];
+  if (fMom !== 'todos') items = items.filter(d => d.momento === fMom);
+  if (fSoloMias) items = items.filter(d => d.responsable === me.email);
+  if (!fVerHechas) items = items.filter(d => !d.hecho);
+
+  const fila = (d, i, arr) => `
+    <div class="item ${d.hecho ? 'descartado' : ''}">
+      <div class="row wrap" style="align-items:flex-start">
+        <button class="mini" data-act="okDia" data-id="${d.id}" title="${d.hecho ? 'Desmarcar' : 'Marcar hecho'}"
+          style="font-size:16px">${d.hecho ? '☑' : '☐'}</button>
+        <div class="btime" style="flex:none;width:64px;text-align:right;font-variant-numeric:tabular-nums;
+             font-weight:600;color:var(--acc);font-size:13.5px;padding-top:3px">${d.hora ? h12(mDe(d.hora)) : '—'}</div>
+        <div class="grow">
+          <div class="txt b">${esc(d.titulo)}</div>
+          ${d.detalle ? `<div class="mut tiny" style="margin-top:4px">${br(d.detalle)}</div>` : ''}
+          <div class="meta">
+            <span class="chip click" data-act="fMom" data-v="${d.momento}">${esc(momLbl(d.momento))}</span>
+            ${d.responsable ? `<span class="chip"><span class="av sm">${initials(nombreDe(d.responsable))}</span>${esc(nombreDe(d.responsable))}</span>`
+              : `<button class="chip click bad" data-act="tomarDia" data-id="${d.id}">sin dueño · tomarlo</button>`}
+            ${d.apoyo ? `<span class="chip">+ ${esc(nombreDe(d.apoyo))}</span>` : ''}
+            ${d.hecho && d.hecho_por ? `<span class="chip ok">✓ ${esc(nombreDe(d.hecho_por))} · ${hace(d.hecho_en)}</span>` : ''}
+            <span class="acts">
+              <button class="mini" data-act="subeDia" data-id="${d.id}" ${i === 0 ? 'disabled' : ''} title="Subir">↑</button>
+              <button class="mini" data-act="bajaDia" data-id="${d.id}" ${i === arr.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
+              <button class="mini" data-act="edDia" data-id="${d.id}" title="Editar">✎</button></span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const grupos = MOMENTOS.filter(([k]) => items.some(d => d.momento === k)).map(([k, t, sub]) => {
+    const ds = items.filter(d => d.momento === k);
+    const list = ds.map((d, i) => fila(d, i, ds)).join('');
+    return `<div class="sub-h2" style="margin:18px 0 8px;display:flex;align-items:baseline;gap:9px">
+        <b style="font-size:13px">${t}</b>
+        <span class="mut tiny">${sub} · ${ds.filter(d => d.hecho).length}/${ds.length} listos</span>
+      </div>${list}`;
+  }).join('');
+
+  el.innerHTML = head('Día del evento',
+    `Todo lo que hay que hacer el 1 de septiembre, en orden. <b>Palomea cuando quede listo</b>,
+     ponle hora y dueño a lo que falte, y usa las flechas para acomodarlo.
+     La hoja para imprimir sale con todo lo que veas aquí.`,
+    `<button class="btn" data-act="dImprimir">🖨 Hoja del día</button>
+     <button class="btn p" data-act="nuevoDia">＋ Pendiente</button>`) + `
+
+    <div class="grid g4" style="margin-bottom:12px">
+      <div class="stat click" data-act="dLimpia"><div class="v">${todos.length}</div><div class="k">Pendientes</div></div>
+      <div class="stat click ok"><div class="v">${hechas}</div><div class="k">Listos</div></div>
+      <div class="stat click ${sinDueno ? 'bad' : 'ok'}"><div class="v">${sinDueno}</div><div class="k">Sin dueño</div></div>
+      <div class="stat click warn" data-act="dMias"><div class="v">${mias}</div><div class="k">Míos</div></div>
+    </div>
+
+    <div class="row wrap" style="margin-bottom:4px">
+      <span class="chip click ${fMom === 'todos' ? 'on' : ''}" data-act="fMom" data-v="todos">Todo el día · ${todos.length}</span>
+      ${MOMENTOS.map(([k, t]) => `<span class="chip click ${fMom === k ? 'on' : ''}" data-act="fMom" data-v="${k}">${t} · ${
+        todos.filter(d => d.momento === k).length}</span>`).join('')}
+      <span class="chip click ${fSoloMias ? 'on' : ''}" data-act="dMias">Solo lo mío</span>
+      <span class="chip click ${fVerHechas ? '' : 'on'}" data-act="dHechas">${fVerHechas ? 'Ocultar los listos' : 'Ver también los listos'}</span>
+    </div>
+
+    ${grupos || '<div class="empty">Nada con esos filtros.</div>'}`;
+}
+
+function edDia(id) {
+  const d = id ? D.dia.find(x => x.id === id) : {};
+  modal(id ? 'Editar pendiente del día' : 'Nuevo pendiente del día',
+    campo('dTit', 'Qué hay que hacer', d.titulo, 'text', 'placeholder="Colocar los gafetes en el área de registro en orden alfabético"') +
+    campo('dDet', 'Detalle', d.detalle, 'area') +
+    `<div class="row" style="gap:10px"><div style="width:120px">` + campo('dHora', 'Hora', d.hora ? String(d.hora).slice(0, 5) : '', 'time') +
+    `</div><div class="grow">` + campo('dMom', 'Momento', '', 'select', opts(MOMENTOS.map(m => [m[0], m[1]]), d.momento || 'montaje')) + `</div></div>` +
+    `<div class="row" style="gap:10px"><div class="grow">` + campo('dResp', 'Responsable', '', 'select', optPersonas(d.responsable)) +
+    `</div><div class="grow">` + campo('dApoyo', 'Apoyo (opcional)', '', 'select', optPersonas(d.apoyo)) + `</div></div>`,
+    `<button class="btn" data-cerrar>Cancelar</button>
+     ${id ? `<button class="btn danger" data-act="delDia" data-id="${id}">Borrar</button>` : ''}
+     <button class="btn p" data-act="guardaDia" data-id="${id || ''}">Guardar</button>`);
+}
+
+/* Hoja del día para imprimir y repartir */
+function diaImprimir() {
+  const items = [...D.dia].sort((a, b) =>
+    MOMENTOS.findIndex(m => m[0] === a.momento) - MOMENTOS.findIndex(m => m[0] === b.momento) || a.orden - b.orden);
+  $('#progFinal').innerHTML = `
+    <div class="pfbar no-print">
+      <button class="btn" data-act="pfCerrar">← Volver al portal</button>
+      <span class="grow"></span>
+      <button class="btn p" data-act="pfImprimir">🖨 Imprimir / guardar PDF</button>
+    </div>
+    <div class="pfhoja">
+      <div class="pfeyebrow">Natural Trade · Global Forest</div>
+      <div class="pfregla"></div>
+      <h1>Pendientes del día</h1>
+      <div class="pfsub">Martes 1 de septiembre de 2026 · Presidente Polanco, CDMX · Salón «Feria»<br>
+        ${items.filter(d => d.hecho).length} de ${items.length} listos al momento de imprimir</div>
+      ${MOMENTOS.filter(([k]) => items.some(d => d.momento === k)).map(([k, t, sub]) => `
+        <div style="margin:18px 0 6px;font-size:11px;font-weight:600;letter-spacing:.12em;
+             text-transform:uppercase;color:#8A6F5B">${t} · ${sub}</div>
+        ${items.filter(d => d.momento === k).map(d => `
+          <div class="pfrow">
+            <div class="pfhora">${d.hora ? h12(mDe(d.hora)) : '—'}</div>
+            <div class="grow">
+              <div class="pft">${d.hecho ? '☑' : '☐'} ${esc(d.titulo)}</div>
+              ${d.detalle ? `<div class="pfm">${esc(d.detalle)}</div>` : ''}
+              <div class="pfm">${d.responsable ? esc(nombreDe(d.responsable)) : '____________________'}${
+                d.apoyo ? ' + ' + esc(nombreDe(d.apoyo)) : ''}</div>
+            </div>
+          </div>`).join('')}`).join('')}
+      <div class="pffoot">
+        <img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest">
+        <span>naturaltrade.ca · globalforest.com.mx</span>
+      </div>
+    </div>`;
+  $('#progFinal').classList.remove('hide');
+  document.body.classList.add('pfon');
+}
+
+/* ═════════════════════════════════════════════════════ 10. ENCUESTA QR
+   El cuestionario que contestan los invitados vive en la base: aquí se
+   edita y al guardar la página pública ya lo muestra. La URL del QR NO
+   cambia nunca, así el código impreso sirve para siempre.               */
+const ENCUESTA_URL = 'https://natural-trade-ltd.github.io/nt-evento-comite/encuesta.html';
+const TIPOS_Q = [['multi','Varias respuestas'], ['unica','Una sola respuesta'],
+                 ['parrafo','Texto largo'], ['texto','Texto corto'], ['matriz','Calificar del 1 al 5']];
+let verRespuesta = null;
+
+const defForm = () => (FORM && FORM.definicion) || null;
+const opsTexto = ops => (ops || []).map(o => (o.otro ? '*' : '') + o.v).join('\n');
+const textoOps = (t, previas) => String(t || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+  const otro = l.startsWith('*');
+  const v = otro ? l.slice(1).trim() : l;
+  const antes = (previas || []).find(o => o.v === v) || {};
+  const o = { v };
+  if (otro) { o.otro = true; o.campo = antes.campo || slugJs(v); o.ph = antes.ph || '¿Cuál?'; }
+  if (antes.exclusiva) o.exclusiva = true;
+  if (antes.ancho) o.ancho = true;
+  if (antes.sigue) o.sigue = antes.sigue;
+  return o;
+});
+const slugJs = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'p';
+
+function rEncuesta(el) {
+  const def = defForm();
+  const resp = D.encuesta || [];
+  const completas = resp.filter(r => r.completada);
+  const enCurso = resp.filter(r => !r.completada);
+
+  const cuenta = (campo) => {
+    const m = {};
+    completas.forEach(r => (Array.isArray(r[campo]) ? r[campo] : [r[campo]]).filter(Boolean)
+      .forEach(v => m[v] = (m[v] || 0) + 1));
+    return Object.entries(m).sort((a, b) => b[1] - a[1]);
+  };
+  const promPrioridad = () => {
+    const s = {}, n = {};
+    completas.forEach(r => Object.entries(r.prioridad || {}).forEach(([k, v]) => {
+      s[k] = (s[k] || 0) + Number(v); n[k] = (n[k] || 0) + 1;
+    }));
+    return Object.keys(s).map(k => [k, s[k] / n[k]]).sort((a, b) => b[1] - a[1]);
+  };
+
+  const barras = (pares, total) => pares.length ? pares.map(([k, v]) => `
+    <div class="row" style="gap:9px;align-items:center;margin-bottom:5px">
+      <div style="flex:none;width:44%;font-size:12.5px" class="mut">${esc(k)}</div>
+      <div style="flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(v / total * 100)}%;background:var(--acc)"></div></div>
+      <b style="flex:none;font-size:12.5px;width:26px;text-align:right">${v}</b>
+    </div>`).join('') : '<div class="empty">Todavía nadie contesta.</div>';
+
+  const listaQ = !def ? '<div class="empty">No pude leer el cuestionario. Recarga el portal.</div>'
+    : def.preguntas.map((q, i) => `
+      <div class="item">
+        <div class="row wrap" style="align-items:flex-start">
+          <div class="grow">
+            <div class="txt b">${i + 1}. ${esc(String(q.texto).replace(/<[^>]+>/g, ''))}</div>
+            ${q.ayuda ? `<div class="mut tiny" style="margin-top:3px">${esc(String(q.ayuda).replace(/<[^>]+>/g, ''))}</div>` : ''}
+            <div class="meta">
+              <span class="chip">${esc((TIPOS_Q.find(t => t[0] === q.tipo) || [0, q.tipo === 'familias' ? 'Origen por familia' : q.tipo])[1])}</span>
+              ${q.tipo === 'matriz' ? `<span class="chip">${(q.filas || []).length} atributos</span>`
+                : q.tipo === 'familias' ? `<span class="chip">${(q.familias || []).length} familias</span>`
+                : (q.opciones || []).length ? `<span class="chip">${q.opciones.length} opciones</span>` : ''}
+              ${q.obligatoria === false ? '<span class="chip">opcional</span>' : ''}
+              <span class="acts">
+                <button class="mini" data-act="qSube" data-i="${i}" ${i === 0 ? 'disabled' : ''} title="Subir">↑</button>
+                <button class="mini" data-act="qBaja" data-i="${i}" ${i === def.preguntas.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
+                <button class="mini" data-act="qEdita" data-i="${i}" title="Editar">✎</button></span>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+
+  const filaResp = r => `
+    <div class="item">
+      <div class="row wrap" style="align-items:flex-start">
+        <div class="grow" style="cursor:pointer" data-act="verResp" data-id="${r.id}">
+          <div class="txt b">${esc(r.empresa || '(sin empresa)')}
+            <span class="mut" style="font-weight:400"> · ${esc(r.nombre || 'sin nombre')}</span></div>
+          <div class="meta">
+            ${r.completada ? '<span class="chip ok">completa</span>' : '<span class="chip warn">a medias</span>'}
+            ${r.seguimiento ? `<span class="chip">${esc(r.seguimiento)}</span>` : ''}
+            <span class="chip">${hace(r.creado_en)}</span>
+            ${r.contacto ? `<span class="chip">${esc(r.contacto)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      ${verRespuesta === r.id ? `<div class="mut tiny" style="margin-top:9px;padding-top:9px;border-top:1px solid var(--line)">
+        <pre class="pl">${esc(detalleResp(r))}</pre></div>` : ''}
+    </div>`;
+
+  el.innerHTML = head('Encuesta QR',
+    `Esto es lo que contestan los invitados al escanear el código de su mesa.
+     <b>La liga del QR nunca cambia</b>: puedes imprimir el código hoy y seguir moviendo las preguntas
+     hasta el 1 de septiembre. Lo que guardes aquí lo ve el invitado en su siguiente escaneo.`,
+    `<a class="btn" href="${ENCUESTA_URL}" target="_blank" rel="noopener">Ver la encuesta</a>
+     <button class="btn p" data-act="qNueva">＋ Pregunta</button>`) + `
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="row wrap" style="gap:18px;align-items:center">
+        <img src="img/qr-encuesta.png" alt="Código QR de la encuesta"
+          style="width:150px;height:150px;flex:none;border-radius:12px;background:#fff;padding:6px">
+        <div class="grow" style="min-width:230px">
+          <div class="mut tiny" style="text-transform:uppercase;letter-spacing:.12em;font-weight:600">La liga definitiva</div>
+          <div class="txt b" style="word-break:break-all;margin:5px 0 9px">${ENCUESTA_URL}</div>
+          <div class="row wrap" style="gap:8px">
+            <button class="btn sm" data-act="qCopiar">Copiar liga</button>
+            <a class="btn sm" href="img/qr-encuesta.png" download>Descargar QR (PNG)</a>
+            <a class="btn sm" href="img/qr-encuesta.svg" download>QR vectorial (SVG)</a>
+            <a class="btn sm" href="qr-mesa.html" target="_blank" rel="noopener">Cartel de mesa</a>
+            <a class="btn sm" href="qr-pantalla.html" target="_blank" rel="noopener">Lámina de pantalla</a>
+          </div>
+          <div class="mut tiny" style="margin-top:9px">Versión del cuestionario publicada:
+            <b>v${FORM ? FORM.version : '—'}</b>${FORM && FORM.actualizado_por
+              ? ` · último cambio de ${esc(nombreDe(FORM.actualizado_por))} ${hace(FORM.actualizado_en)}` : ''}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:12px">
+      <div class="stat"><div class="v">${completas.length}</div><div class="k">Contestadas</div></div>
+      <div class="stat warn"><div class="v">${enCurso.length}</div><div class="k">A medias</div></div>
+      <div class="stat"><div class="v">${new Set(completas.map(r => (r.empresa || '').toLowerCase()).filter(Boolean)).size}</div><div class="k">Empresas</div></div>
+      <div class="stat ok"><div class="v">${completas.filter(r => /Sí/i.test(r.programa || '')).length}</div><div class="k">Quieren programa</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <h3 style="margin:0 0 10px">Las preguntas</h3>
+      <div class="help" style="margin-bottom:10px"><b>Cómo se edita.</b> Cambia el texto, agrega o quita opciones
+        y mueve el orden con ↑ ↓. En la lista de opciones, una línea que empiece con <b>*</b> lleva además un
+        campo para que el invitado escriba (así funciona «Otro»). Al guardar sube la versión y la encuesta
+        pública se actualiza sola; lo ya contestado no se pierde.</div>
+      ${listaQ}
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <h3 style="margin:0 0 10px">Qué están contestando</h3>
+      <div class="grid g2">
+        <div><div class="mut tiny" style="margin-bottom:6px">Productos que consumen</div>
+          ${barras(cuenta('productos'), completas.length || 1)}</div>
+        <div><div class="mut tiny" style="margin-bottom:6px">Cómo quieren seguimiento</div>
+          ${barras(cuenta('seguimiento'), completas.length || 1)}</div>
+        <div><div class="mut tiny" style="margin-bottom:6px">Origen de su madera</div>
+          ${barras(cuenta('origen_madera'), completas.length || 1)}</div>
+        <div><div class="mut tiny" style="margin-bottom:6px">Qué valoran de un proveedor (promedio, 5 = lo que más)</div>
+          ${promPrioridad().length ? promPrioridad().map(([k, v]) => `
+            <div class="row" style="gap:9px;align-items:center;margin-bottom:5px">
+              <div style="flex:none;width:44%;font-size:12.5px" class="mut">${esc(k)}</div>
+              <div style="flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden">
+                <div style="height:100%;width:${Math.round(v / 5 * 100)}%;background:var(--acc2)"></div></div>
+              <b style="flex:none;font-size:12.5px;width:26px;text-align:right">${v.toFixed(1)}</b>
+            </div>`).join('') : '<div class="empty">Todavía nadie contesta.</div>'}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="align-items:center;margin-bottom:10px">
+        <h3 class="grow" style="margin:0">Respuestas · ${resp.length}</h3>
+        <button class="btn sm" data-act="qCsv">Descargar Excel (CSV)</button>
+      </div>
+      ${resp.length ? resp.map(filaResp).join('') : '<div class="empty">Nadie ha contestado todavía. Escanea el QR y prueba tú mismo.</div>'}
+    </div>`;
+}
+
+/* mover un pendiente dentro de su momento */
+async function mueveDia(id, dir) {
+  const d = D.dia.find(x => x.id === id);
+  const grupo = D.dia.filter(x => x.momento === d.momento).sort(by('orden'));
+  const i = grupo.findIndex(x => x.id === id), j = i + dir;
+  if (j < 0 || j >= grupo.length) return;
+  const otro = grupo[j];
+  await sb.from('ev_dia').update({ orden: otro.orden }).eq('id', d.id);
+  await sb.from('ev_dia').update({ orden: d.orden }).eq('id', otro.id);
+  await recargar('dia'); render();
+}
+/* mover una pregunta de la encuesta */
+async function mueveQ(i, dir) {
+  const def = clonaForm(); if (!def) return;
+  const j = i + dir;
+  if (j < 0 || j >= def.preguntas.length) return;
+  [def.preguntas[i], def.preguntas[j]] = [def.preguntas[j], def.preguntas[i]];
+  await publicaForm(def, 'Orden publicado');
+}
+const clonaForm = () => defForm() ? JSON.parse(JSON.stringify(defForm())) : null;
+
+function detalleResp(r) {
+  const L = [];
+  const arr = v => Array.isArray(v) ? v.join(' · ') : (v || '');
+  L.push(`Productos: ${arr(r.productos)}${r.otros_tableros ? ' · otros tableros: ' + r.otros_tableros : ''}${
+    r.otros_forestales ? ' · otros forestales: ' + r.otros_forestales : ''}`);
+  L.push(`Origen madera: ${arr(r.origen_madera) || '(no aplica)'}${r.origen_madera_otro ? ' · ' + r.origen_madera_otro : ''}`);
+  L.push(`Origen tableros: ${arr(r.origen_tableros) || '(no aplica)'}${r.origen_tableros_otro ? ' · ' + r.origen_tableros_otro : ''}`);
+  L.push(`Anticipación: ${r.anticipacion || ''}`);
+  L.push(`Sistema: ${r.sistema_otro || r.sistema || ''}`);
+  L.push(`Prioridad (5 = lo que más valora): ${Object.entries(r.prioridad || {})
+    .sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} (${v})`).join(' · ')}`);
+  L.push(`Frustración: ${r.frustracion || ''}`);
+  L.push(`Programa: ${r.programa || ''}`);
+  L.push(`Seguimiento: ${r.seguimiento || ''}`);
+  // cualquier pregunta que el comité haya agregado después
+  const conocidos = new Set(['productos','otros_tableros','otros_forestales','origen_madera','origen_madera_otro',
+    'origen_tableros','origen_tableros_otro','anticipacion','sistema','sistema_otro','prioridad','frustracion',
+    'programa','seguimiento','nombre','empresa','contacto','dispositivo']);
+  Object.entries(r.respuestas || {}).forEach(([k, v]) => {
+    if (conocidos.has(k)) return;
+    const t = Array.isArray(v) ? v.join(' · ') : typeof v === 'object' ? JSON.stringify(v) : v;
+    if (t) L.push(`${k}: ${t}`);
+  });
+  return L.join('\n');
+}
+
+function edQ(i) {
+  const def = defForm(); if (!def) return;
+  const nueva = i === null || i === undefined;
+  const q = nueva ? { tipo: 'unica', obligatoria: true, opciones: [] } : def.preguntas[i];
+  const esFam = q.tipo === 'familias';
+  const cuerpo =
+    campo('qTxt', 'La pregunta', String(q.texto || ''), 'area') +
+    campo('qAyu', 'Ayuda debajo de la pregunta', String(q.ayuda || '')) +
+    `<div class="row" style="gap:10px"><div class="grow">` +
+      (esFam ? campo('qTipo', 'Tipo', 'Origen por familia (madera / tableros)', 'text', 'disabled')
+             : campo('qTipo', 'Tipo', '', 'select', opts(TIPOS_Q, q.tipo))) +
+    `</div><div style="width:150px">` +
+      campo('qObl', 'Obligatoria', '', 'select', opts([['si', 'Sí'], ['no', 'No']], q.obligatoria === false ? 'no' : 'si')) +
+    `</div></div>` +
+    (esFam
+      ? (q.familias || []).map((fa, k) =>
+          campo('qFam' + k, `Opciones de «${fa.titulo}» (una por línea, * = con texto abierto)`,
+            opsTexto(fa.opciones), 'area', 'rows="7"')).join('')
+      : q.tipo === 'matriz'
+        ? campo('qFilas', 'Qué se califica (uno por línea)', (q.filas || []).join('\n'), 'area', 'rows="6"') +
+          `<div class="row" style="gap:10px"><div class="grow">` + campo('qEtiMin', 'Etiqueta del 1', q.etiquetaMin || 'Menos') +
+          `</div><div class="grow">` + campo('qEtiMax', `Etiqueta del ${q.escala || 5}`, q.etiquetaMax || 'Más') + `</div></div>`
+        : campo('qOps', 'Opciones (una por línea · * al inicio = con texto abierto)', opsTexto(q.opciones), 'area', 'rows="8"'));
+
+  modal(nueva ? 'Nueva pregunta de la encuesta' : `Pregunta ${i + 1} de la encuesta`, cuerpo,
+    `<button class="btn" data-cerrar>Cancelar</button>
+     ${!nueva && def.preguntas.length > 1 ? `<button class="btn danger" data-act="qBorra" data-i="${i}">Borrar</button>` : ''}
+     <button class="btn p" data-act="qGuarda" data-i="${nueva ? '' : i}">Guardar y publicar</button>`);
+}
+
+async function publicaForm(def, aviso) {
+  const { error } = await sb.from('ev_encuesta_form')
+    .update({ definicion: def, version: (FORM.version || 1) + 1,
+              actualizado_por: me.email, actualizado_en: new Date().toISOString() })
+    .eq('id', 1);
+  if (error) { toast(error.message, true); return false; }
+  await cargarForm();
+  render();
+  toast(aviso || `Publicado · el QR ya muestra la v${FORM.version}`);
+  return true;
+}
+async function cargarForm() {
+  const { data, error } = await sb.from('ev_encuesta_form').select('*').eq('id', 1).maybeSingle();
+  if (error) { console.error('form', error); return; }
+  FORM = data || null;
+}
+
+function csvEncuesta() {
+  const cols = ['creado_en','completada','nombre','empresa','contacto','productos','otros_tableros',
+    'otros_forestales','origen_madera','origen_madera_otro','origen_tableros','origen_tableros_otro',
+    'anticipacion','sistema','sistema_otro','prioridad','frustracion','programa','seguimiento','form_version'];
+  const celda = v => {
+    const t = Array.isArray(v) ? v.join(' · ')
+      : v && typeof v === 'object' ? Object.entries(v).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} (${n})`).join(' · ')
+      : v === null || v === undefined ? '' : String(v);
+    return `"${t.replace(/"/g, '""')}"`;
+  };
+  const filas = [cols.join(','), ...D.encuesta.map(r => cols.map(c => celda(r[c])).join(','))];
+  const blob = new Blob(['﻿' + filas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Encuesta_evento_1-sep_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast(`${D.encuesta.length} respuestas descargadas`);
+}
+
 /* ============================================================== AYUDA */
 function ayuda() {
   $('#mbox').classList.add('wide');
@@ -1511,6 +1932,12 @@ function ayuda() {
         Todo se espeja a una carpeta de GitHub para el editor.</dd>
       <dt>Ideas</dt><dd>El muro. Aporta, vota y comenta. Lo que se adopta se convierte en bloque, video o tarea.</dd>
       <dt>Tareas</dt><dd>Si una tarea no tiene dueño, tómala. Si te bloquea algo, coméntala.</dd>
+      <dt>Día del evento</dt><dd>La lista de lo que hay que hacer el 1 de septiembre, en orden y por momento
+        (montaje, registro, evento, cierre). Ponle hora y dueño, muévela con ↑ ↓ y palomea cuando quede
+        lista. «Hoja del día» la imprime para repartirla.</dd>
+      <dt>Encuesta QR</dt><dd>Las preguntas que contestan los invitados desde el código de su mesa. La liga
+        del QR <b>nunca cambia</b>: el código impreso sirve aunque cambiemos las preguntas mil veces. Ahí
+        mismo están el QR para imprimir, lo que van contestando y la descarga a Excel.</dd>
     </dl>
     <h3 style="margin:18px 0 8px;font-size:14px">Los botones</h3>
     <dl class="kv">
@@ -1743,6 +2170,87 @@ document.addEventListener('click', async e => {
     },
     fEstT:    () => { fEst = b.dataset.v; render(); },
     fLimpiaT: () => { fResp = 'todos'; fEq = 'todos'; fEst = 'abiertas'; render(); },
+
+    /* ---- día del evento ---- */
+    fMom:      () => { fMom = (fMom === b.dataset.v ? 'todos' : b.dataset.v); ir('dia'); },
+    dMias:     () => { fSoloMias = !fSoloMias; ir('dia'); },
+    dHechas:   () => { fVerHechas = !fVerHechas; render(); },
+    dLimpia:   () => { fMom = 'todos'; fSoloMias = false; fVerHechas = true; render(); },
+    nuevoDia:  () => edDia(null),
+    edDia:     () => edDia(id),
+    guardaDia: async () => {
+      const row = { titulo: val('dTit'), detalle: val('dDet') || null, hora: val('dHora') || null,
+        momento: val('dMom'), responsable: val('dResp') || null, apoyo: val('dApoyo') || null };
+      if (!row.titulo) return toast('Ponle título', true);
+      const ok = id ? await upd('dia', id, row)
+        : await ins('dia', { ...row, orden: Math.max(0, ...D.dia.map(d => d.orden || 0)) + 10,
+                             creado_por: me.email });
+      if (ok) cerrar();
+    },
+    delDia:    async () => { await del('dia', id); cerrar(); },
+    okDia:     async () => {
+      const d = D.dia.find(x => x.id === id);
+      await upd('dia', id, d.hecho
+        ? { hecho: false, hecho_en: null, hecho_por: null }
+        : { hecho: true, hecho_en: new Date().toISOString(), hecho_por: me.email });
+    },
+    tomarDia:  async () => { await upd('dia', id, { responsable: me.email }); toast('Es tuyo.'); },
+    subeDia:   () => mueveDia(id, -1),
+    bajaDia:   () => mueveDia(id, +1),
+    dImprimir: diaImprimir,
+
+    /* ---- encuesta del QR ---- */
+    qNueva:  () => edQ(null),
+    qEdita:  () => edQ(+b.dataset.i),
+    qSube:   () => mueveQ(+b.dataset.i, -1),
+    qBaja:   () => mueveQ(+b.dataset.i, +1),
+    verResp: () => { verRespuesta = verRespuesta === id ? null : id; render(); },
+    qCsv:    csvEncuesta,
+    qCopiar: async () => {
+      try { await navigator.clipboard.writeText(ENCUESTA_URL); toast('Liga copiada'); }
+      catch(_) { toast(ENCUESTA_URL); }
+    },
+    qBorra:  async () => {
+      const def = clonaForm(); const i = +b.dataset.i;
+      if (!confirm(`¿Quitar la pregunta «${String(def.preguntas[i].texto).replace(/<[^>]+>/g, '')}»?`
+        + '\n\nLo ya contestado no se borra: solo deja de preguntarse.')) return;
+      def.preguntas.splice(i, 1);
+      if (await publicaForm(def, 'Pregunta quitada y publicada')) cerrar();
+    },
+    qGuarda: async () => {
+      const def = clonaForm(); if (!def) return;
+      const i = b.dataset.i === '' ? null : +b.dataset.i;
+      const texto = val('qTxt'); if (!texto) return toast('Escribe la pregunta', true);
+      const q = i === null ? { obligatoria: true } : def.preguntas[i];
+      q.texto = texto;
+      const ayuda = val('qAyu'); if (ayuda) q.ayuda = ayuda; else delete q.ayuda;
+      q.obligatoria = val('qObl') !== 'no';
+      if (q.tipo !== 'familias') q.tipo = val('qTipo') || 'unica';
+
+      if (q.tipo === 'familias') {
+        (q.familias || []).forEach((fa, k) => fa.opciones = textoOps(val('qFam' + k), fa.opciones));
+      } else if (q.tipo === 'matriz') {
+        const filas = val('qFilas').split('\n').map(x => x.trim()).filter(Boolean);
+        if (filas.length < 2) return toast('Pon al menos dos cosas que calificar', true);
+        q.filas = filas; q.escala = q.escala || 5;
+        q.etiquetaMin = val('qEtiMin') || 'Menos'; q.etiquetaMax = val('qEtiMax') || 'Más';
+        delete q.opciones;
+      } else if (q.tipo === 'multi' || q.tipo === 'unica') {
+        const ops = textoOps(val('qOps'), q.opciones);
+        if (!ops.length) return toast('Pon al menos una opción', true);
+        q.opciones = ops; delete q.filas;
+      } else {
+        delete q.opciones; delete q.filas;
+      }
+
+      if (i === null) {
+        let base = slugJs(texto), idq = base, n = 2;
+        while (def.preguntas.some(x => x.id === idq)) idq = base + '_' + (n++);
+        q.id = idq; q.campo = idq;
+        def.preguntas.push(q);
+      }
+      if (await publicaForm(def)) cerrar();
+    },
 
     nuevaTarea: () => edTarea(null),
     edTarea:    () => edTarea(id),
