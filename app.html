@@ -217,6 +217,7 @@ footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
     <div class="tabs">
       <button class="tab on" id="tabPadron">Padrón</button>
       <button class="tab" id="tabEncuesta">Cuestionario</button>
+      <button class="tab" id="tabEquipo">Equipo</button>
     </div>
 
     <div id="secPadron">
@@ -279,6 +280,42 @@ footer{margin-top:26px; color:var(--faint); font-size:12px; line-height:1.7}
         Para encender el cuestionario después del evento:
         <code>update app_config set etapa_invitado = 'encuesta' where id = 1;</code>
         (los invitados que abran la app dejarán sus respuestas en vez de ver el demo).
+      </footer>
+    </div>
+    <!-- ── EQUIPO: quién ya entró de verdad y qué ha recorrido ─────────────── -->
+    <div id="secEquipo" class="hide">
+      <div class="kpis">
+        <div class="kpi"><div class="n acc" id="qTotal">0</div><div class="l">En el roster</div></div>
+        <div class="kpi"><div class="n" id="qEntraron">0</div><div class="l">Ya entraron</div></div>
+        <div class="kpi"><div class="n" id="qActivos">0</div><div class="l">Activos esta semana</div></div>
+        <div class="kpi"><div class="n" id="qShots">0</div><div class="l">Pantallazos (30 días)</div></div>
+      </div>
+
+      <div class="tools">
+        <button class="ghost" id="refrescarEquipo">Actualizar</button>
+        <span class="meta">Las visitas por pantalla empiezan a contarse con la actualización del 20-ago (los teléfonos la reciben sola al abrir la app).</span>
+      </div>
+
+      <div class="tablaWrap">
+        <table>
+          <thead><tr>
+            <th>Quién</th><th>Entró</th><th>Última actividad</th><th>Pantallas visitadas</th><th>Pantallazos</th>
+          </tr></thead>
+          <tbody id="qFilas"></tbody>
+        </table>
+      </div>
+
+      <h2 class="secT" style="margin-top:26px">Bitácora reciente</h2>
+      <div class="tablaWrap">
+        <table>
+          <thead><tr><th>Cuándo</th><th>Quién</th><th>Qué</th></tr></thead>
+          <tbody id="qEventos"></tbody>
+        </table>
+      </div>
+
+      <footer>
+        «Entró» = ya hizo su primer registro con correo y contraseña. El recorrido por pantallas
+        y los pantallazos vienen de la bitácora de seguridad de la app (últimos 30 días).
       </footer>
     </div>
   </section>
@@ -421,15 +458,63 @@ $('csv').addEventListener('click', () => {
 
 // ── Pestañas ──────────────────────────────────────────────────────────────────
 let encuestaCargada = false;
+let equipoCargado = false;
 const verTab = (cual) => {
   $('tabPadron').classList.toggle('on', cual === 'padron');
   $('tabEncuesta').classList.toggle('on', cual === 'encuesta');
+  $('tabEquipo').classList.toggle('on', cual === 'equipo');
   $('secPadron').classList.toggle('hide', cual !== 'padron');
   $('secEncuesta').classList.toggle('hide', cual !== 'encuesta');
+  $('secEquipo').classList.toggle('hide', cual !== 'equipo');
   if (cual === 'encuesta' && !encuestaCargada) cargarEncuesta();
+  if (cual === 'equipo' && !equipoCargado) cargarEquipo();
 };
 $('tabPadron').addEventListener('click', () => verTab('padron'));
 $('tabEncuesta').addEventListener('click', () => verTab('encuesta'));
+$('tabEquipo').addEventListener('click', () => verTab('equipo'));
+
+// ── Equipo: roster real, recorrido por pantallas y pantallazos ────────────────
+const nombrePantalla = (p) => {
+  const s = String(p || '').replace(/^\//, '');
+  if (!s) return 'inicio';
+  const MAPA = { '': 'inicio', 'ofertas':'Ofertas', 'mercado':'Tu Mercado', 'compras':'Compras',
+    'pedidos':'Pedidos', 'credito':'Crédito', 'trader':'Panel trader', 'trader-cliente':'Cotizador',
+    'margenes':'Márgenes', 'logistica':'Logística', 'asistente':'Asistente NT' };
+  return MAPA[s] ?? s;
+};
+
+async function cargarEquipo() {
+  const j = await llamar({ action: 'equipo_resumen' });
+  if (!j.ok) return;
+  equipoCargado = true;
+  const eq = j.equipo || [];
+  $('qTotal').textContent = eq.length;
+  $('qEntraron').textContent = eq.filter((m) => m.entro).length;
+  const hace7d = Date.now() - 7 * 24 * 3600 * 1000;
+  $('qActivos').textContent = eq.filter((m) => m.ultima_actividad && new Date(m.ultima_actividad).getTime() > hace7d).length;
+  $('qShots').textContent = eq.reduce((s, m) => s + (m.pantallazos || 0), 0);
+
+  $('qFilas').innerHTML = eq.map((m) => {
+    const pantallas = Object.entries(m.pantallas || {}).sort((a, b) => b[1] - a[1]);
+    const chips = pantallas.slice(0, 7).map(([p, n]) =>
+      `<span class="chip">${esc(nombrePantalla(p))} · ${n}</span>`).join('') || '<span class="chip nada">Sin recorrido aún</span>';
+    const rol = `<span class="chip ${m.rol === 'admin' ? 'compra' : 'plat'}">${m.rol === 'admin' ? 'Admin' : 'Trader'}</span>`;
+    return `<tr>
+      <td><div class="nom">${esc(m.nombre)}</div><div class="emp">${esc(m.email || m.phone)}</div>${rol}</td>
+      <td class="hora">${m.entro ? '✓ ' + hora(m.primer_login) : '<span class="chip nada">pendiente</span>'}</td>
+      <td class="hora">${hora(m.ultima_actividad)}</td>
+      <td>${chips}</td>
+      <td class="hora">${m.pantallazos || 0}</td>
+    </tr>`;
+  }).join('');
+
+  $('qEventos').innerHTML = (j.eventos || []).slice(0, 40).map((e) => `<tr>
+    <td class="hora">${hora(e.creado)}</td>
+    <td>${esc(e.quien)}</td>
+    <td>${e.tipo === 'screenshot' ? '📸 Pantallazo' : 'Visitó ' + esc(nombrePantalla(e.pantalla))}</td>
+  </tr>`).join('') || '<tr><td colspan="3" class="hora">Sin eventos todavía.</td></tr>';
+}
+$('refrescarEquipo').addEventListener('click', () => { equipoCargado = false; cargarEquipo(); });
 
 // ── Cuestionario: editor de preguntas + respuestas ────────────────────────────
 // Las preguntas viven en el servidor; lo que se guarda aquí lo ve la app al instante.
