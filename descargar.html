@@ -119,13 +119,12 @@ a{color:var(--acc)}
 
   <!-- iPhone -->
   <section id="ios" class="hide">
-    <a class="btn" id="btnIos" href="https://testflight.apple.com/join/mbkdhXAr">Instalar en iPhone</a>
+    <a class="btn" id="btnIos" href="https://apps.apple.com/mx/app/id6795663750">Instalar en iPhone</a>
     <div class="pasos">
       <h2>Tres pasos</h2>
       <ol>
-        <li>Toca el botón. Si te pide instalar <b>TestFlight</b> primero, instálalo y
-            <b>vuelve a tocar el botón</b> — es el instalador de Apple para versiones de prueba.</li>
-        <li>Dentro de TestFlight, toca <b>Instalar</b> en NT App.</li>
+        <li>Toca el botón — se abre la <b>App Store</b>.</li>
+        <li>Toca <b>Obtener</b> e instala NT App (descarga normal, sin nada extra).</li>
         <li>Abre la app y escribe tu <b>nombre y celular</b>. Listo, ya estás dentro.</li>
       </ol>
     </div>
@@ -146,7 +145,7 @@ a{color:var(--acc)}
 
   <!-- Computadora o teléfono no reconocido -->
   <section id="ambos" class="hide">
-    <a class="btn" href="https://testflight.apple.com/join/mbkdhXAr">Instalar en iPhone</a>
+    <a class="btn" href="https://apps.apple.com/mx/app/id6795663750">Instalar en iPhone</a>
     <a class="btn" href="https://play.google.com/apps/testing/com.naturaltrade.ntapp">Instalar en Android</a>
     <div class="nota">Abre esta página desde tu teléfono para que el botón correcto salga solo.</div>
   </section>
@@ -171,7 +170,7 @@ const esAndroid = /Android/.test(ua);
 const ver = (id) => document.getElementById(id).classList.remove('hide');
 const OTRO = {
   ios:     ['¿Traes Android?', 'https://play.google.com/apps/testing/com.naturaltrade.ntapp', 'Instalar en Android'],
-  android: ['¿Traes iPhone?',  'https://testflight.apple.com/join/mbkdhXAr',                  'Instalar en iPhone'],
+  android: ['¿Traes iPhone?',  'https://apps.apple.com/mx/app/id6795663750',                  'Instalar en iPhone'],
 };
 
 if (esIOS)        { ver('ios');     pintarOtra('ios'); }
