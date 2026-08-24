@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Voluntarios NT App · Android</title>
+<style>
+  :root{
+    --bg:#F2EDE3; --card:#FBF8F1; --card2:#F6F1E7; --line:#E0D8C8;
+    --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+    --acc:#587F6B; --accInk:#F6FBF7; --acc2:#8A6F5B;
+    --okBg:#E4EDE7; --alerta:#9A6A12; --alertaBg:#F5EBD6;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#1A1713; --card:#241F1A; --card2:#1F1B16; --line:#3A322A;
+    --ink:#F0EAE0; --sub:#BCAFA0; --faint:#8D8072;
+    --acc:#8FB89F; --accInk:#17241C; --acc2:#C9A87F;
+    --okBg:#1E2E24; --alerta:#E0B463; --alertaBg:#33291A;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.6}
+  .wrap{max-width:560px;margin:0 auto;padding:40px 20px 60px}
+  .rule{height:3px;width:52px;background:var(--acc2);border-radius:99px;margin-bottom:18px}
+  .eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  h1{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:500;
+     font-size:clamp(26px,6vw,36px);line-height:1.1;margin:10px 0 0}
+  .lede{color:var(--sub);margin:12px 0 24px;font-size:15px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label{display:block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+        color:var(--faint);margin:14px 0 6px}
+  input{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--card2);
+        color:var(--ink);font-size:16px;padding:13px 14px;outline:none}
+  input:focus{border-color:var(--acc)}
+  button{width:100%;margin-top:18px;background:var(--acc);color:var(--accInk);border:none;
+         border-radius:12px;padding:14px;font-size:16px;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.5}
+  .err{color:#AE4E2B;font-size:13.5px;margin-top:10px;min-height:18px}
+  .oculto{display:none}
+  .gracias{background:var(--okBg);border-radius:16px;padding:22px}
+  .gracias h2{font-family:Georgia,serif;font-weight:500;margin:0 0 8px;font-size:22px}
+  ol{margin:10px 0 0;padding-left:20px}
+  li{margin:8px 0;font-size:14.5px;color:var(--sub)}
+  li b{color:var(--ink)}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:.92em;background:var(--card2);
+        border:1px solid var(--line);border-radius:6px;padding:1px 6px;word-break:break-all}
+  .aviso{background:var(--alertaBg);border-radius:12px;padding:12px 15px;font-size:13.5px;margin-top:16px}
+  footer{margin-top:34px;border-top:1px solid var(--line);padding-top:16px;color:var(--faint);font-size:12px}
+  .adminBtn{background:none;border:none;color:var(--faint);font-size:12px;cursor:pointer;
+            text-decoration:underline;width:auto;margin:0;padding:0}
+  textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:12px;
+           background:var(--card2);color:var(--ink);font-size:13px;padding:12px;margin-top:10px;
+           font-family:ui-monospace,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Natural Trade · Global Forest</p>
+  <div style="height:8px"></div>
+  <div class="rule"></div>
+  <h1>Voluntarios NT App <span style="color:var(--acc)">· Android</span></h1>
+  <p class="lede">Necesitamos <b>15 personas con teléfono Android</b> que instalen nuestra app
+  nueva y la dejen instalada <b>2 semanas</b>. Es un requisito de Google para publicarla —
+  nos ayudas muchísimo con 2 minutos.</p>
+
+  <div class="card" id="forma">
+    <label for="nombre">Tu nombre</label>
+    <input id="nombre" autocomplete="name" placeholder="Nombre y apellido">
+    <label for="correo">Tu correo de Google (el del teléfono)</label>
+    <input id="correo" type="email" autocomplete="email" placeholder="tucorreo@gmail.com" inputmode="email">
+    <button id="btn">Anotarme como voluntario</button>
+    <p class="err" id="err"></p>
+  </div>
+
+  <div class="gracias oculto" id="gracias">
+    <h2>¡Gracias! Quedaste anotado 🌲</h2>
+    <p style="margin:0;color:var(--sub);font-size:14.5px">Eres el voluntario <b id="numero" style="color:var(--ink)">#—</b>. Siguen 3 pasos, <b>desde tu teléfono Android</b>:</p>
+    <ol>
+      <li><b>Espera nuestro "listo"</b> (te avisamos por WhatsApp cuando tu correo quede activado — normalmente el mismo día).</li>
+      <li>Abre <span class="mono">play.google.com/apps/testing/com.naturaltrade.ntapp</span> con este mismo correo y toca <b>"Convertirme en tester"</b>.</li>
+      <li><b>Instala NT App desde Google Play</b> y déjala instalada 2 semanas (úsala si quieres — mejor aún).</li>
+    </ol>
+    <div class="aviso">Si tu teléfono usa otro correo de Google, vuelve a anotarte con ese —
+    debe ser el correo con el que entras a Play Store.</div>
+  </div>
+
+  <footer>
+    <span>NT App · registro de voluntarios de prueba (Google Play) · los correos solo se usan para activar el acceso de prueba.</span>
+    <div style="margin-top:10px"><button class="adminBtn" id="verLista">Ver lista (comité)</button></div>
+    <div class="oculto" id="admin">
+      <input id="clave" type="password" placeholder="Clave del tablero" style="margin-top:10px">
+      <button id="traer" style="margin-top:10px">Traer lista para Play Console</button>
+      <p class="err" id="errA"></p>
+      <div class="oculto" id="listaBox">
+        <p style="font-size:13px;color:var(--sub);margin:12px 0 0"><b id="nLista"></b> voluntarios — copia y pega tal cual en Play Console → Testers → tu lista → Add:</p>
+        <textarea id="lista" readonly></textarea>
+        <button id="copiar" style="margin-top:10px">Copiar lista</button>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const FN = 'https://borouviqngtdzfvlmlur.supabase.co/functions/v1/evento-registro';
+const $ = (id) => document.getElementById(id);
+
+$('btn').addEventListener('click', async () => {
+  const nombre = $('nombre').value.trim();
+  const correo = $('correo').value.trim().toLowerCase();
+  $('err').textContent = '';
+  if (!/^\S+@\S+\.\S+$/.test(correo)) { $('err').textContent = 'Revisa el correo — debe ser el de Google de tu teléfono.'; return; }
+  $('btn').disabled = true;
+  try {
+    const r = await fetch(FN, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'tester_alta', correo, nombre }) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'error');
+    $('numero').textContent = '#' + j.total;
+    $('forma').classList.add('oculto');
+    $('gracias').classList.remove('oculto');
+  } catch (e) {
+    $('err').textContent = 'No se pudo guardar. Revisa tu conexión e intenta de nuevo.';
+    $('btn').disabled = false;
+  }
+});
+
+$('verLista').addEventListener('click', () => $('admin').classList.toggle('oculto'));
+$('traer').addEventListener('click', async () => {
+  $('errA').textContent = '';
+  const r = await fetch(FN, { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'testers_lista', clave: $('clave').value.trim() }) });
+  if (r.status === 401) { $('errA').textContent = 'Clave incorrecta.'; return; }
+  const j = await r.json();
+  if (!j.ok) { $('errA').textContent = 'No se pudo traer la lista.'; return; }
+  $('nLista').textContent = j.n;
+  $('lista').value = j.correos;
+  $('listaBox').classList.remove('oculto');
+});
+$('copiar').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('lista').value).catch(() => {});
+  $('copiar').textContent = 'Copiada ✓';
+  setTimeout(() => { $('copiar').textContent = 'Copiar lista'; }, 1800);
+});
+</script>
+</body>
+</html>
