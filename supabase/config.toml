@@ -1,0 +1,5 @@
+project_id = "nt-evento-comite"
+
+[functions.constructor]
+verify_jwt = false
+entrypoint = "./functions/constructor/index.ts"

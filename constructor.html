@@ -296,7 +296,31 @@ footer{margin-top:30px; color:var(--faint); font-size:12px; line-height:1.7}
         <button class="ghost hide" id="btnQuitarVideo" type="button">Quitar</button>
         <span class="pista" id="videoEstado"></span>
       </div>
-      <p class="pista">Pega el enlace o sube el archivo (hasta 300 MB). El video se proyecta dentro de la lámina; con <b>V</b> se reproduce al presentar.</p>
+      <p class="pista">Pega el enlace o sube el archivo (hasta 300 MB). Al presentar, el video
+        <b>entra solo</b> al llegar a la lámina; <b>V</b> lo pausa y lo reanuda.
+        <b>Ojo:</b> después de subirlo hay que dar «Guardar lámina» — ahí queda.</p>
+    </div>
+    <!-- Diseño de la lámina (24-ago): dónde va el título y qué tan grande el media -->
+    <div class="fila2">
+      <div class="campo">
+        <label for="fTituloModo">Título y texto</label>
+        <select id="fTituloModo">
+          <option value="lado">Texto al lado (clásico)</option>
+          <option value="arriba">Título arriba · imagen/video grande</option>
+          <option value="oculto">Sin título — solo la imagen o el video</option>
+        </select>
+        <p class="pista">«Arriba» y «Sin título» esconden los puntos: son para láminas donde manda la imagen o el video.</p>
+      </div>
+      <div class="campo">
+        <label for="fMediaTam">Tamaño de imagen/video</label>
+        <select id="fMediaTam">
+          <option value="chico">Chico</option>
+          <option value="normal">Normal</option>
+          <option value="grande">Grande</option>
+          <option value="lleno">Pantalla completa</option>
+        </select>
+        <p class="pista">«Pantalla completa» proyecta de borde a borde, sin marco.</p>
+      </div>
     </div>
     <div class="fila2">
       <div class="campo">
@@ -489,6 +513,8 @@ function abrirEditor(id, seccionPreset) {
   $('fMinutos').value = editando?.minutos ?? 2;
   $('fNotas').value = editando?.notas || '';
   $('fVideo').value = editando?.video_url || '';
+  $('fTituloModo').value = editando?.titulo_modo || 'lado';
+  $('fMediaTam').value = editando?.media_tam || 'normal';
   $('videoEstado').textContent = '';
   pintarVideo();
   $('edErr').textContent = '';
@@ -559,6 +585,8 @@ async function guardar() {
       cuerpo: $('fCuerpo').value,
       imagen_url: imagenUrl,
       video_url: $('fVideo').value.trim(),
+      titulo_modo: $('fTituloModo').value,
+      media_tam: $('fMediaTam').value,
       presentador: $('fPresentador').value,
       minutos: Number($('fMinutos').value || 0),
       notas: $('fNotas').value,
