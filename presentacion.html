@@ -217,25 +217,64 @@ body.negro{background:#000}
     </div>
   </section>
 
-  <!-- Lámina final: el QR del salón. Un solo código para iPhone y Android;
-       la página de destino detecta el teléfono y muestra el botón correcto. -->
+  <!-- Lámina final (24-ago): DOS códigos — iPhone directo al App Store (ya pública) y
+       Android a la página del instalador. Instrucciones por plataforma, lado a lado. -->
   <section class="slide">
-    <div class="qrCaja"><img src="img/app/15_qr.png" alt="Código QR para descargar la NT App"></div>
-    <div class="txt">
+    <div class="txt" style="width:100%">
       <p class="eyebrow">Llévatela hoy</p>
       <h2>Descarga la NT App</h2>
-      <p class="frase">Un solo código para iPhone y Android.</p>
-      <h3>Tres pasos</h3>
-      <ul>
-        <li><b>Apunta tu cámara</b> al código — la página reconoce tu teléfono y te lleva a la tienda correcta.</li>
-        <li><b>Instala.</b> En iPhone te pedirá primero TestFlight, el instalador de Apple: instálalo y vuelve a tocar el botón.</li>
-        <li>Abre la app, toca <b>“Soy invitado del evento”</b> y escribe tu nombre, empresa y celular. Sin códigos ni contraseñas — entras al instante.</li>
-      </ul>
-      <div class="importa"><h3>Lo que verás</h3><p>El recorrido completo con datos de demostración. ¿Quieres tu información real? Dínoslo esta noche y te damos de alta.</p></div>
+      <div style="display:flex;gap:4vw;margin-top:2.2vh;flex-wrap:wrap">
+        <div style="flex:1;min-width:320px">
+          <h3 style="font-size:2.6vh"> iPhone — App Store</h3>
+          <div class="qrCaja" style="margin:1.2vh 0"><img src="img/qr-appstore.png" alt="QR App Store" style="width:min(30vh,26vw)"></div>
+          <ul style="font-size:2.1vh">
+            <li><b>1.</b> Apunta tu cámara al código.</li>
+            <li><b>2.</b> Toca <b>Obtener</b> — descarga normal del App Store.</li>
+            <li><b>3.</b> Abre la app → <b>“Soy invitado del evento”</b> → nombre, empresa, correo y celular. Entras al instante.</li>
+          </ul>
+        </div>
+        <div style="flex:1;min-width:320px">
+          <h3 style="font-size:2.6vh">🤖 Android — instalador directo</h3>
+          <div class="qrCaja" style="margin:1.2vh 0"><img src="img/qr-descargar.png" alt="QR instalador Android" style="width:min(30vh,26vw)"></div>
+          <ul style="font-size:2.1vh">
+            <li><b>1.</b> Apunta tu cámara al código y toca <b>Instalar en Android</b> (~90 MB; usa tus datos móviles).</li>
+            <li><b>2.</b> Abre la descarga → si pregunta, <b>“Permitir de esta fuente”</b> → Instalar.</li>
+            <li><b>3.</b> Abre la app → <b>“Soy invitado del evento”</b> → nombre, empresa, correo y celular.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="importa" style="margin-top:1.5vh"><h3>Lo que verás</h3><p>El recorrido completo con datos de demostración — ninguna cuenta real. ¿Quieres tu información de verdad? Dínoslo esta noche y te damos de alta.</p></div>
     </div>
   </section>
 
 </div>
+
+<!-- Portón con clave (24-ago, pedido de Jorge): la clave vive en el servidor, no aquí. -->
+<div id="porton" style="position:fixed;inset:0;z-index:99;background:var(--bg,#F2EDE3);display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:380px;width:100%;background:#FBF8F1;border:1px solid #E0D8C8;border-radius:16px;padding:26px;color:#3A3129;font-family:system-ui,sans-serif">
+    <div style="height:3px;width:48px;background:#8A6F5B;border-radius:99px;margin-bottom:14px"></div>
+    <h2 style="font-family:Georgia,serif;font-weight:500;margin:0 0 6px;font-size:22px">Presentación NT App</h2>
+    <p style="color:#71655A;font-size:13.5px;margin:0 0 14px">Material del evento — escribe la clave del tablero.</p>
+    <input id="pClave" type="password" placeholder="••••••••••••" style="width:100%;box-sizing:border-box;border:1px solid #E0D8C8;border-radius:12px;background:#F6F1E7;font-size:16px;padding:12px 13px;outline:none">
+    <button id="pEntrar" style="width:100%;margin-top:12px;background:#587F6B;color:#F6FBF7;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer">Entrar</button>
+    <p id="pErr" style="color:#AE4E2B;font-size:13px;min-height:16px;margin:8px 0 0"></p>
+  </div>
+</div>
+<script>
+(function(){
+  const FN='https://borouviqngtdzfvlmlur.supabase.co/functions/v1/evento-registro';
+  const ok=()=>{document.getElementById('porton').remove();};
+  if (sessionStorage.getItem('nt_pres_ok')==='1') { ok(); return; }
+  const intentar=async()=>{
+    const cl=document.getElementById('pClave').value.trim();
+    const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'clave_ok',clave:cl})});
+    if(r.ok){sessionStorage.setItem('nt_pres_ok','1');ok();}
+    else document.getElementById('pErr').textContent='Clave incorrecta.';
+  };
+  document.getElementById('pEntrar').addEventListener('click',intentar);
+  document.getElementById('pClave').addEventListener('keydown',(e)=>{if(e.key==='Enter')intentar();});
+})();
+</script>
 
 <div class="barra">
   <span class="pie">NT App · Natural Trade / Global Forest</span>
