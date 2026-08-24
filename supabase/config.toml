@@ -1,5 +1,22 @@
 project_id = "nt-evento-comite"
 
+# Límite por archivo en Storage (videos de láminas): el default de 50 MB rechazó
+# el "Video NT" de 193 MB (24-ago). 300 MiB = el mismo tope del constructor.
+# Se aplica al proyecto con: npx supabase config push --project-ref cytopyytymxjwvfhosvg
+[storage]
+file_size_limit = "300MiB"
+
+# ⚠️ config push aplica DEFAULTS a todo lo no declarado (el push del 24-ago marcó
+# "auth: updated" sin traer [auth] — pudo resetear el Site URL a localhost y romper
+# los enlaces mágicos). Por eso el login queda DECLARADO aquí, explícito:
+[auth]
+site_url = "https://natural-trade-ltd.github.io/nt-evento-comite"
+additional_redirect_urls = [
+  "https://natural-trade-ltd.github.io/nt-evento-comite",
+  "https://natural-trade-ltd.github.io/nt-evento-comite/",
+  "https://natural-trade-ltd.github.io/nt-evento-comite/**",
+]
+
 [functions.constructor]
 verify_jwt = false
 entrypoint = "./functions/constructor/index.ts"
