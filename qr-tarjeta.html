@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tarjeta de mesa · Encuesta del evento 1-sep</title>
+<style>
+/* ── Dueto Tierra, modo día (para imprimir siempre en claro) ────────────────── */
+:root{
+  --bg:#F2EDE3; --card:#FBF8F1; --line:#E0D8C8;
+  --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+  --acc:#587F6B; --acc2:#8A6F5B;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
+
+/* ── Panel de instrucciones (no se imprime) ────────────────────────────────── */
+.pantalla{max-width:780px;margin:0 auto;padding:30px 22px 6px}
+.pantalla h1{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;margin:0}
+.regla{width:60px;height:3px;background:var(--acc2);border-radius:999px;margin:14px 0 12px}
+.pantalla p{color:var(--sub);line-height:1.6;margin:0 0 12px;max-width:62ch}
+.pantalla ol{color:var(--sub);line-height:1.7;max-width:62ch;padding-left:20px}
+.pantalla b{font-weight:600;color:var(--ink)}
+.imprimir{font:inherit;font-weight:600;cursor:pointer;border:1px solid transparent;
+  border-radius:12px;padding:12px 22px;background:var(--acc);color:#F6FBF7;margin:6px 0 4px}
+.nota{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc2);
+  border-radius:16px;padding:14px 18px;margin:16px 0 8px;color:var(--sub);line-height:1.6}
+
+/* ── La hoja: carta vertical, 4 tarjetas de 1/4 de carta ───────────────────── */
+@page{ size:letter portrait; margin:0 }
+.hoja{
+  width:8.5in; height:11in; margin:22px auto; background:var(--bg);
+  display:grid; grid-template-columns:4.25in 4.25in; grid-template-rows:5.5in 5.5in;
+  box-shadow:0 10px 30px rgba(58,49,41,.18);
+}
+.tarjeta{
+  width:4.25in; height:5.5in; padding:.42in .38in .34in;
+  background:var(--bg); border:1px solid var(--line);   /* la línea es la guía de corte */
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+  text-align:center; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+
+/* Arriba: invitación breve. Abajo: qué hacer + la casa. El QR manda al centro. */
+.arriba{display:flex;flex-direction:column;align-items:center;gap:.09in}
+.epi{font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--acc2)}
+.titulo{font-family:var(--serif);font-weight:400;font-size:21pt;line-height:1.16;
+  letter-spacing:-.01em;color:var(--ink);margin:0;text-wrap:balance;max-width:3.2in}
+
+.qr{background:#fff;border-radius:14px;padding:.1in;line-height:0}
+.qr img{width:2.34in;height:2.34in;display:block}
+
+.abajo{display:flex;flex-direction:column;align-items:center;gap:.13in;width:100%}
+.como{font-size:9.5pt;line-height:1.45;color:var(--sub);margin:0;max-width:2.9in}
+.como b{font-weight:600;color:var(--ink)}
+.marcas{display:flex;align-items:center;gap:.2in;padding-top:.11in;border-top:1px solid var(--line);width:100%;justify-content:center}
+.marcas img{height:.24in;width:auto;display:block}
+
+@media print{
+  body{background:#fff;margin:0}
+  .pantalla{display:none}
+  .hoja{margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .hoja:last-of-type{break-after:auto;page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="pantalla">
+  <h1>Tarjeta de mesa · encuesta del evento</h1>
+  <div class="regla"></div>
+  <p>Cuatro tarjetas por hoja, de <b>un cuarto de carta</b> (10.8 × 14 cm). Se imprime
+     <b>por los dos lados</b> y se corta por las líneas del recuadro.</p>
+  <button class="imprimir" onclick="window.print()">Imprimir</button>
+  <ol>
+    <li>En el diálogo de impresión elige <b>Carta</b>, orientación <b>vertical</b>.</li>
+    <li>Activa <b>Gráficos de fondo</b> (si no, sale en blanco y pierde el color marfil).</li>
+    <li>Márgenes: <b>Ninguno</b> o <b>Mínimos</b>. Escala <b>100 %</b>, nunca «ajustar».</li>
+    <li>Marca <b>Doble cara</b>. El giro no importa: las cuatro tarjetas de cada hoja son
+        iguales, así que cae bien de cualquier forma.</li>
+  </ol>
+  <div class="nota">
+    <b>Si va a imprenta:</b> pide 300 dpi, papel opaco de 250–300 g y <b>3 mm de rebase</b>
+    por lado. El código lleva corrección de errores alta y la marca NT al centro, así que
+    tolera el recorte. <b>No lo re-generes ni lo escales desde una captura</b>: el vector
+    está en <code>img/qr-encuesta.svg</code>.
+  </div>
+  <div class="nota">
+    <b>El código lleva a la encuesta y esa dirección ya no cambia.</b> Las preguntas sí se
+    editan cuando quieras desde el portal del comité, pestaña «Encuesta QR» — el código
+    impreso sigue sirviendo.
+  </div>
+</div>
+
+<!-- ════════ CARA A ════════ -->
+<section class="hoja">
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">Natural Trade · Global Forest</span>
+      <h2 class="titulo">Déjanos conocerte mejor</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">Natural Trade · Global Forest</span>
+      <h2 class="titulo">Déjanos conocerte mejor</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">Natural Trade · Global Forest</span>
+      <h2 class="titulo">Déjanos conocerte mejor</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">Natural Trade · Global Forest</span>
+      <h2 class="titulo">Déjanos conocerte mejor</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CARA B ════════ (mismo código: la tarjeta se lee de cualquier lado) -->
+<section class="hoja">
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">1 de septiembre de 2026</span>
+      <h2 class="titulo">Gracias por<br>acompañarnos</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">1 de septiembre de 2026</span>
+      <h2 class="titulo">Gracias por<br>acompañarnos</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">1 de septiembre de 2026</span>
+      <h2 class="titulo">Gracias por<br>acompañarnos</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+  <div class="tarjeta">
+    <div class="arriba">
+      <span class="epi">1 de septiembre de 2026</span>
+      <h2 class="titulo">Gracias por<br>acompañarnos</h2>
+    </div>
+    <div class="qr"><img src="img/qr-encuesta.svg" alt="Código para abrir la encuesta"></div>
+    <div class="abajo">
+      <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
+      <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
