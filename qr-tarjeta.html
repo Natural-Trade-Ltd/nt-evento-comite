@@ -15,7 +15,8 @@
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
+body{margin:0;background:var(--papel-sim,#EDE6D8);font-family:var(--sans);color:var(--ink);
+  transition:background .25s}
 
 /* ── Panel de instrucciones (no se imprime) ────────────────────────────────── */
 .pantalla{max-width:780px;margin:0 auto;padding:30px 22px 6px}
@@ -26,19 +27,27 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
 .pantalla b{font-weight:600;color:var(--ink)}
 .imprimir{font:inherit;font-weight:600;cursor:pointer;border:1px solid transparent;
   border-radius:12px;padding:12px 22px;background:var(--acc);color:#F6FBF7;margin:6px 0 4px}
+.mut{color:var(--faint);font-size:13px;margin:18px 0 8px}
+.tonos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tonos button{font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--sub);
+  background:var(--card)}
+.tonos button:hover{border-color:var(--acc);color:var(--acc)}
+.tonos button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#F6FBF7}
 .nota{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc2);
   border-radius:16px;padding:14px 18px;margin:16px 0 8px;color:var(--sub);line-height:1.6}
 
 /* ── La hoja: carta vertical, 4 tarjetas de 1/4 de carta ───────────────────── */
 @page{ size:letter portrait; margin:0 }
 .hoja{
-  width:8.5in; height:11in; margin:22px auto; background:var(--bg);
+  width:8.5in; height:11in; margin:22px auto; background:transparent;
   display:grid; grid-template-columns:4.25in 4.25in; grid-template-rows:5.5in 5.5in;
   box-shadow:0 10px 30px rgba(58,49,41,.18);
 }
 .tarjeta{
   width:4.25in; height:5.5in; padding:.42in .38in .34in;
-  background:var(--bg); border:1px solid var(--line);   /* la línea es la guía de corte */
+  background:transparent;                 /* el color lo pone el papel */
+  border:1px solid var(--line);           /* la línea es la guía de corte */
   display:flex; flex-direction:column; align-items:center; justify-content:space-between;
   text-align:center; -webkit-print-color-adjust:exact; print-color-adjust:exact;
 }
@@ -49,7 +58,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
 .titulo{font-family:var(--serif);font-weight:400;font-size:21pt;line-height:1.16;
   letter-spacing:-.01em;color:var(--ink);margin:0;text-wrap:balance;max-width:3.2in}
 
-.qr{background:#fff;border-radius:14px;padding:.1in;line-height:0}
+.qr{background:transparent;padding:.1in;line-height:0}   /* sin placa: papel */
 .qr img{width:2.34in;height:2.34in;display:block}
 
 .abajo{display:flex;flex-direction:column;align-items:center;gap:.13in;width:100%}
@@ -59,7 +68,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
 .marcas img{height:.24in;width:auto;display:block}
 
 @media print{
-  body{background:#fff;margin:0}
+  body{background:transparent;margin:0}
   .pantalla{display:none}
   .hoja{margin:0;box-shadow:none;break-after:page;page-break-after:always}
   .hoja:last-of-type{break-after:auto;page-break-after:auto}
@@ -73,10 +82,22 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
   <div class="regla"></div>
   <p>Cuatro tarjetas por hoja, de <b>un cuarto de carta</b> (10.8 × 14 cm). Se imprime
      <b>por los dos lados</b> y se corta por las líneas del recuadro.</p>
+  <p><b>Fondo transparente:</b> no se imprime ningún color de fondo — el color lo pone
+     el material. Sólo baja tinta en el texto, el código y los logotipos.</p>
+
+  <p class="mut">Prueba cómo se ve sobre el papel que vas a usar:</p>
+  <div class="tonos">
+    <button data-tono="#EDE6D8" title="Marfil">Marfil</button>
+    <button data-tono="#F5F1E6" title="Hueso">Hueso</button>
+    <button data-tono="#D8C7A8" title="Kraft claro">Kraft claro</button>
+    <button data-tono="#B99C72" title="Kraft">Kraft</button>
+    <button data-tono="#FFFFFF" title="Blanco">Blanco</button>
+    <button data-tono="#4A4438" title="Papel oscuro — para ver dónde deja de leerse">Oscuro</button>
+  </div>
+
   <button class="imprimir" onclick="window.print()">Imprimir</button>
   <ol>
     <li>En el diálogo de impresión elige <b>Carta</b>, orientación <b>vertical</b>.</li>
-    <li>Activa <b>Gráficos de fondo</b> (si no, sale en blanco y pierde el color marfil).</li>
     <li>Márgenes: <b>Ninguno</b> o <b>Mínimos</b>. Escala <b>100 %</b>, nunca «ajustar».</li>
     <li>Marca <b>Doble cara</b>. El giro no importa: las cuatro tarjetas de cada hoja son
         iguales, así que cae bien de cualquier forma.</li>
@@ -85,8 +106,16 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
     <b>Si va a imprenta:</b> pide papel opaco de 250–300 g y <b>3 mm de rebase</b> por lado.
     El código lleva corrección de errores alta y la marca NT al centro, así que tolera el
     recorte. <b>No lo re-generes ni lo escales desde una captura</b>: el original de
-    2400 px está en <code>img/qr-encuesta.png</code> (≈1,025 dpi al tamaño impreso) y el
-    vector en <code>img/qr-encuesta.svg</code>.
+    2400 px con canal alfa está en <code>img/qr-encuesta-transparente.png</code>
+    (≈1,025 dpi al tamaño impreso) y el vector sin fondo en
+    <code>img/qr-encuesta-transparente.svg</code>.
+  </div>
+  <div class="nota">
+    <b>Ojo con el papel oscuro.</b> El papel hace de «blanco» del código: en marfil, hueso
+    o kraft claro lee sin problema, pero en un material oscuro o muy saturado el lector
+    falla. Prueba con el tono «Oscuro» de arriba — si ahí no te convence, imprime una
+    muestra y escanéala <b>antes</b> de mandar el tiraje. La versión con fondo blanco
+    sigue disponible en <code>img/qr-encuesta.png</code>.
   </div>
   <div class="nota">
     <b>El código lleva a la encuesta y esa dirección ya no cambia.</b> Las preguntas sí se
@@ -102,7 +131,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">Natural Trade · Global Forest</span>
       <h2 class="titulo">Déjanos conocerte mejor</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -113,7 +142,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">Natural Trade · Global Forest</span>
       <h2 class="titulo">Déjanos conocerte mejor</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -124,7 +153,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">Natural Trade · Global Forest</span>
       <h2 class="titulo">Déjanos conocerte mejor</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -135,7 +164,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">Natural Trade · Global Forest</span>
       <h2 class="titulo">Déjanos conocerte mejor</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Apunta la <b>cámara de tu teléfono</b> al código.<br>Se abre solo, sin instalar nada.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -150,7 +179,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">1 de septiembre de 2026</span>
       <h2 class="titulo">Gracias por<br>acompañarnos</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -161,7 +190,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">1 de septiembre de 2026</span>
       <h2 class="titulo">Gracias por<br>acompañarnos</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -172,7 +201,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">1 de septiembre de 2026</span>
       <h2 class="titulo">Gracias por<br>acompañarnos</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -183,7 +212,7 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
       <span class="epi">1 de septiembre de 2026</span>
       <h2 class="titulo">Gracias por<br>acompañarnos</h2>
     </div>
-    <div class="qr"><img src="img/qr-encuesta.png" alt="Código para abrir la encuesta"></div>
+    <div class="qr"><img src="img/qr-encuesta-transparente.png" alt="Código para abrir la encuesta"></div>
     <div class="abajo">
       <p class="como">Cuéntanos un poco de ti.<br>Nos ayuda a <b>servirte mejor</b>.</p>
       <div class="marcas"><img src="img/nt.png" alt="Natural Trade"><img src="img/gf.png" alt="Global Forest"></div>
@@ -191,5 +220,18 @@ body{margin:0;background:#DCD6CA;font-family:var(--sans);color:var(--ink)}
   </div>
 </section>
 
+<script>
+// Sólo cambia el fondo de la VISTA (simula el papel). No afecta la impresión:
+// las tarjetas van sin fondo y el color lo pone el material.
+(function () {
+  var botones = document.querySelectorAll('.tonos button');
+  function elegir(b) {
+    document.body.style.setProperty('--papel-sim', b.dataset.tono);
+    botones.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+  }
+  botones.forEach(function (b) { b.addEventListener('click', function () { elegir(b); }); });
+  elegir(botones[0]);
+})();
+</script>
 </body>
 </html>
