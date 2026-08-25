@@ -178,13 +178,23 @@ input[type=text]:focus, textarea:focus{outline:2px solid var(--acc); outline-off
 .fila .attr{font-size:15.5px; color:var(--ink)}
 .notas{display:flex; gap:8px}
 .notas label{
+  position:relative;                 /* ancla del radio: sin esto los 25 se apilan */
   flex:1 1 0; min-width:0; height:46px; display:flex; align-items:center; justify-content:center;
   border:1px solid var(--line); border-radius:12px; background:var(--card2);
   font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--sub);
   cursor:pointer; transition:background .15s ease, color .15s ease, border-color .15s ease;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
 }
-.notas input{position:absolute; opacity:0; width:0; height:0}
-.notas label:has(input:checked){background:var(--acc); border-color:var(--acc); color:var(--accInk)}
+/* El radio CUBRE su botón y recibe el toque él mismo. Antes iba con tamaño cero y
+   position:absolute sin ancestro posicionado: los 25 caían en el mismo punto y en
+   iOS todos los toques marcaban el ultimo del documento (bug del 25-ago). */
+.notas input{
+  position:absolute; inset:0; width:100%; height:100%; margin:0;
+  opacity:0; -webkit-appearance:none; appearance:none; border:0; border-radius:12px;
+  cursor:pointer;
+}
+.notas label:has(input:checked), .notas label.marcada{
+  background:var(--acc); border-color:var(--acc); color:var(--accInk)}
 .notas label:focus-within{outline:2px solid var(--acc); outline-offset:2px}
 .ranking-pie{font-size:13px; color:var(--faint); margin-top:12px; padding-top:12px; border-top:1px solid var(--line)}
 .ranking-pie b{color:var(--sub)}
@@ -431,7 +441,7 @@ function pintar(def){
     def.preguntas.map(preguntaHTML).join('') + contactoHTML(def.contacto || {campos: []});
   document.title = (def.titulo || 'Encuesta') + ' · Natural Trade / Global Forest';
   cargarBorrador();
-  def.preguntas.filter(q => q.tipo === 'matriz').forEach(pintaMatriz);
+  def.preguntas.filter(q => q.tipo === 'matriz').forEach(q => { pintaMarcadas(q); pintaMatriz(q); });
   refrescarDependencias();
   avanzar();
 }
@@ -583,7 +593,17 @@ function matrizCambio(radio){
     }
   });
   marcarPrevios(radio.name);
+  pintaMarcadas(q);
   pintaMatriz(q);
+}
+/* El resaltado no depende solo de :has(): Safari viejo no siempre lo repinta. */
+function pintaMarcadas(q){
+  (q.filas || []).forEach(fila => {
+    $$(`input[name="m_${q.id}__${slug(fila)}"]`).forEach(i => {
+      const l = i.closest('label');
+      if (l) l.classList.toggle('marcada', i.checked);
+    });
+  });
 }
 function marcarPrevios(nombre){
   const sel = $(`input[name="${nombre}"]:checked`);
