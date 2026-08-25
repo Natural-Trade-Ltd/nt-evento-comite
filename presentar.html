@@ -6,6 +6,9 @@
 <meta name="description" content="Modo presentar del constructor: la presentación principal del evento del 1 de septiembre de 2026, lámina por lámina.">
 <meta name="robots" content="noindex, nofollow">
 <title>Presentación · Evento 1-sep-2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Dueto Tierra en modo día: es un deck para proyectar, igual que presentacion.html. */
 :root{
@@ -158,6 +161,221 @@ li b{color:var(--ink)}
 body.negro .deck, body.negro .barra, body.negro .notas{visibility:hidden}
 body.negro{background:#000}
 
+
+/* ═══════════════ LÁMINAS DEL PORTAL DE CLIENTES ═══════════════
+   Deck propio (revelado por pasos, contadores, barras, gráfica y demo
+   interactiva) integrado al proyector del evento. Conserva SUS colores;
+   el fondo es el de la plantilla del evento (marfil), así que las láminas
+   que en el original eran verde oscuro usan aquí las variantes CLARAS del
+   mismo sistema de color. Todo va prefijado con .pslide para no tocar las
+   láminas que vienen del constructor. */
+.slide.pslide{
+  --p-pino:#1B5E20; --p-savia:#A6D96A; --p-savia-d:#7FB33F; --p-pinotea:#D9A441;
+  --p-oro:#8D6E00; --p-papel2:#E4EDD6; --p-tinta:#132218; --p-tinta2:#4A6741;
+  --p-tinta3:#7A9878; --p-rojo:#C62828; --p-ambar:#F9A825; --p-naranja:#E65100;
+  --p-azul:#1565C0; --p-br:#C8E6C9;
+  --p-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --p-sans:"IBM Plex Sans",system-ui,sans-serif;
+  --p-disp:"Big Shoulders Display","Arial Narrow","Helvetica Neue Condensed",Impact,sans-serif;
+  flex-direction:column; justify-content:center; align-items:stretch; gap:0;
+  padding:clamp(26px,4.4vh,58px) clamp(26px,4vw,74px) clamp(18px,3vh,38px);
+  font-family:var(--p-sans); font-size:16px; color:var(--p-tinta); line-height:1.45;
+}
+.slide.pslide::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(27,94,32,.045) 0 1px,transparent 1px 52px)}
+.pslide .inner{position:relative;z-index:2;width:100%;max-width:1580px;margin:0 auto}
+.pslide h2,.pslide h3,.pslide h4{font-family:var(--p-disp);font-weight:800;line-height:.88;
+  margin:0;text-transform:uppercase;letter-spacing:-.005em}
+.pslide p{margin:0}
+.pslide .eyebrow{font-family:var(--p-mono);font-size:clamp(10px,1.15vh,12.5px);letter-spacing:.22em;
+  text-transform:uppercase;color:var(--p-pino);display:block;margin-bottom:14px}
+.pslide .dsp{font-size:clamp(2.4rem,6vh,5.2rem);color:var(--p-pino)}
+.pslide .dsp em{font-style:normal;color:var(--p-tinta)}
+
+/* revelado por pasos */
+.pslide [data-step]{opacity:0;transform:translateY(10px);
+  transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.3,1)}
+.pslide [data-step].show{opacity:1;transform:none}
+
+/* portada */
+.pslide .bub{display:inline-block;background:var(--p-papel2);border:1px solid var(--p-br);
+  border-radius:15px 15px 15px 4px;padding:12px 18px;font-size:clamp(14px,1.9vh,19px);
+  color:var(--p-tinta2);max-width:34ch}
+.pslide .caret{display:inline-block;width:2px;height:1em;background:var(--p-savia-d);
+  vertical-align:-2px;margin-left:2px;animation:pbk 1s steps(1) infinite}
+@keyframes pbk{50%{opacity:0}}
+.pslide .stamp{font-family:var(--p-mono);font-size:clamp(9px,1.1vh,11px);color:var(--p-tinta3);
+  letter-spacing:.09em;margin-top:8px;display:block}
+.pslide .costo{display:flex;gap:clamp(28px,4vw,64px);flex-wrap:wrap;margin-top:clamp(20px,3vh,38px);
+  border-top:1px solid var(--p-br);padding-top:clamp(14px,2.2vh,26px)}
+.pslide .costo div b{display:block;font-family:var(--p-disp);font-size:clamp(2rem,4.8vh,3.4rem);
+  font-weight:900;color:var(--p-pino);line-height:.82}
+.pslide .costo div span{font-family:var(--p-mono);font-size:clamp(9px,1.1vh,11px);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--p-tinta3);display:block;margin-top:8px;line-height:1.6}
+
+/* paneles: mapa de áreas, candados de acceso, roadmap */
+.pslide .map,.pslide .locks,.pslide .road{display:grid;gap:1px;background:var(--p-br);
+  border:1px solid var(--p-br);border-radius:14px;overflow:hidden}
+.pslide .map{grid-template-columns:repeat(3,1fr);margin-top:clamp(20px,3.2vh,42px)}
+.pslide .locks{grid-template-columns:repeat(3,1fr);margin-top:clamp(20px,3vh,38px)}
+.pslide .road{grid-template-columns:repeat(4,1fr);margin-top:clamp(18px,2.8vh,34px)}
+.pslide .map article,.pslide .locks div,.pslide .road article{background:#FBFCF7}
+.pslide .map article{padding:clamp(18px,2.8vh,32px) clamp(16px,1.7vw,28px)}
+.pslide .locks div{padding:clamp(16px,2.4vh,28px) clamp(15px,1.5vw,25px)}
+.pslide .road article{padding:clamp(14px,2.2vh,26px) clamp(13px,1.4vw,22px)}
+.pslide .map .n,.pslide .locks .k{font-family:var(--p-mono);font-size:clamp(9px,1.1vh,11px);
+  letter-spacing:.2em;color:var(--p-oro);display:block}
+.pslide .locks .k{margin-bottom:11px}
+.pslide .map h3{font-size:clamp(1.4rem,3.2vh,2.4rem);color:var(--p-pino);margin:8px 0 4px}
+.pslide .locks h4,.pslide .road h4{font-size:clamp(1.15rem,2.6vh,1.9rem);color:var(--p-pino);
+  margin:0 0 8px;line-height:.95}
+.pslide .map .who{font-family:var(--p-mono);font-size:clamp(9.5px,1.15vh,11.5px);letter-spacing:.11em;
+  color:var(--p-savia-d);text-transform:uppercase}
+.pslide .map p,.pslide .locks p,.pslide .road p{font-size:clamp(12px,1.6vh,15.5px);
+  color:var(--p-tinta2);line-height:1.55}
+.pslide .map p{margin-top:12px}
+.pslide .closing{margin-top:clamp(18px,2.8vh,34px);font-family:var(--p-disp);
+  font-size:clamp(1.6rem,4vh,3rem);font-weight:900;text-transform:uppercase;color:var(--p-pino);
+  line-height:.95;text-align:center}
+.pslide .closing em{font-style:normal;color:var(--p-tinta)}
+
+/* láminas de producto: dos columnas */
+.pslide .two{display:grid;grid-template-columns:minmax(290px,.82fr) 1.25fr;
+  gap:clamp(22px,2.6vw,54px);align-items:center}
+.pslide .two .say h2{font-size:clamp(1.8rem,4.4vh,3.3rem)}
+.pslide .pts{list-style:none;padding:0;margin:clamp(16px,2.4vh,28px) 0 0}
+.pslide .pts li{padding:clamp(9px,1.4vh,14px) 0;border-top:1px solid var(--p-br);
+  font-size:clamp(13px,1.75vh,17px);line-height:1.5;color:var(--p-tinta2);
+  display:grid;grid-template-columns:auto 1fr;gap:12px;margin-bottom:0}
+.pslide .pts li:last-child{border-bottom:1px solid var(--p-br)}
+.pslide .pts li::before{content:none}
+.pslide .pts li i{font-style:normal;font-family:var(--p-mono);font-size:clamp(9.5px,1.1vh,11.5px);
+  color:var(--p-savia-d);padding-top:.42em}
+.pslide .pts li b{color:var(--p-pino)}
+.pslide .punch{margin-top:clamp(14px,2.2vh,26px);font-family:var(--p-disp);
+  font-size:clamp(1.1rem,2.4vh,1.8rem);font-weight:800;text-transform:uppercase;
+  color:var(--p-pino);line-height:1.02;border-left:4px solid var(--p-ambar);padding-left:14px}
+
+/* maqueta del portal */
+.pslide .mockwrap{display:flex;justify-content:center}
+.pslide .mock{background:#fff;border:1px solid var(--p-br);border-radius:13px;overflow:hidden;
+  box-shadow:0 18px 50px rgba(27,94,32,.17);width:100%;transform-origin:top center}
+.pslide .mh{background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;padding:9px 15px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pslide .mh .tt{font-weight:700;font-size:13px}
+.pslide .mh .ts{font-size:10px;color:#A5D6A7}
+.pslide .mh .pill{background:rgba(255,255,255,.17);border-radius:20px;padding:3px 11px;
+  font-size:10px;font-family:var(--p-mono)}
+.pslide .mtabs{display:flex;border-bottom:2px solid var(--p-br);padding:0 8px;background:#fff}
+.pslide .mtabs span{padding:8px 13px;font-size:11.5px;font-weight:600;color:var(--p-tinta3);
+  border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.pslide .mtabs span.on{color:var(--p-pino);border-bottom-color:#388E3C}
+.pslide .mb{padding:13px}
+.pslide .krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}
+.pslide .kpi{background:#fff;border:1px solid var(--p-br);border-radius:8px;padding:10px 12px;
+  position:relative;overflow:hidden}
+.pslide .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#43A047}
+.pslide .kpi.rd::before{background:var(--p-rojo)}
+.pslide .kpi.or::before{background:var(--p-naranja)}
+.pslide .kpi.am::before{background:var(--p-ambar)}
+.pslide .kpi.bl::before{background:var(--p-azul)}
+.pslide .kpi .l{font-size:9px;color:var(--p-tinta2);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.pslide .kpi .v{font-size:18px;font-weight:700;margin-top:4px;color:var(--p-tinta)}
+.pslide .kpi.rd .v{color:var(--p-rojo)}.pslide .kpi.or .v{color:var(--p-naranja)}
+.pslide .kpi.am .v{color:var(--p-ambar)}.pslide .kpi.bl .v{color:var(--p-azul)}
+.pslide .kpi .s{font-size:9px;color:var(--p-tinta3);margin-top:2px}
+.pslide .shead{background:linear-gradient(90deg,#2E7D32,#388E3C);color:#fff;padding:7px 12px;
+  border-radius:6px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pslide .shead h4{margin:0;font-size:12px;font-family:var(--p-sans);font-weight:700;
+  text-transform:none;letter-spacing:0;color:#fff}
+.pslide .btnx{background:#1B5E20;color:#fff;border:0;border-radius:5px;padding:3px 9px;
+  font-size:9.5px;font-weight:600;font-family:var(--p-sans)}
+.pslide .btnx.pdf{background:var(--p-rojo)}
+.pslide table.t{width:100%;border-collapse:collapse;font-size:11px}
+.pslide table.t thead th{background:#2E7D32;color:#fff;padding:6px 8px;text-align:left;
+  font-weight:600;font-size:10px;white-space:nowrap}
+.pslide table.t td{padding:6px 8px;border-bottom:1px solid #E8F5E9;white-space:nowrap;color:var(--p-tinta)}
+.pslide table.t tfoot td{background:#1B5E20;color:#fff;font-weight:700}
+.pslide .num{text-align:right;font-family:var(--p-mono);font-size:10.5px}
+.pslide .docn{color:var(--p-azul);font-weight:600;text-decoration:underline;
+  text-underline-offset:2px;cursor:pointer}
+.pslide .tag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:9px;
+  font-weight:700;font-family:var(--p-mono)}
+.pslide .tag.ok{background:#E8F5E9;color:#2E7D32}
+.pslide .tag.a30{background:#FFF8E1;color:var(--p-oro)}
+.pslide .tag.a60{background:#FFF3E0;color:var(--p-naranja)}
+.pslide .tag.a90{background:#FFEBEE;color:var(--p-rojo)}
+.pslide .tw{border:1px solid var(--p-br);border-radius:6px;overflow:hidden;margin-top:9px}
+.pslide .hint{font-size:10px;color:var(--p-tinta3);font-family:var(--p-mono);margin-top:8px}
+.pslide .bars{margin-top:10px;display:grid;gap:6px}
+.pslide .bar{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center}
+.pslide .bar .rk{width:17px;height:17px;border-radius:50%;background:#2E7D32;color:#fff;
+  font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--p-mono)}
+.pslide .bar .tr{background:#E8F5E9;border-radius:5px;height:20px;position:relative;overflow:hidden}
+.pslide .bar .fl{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#43A047,#1B5E20);
+  border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.pslide .bar .nm{position:absolute;left:8px;top:0;bottom:0;display:flex;align-items:center;font-size:10px;
+  color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:calc(100% - 16px)}
+.pslide .bar .am{font-family:var(--p-mono);font-size:10px;font-weight:600;color:var(--p-pino)}
+.pslide .chartbox{margin-top:10px;border:1px solid var(--p-br);border-radius:7px;padding:11px 8px 5px}
+.pslide .legend{display:flex;gap:15px;font-size:10px;color:var(--p-tinta2);font-family:var(--p-mono);margin:0 0 7px 4px}
+.pslide .legend i{display:inline-block;width:10px;height:10px;vertical-align:-1px;margin-right:5px;border-radius:2px}
+.pslide .legend i.f{background:#2E7D32}
+.pslide .legend i.o{border:1.5px solid #7A9878}
+.pslide .wp table{width:100%;border-collapse:collapse;font-size:11px}
+.pslide .wp th{background:#2E7D32;color:#fff;padding:6px 9px;font-size:10px;text-align:right;font-weight:600}
+.pslide .wp th:first-child{text-align:left}
+.pslide .wp td{padding:5px 9px;border-bottom:1px solid #E8F5E9;text-align:right;color:var(--p-tinta)}
+.pslide .wp td:first-child{text-align:left;font-family:var(--p-mono);font-size:10.5px;color:var(--p-tinta2)}
+.pslide .wp input{width:100px;text-align:right;font-family:var(--p-mono);font-size:11.5px;padding:4px 7px;
+  border:1px solid var(--p-br);border-radius:5px;background:#F9FCF5;color:var(--p-pino);font-weight:600}
+.pslide .wp input:focus{outline:2px solid var(--p-savia-d);outline-offset:1px;background:#fff}
+.pslide .wp tfoot td{background:#1B5E20;color:#fff;font-weight:700;font-family:var(--p-mono)}
+.pslide .wpmsg{font-size:11px;padding:8px 11px;background:#F1F8E9;border-top:1px solid var(--p-br);color:var(--p-tinta2)}
+.pslide .wpmsg b{color:var(--p-pino)}
+.pslide .gauge{margin-top:10px;border:1px solid var(--p-br);border-radius:7px;padding:12px}
+.pslide .gbar{height:22px;border-radius:6px;background:#E8F5E9;overflow:hidden;display:flex}
+.pslide .gbar span{display:block;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.pslide .gbar .ar{background:#C62828}
+.pslide .gbar .so{background:#F9A825}
+.pslide .gleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:9px;font-size:10px;
+  font-family:var(--p-mono);color:var(--p-tinta2)}
+.pslide .gleg i{display:inline-block;width:9px;height:9px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+.pslide .gnums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}
+.pslide .gnums div{border-left:3px solid var(--p-br);padding-left:9px}
+.pslide .gnums b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--p-tinta2);font-weight:600}
+.pslide .gnums u{display:block;text-decoration:none;font-size:15px;font-weight:700;margin-top:2px;
+  font-family:var(--p-mono);color:var(--p-tinta)}
+.pslide .hl{outline:3px solid var(--p-ambar);outline-offset:3px;border-radius:9px;
+  box-shadow:0 0 0 8px rgba(249,168,37,.18);transition:outline-color .3s,box-shadow .3s}
+
+/* modal de la factura: vive FUERA del deck porque el deck se re-dibuja */
+#pModal{position:fixed;inset:0;background:rgba(6,20,11,.66);z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);
+  font-family:"IBM Plex Sans",system-ui,sans-serif}
+#pModal.on{display:flex}
+#pModal .mcard{background:#fff;border-radius:12px;max-width:620px;width:100%;color:#132218;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden}
+#pModal .mtop{background:linear-gradient(90deg,#2E7D32,#1B5E20);color:#fff;padding:12px 17px;
+  display:flex;justify-content:space-between;align-items:center;font-size:15px}
+#pModal .mtop button{background:none;border:0;color:#fff;font-size:23px;cursor:pointer;line-height:1}
+#pModal .mbody{padding:15px 17px 18px}
+#pModal table{width:100%;border-collapse:collapse;font-size:11px}
+#pModal thead th{background:#2E7D32;color:#fff;padding:6px 8px;text-align:left;font-weight:600;font-size:10px}
+#pModal td{padding:6px 8px;border-bottom:1px solid #E8F5E9;color:#132218}
+#pModal tfoot td{background:#1B5E20;color:#fff;font-weight:700}
+#pModal .num{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:10.5px}
+#pModal .hint{font-size:10px;color:#7A9878;font-family:"IBM Plex Mono",monospace;margin-top:8px}
+
+@media(max-width:1100px){
+  .pslide .two{grid-template-columns:1fr;gap:18px}
+  .pslide .map,.pslide .locks{grid-template-columns:1fr}
+  .pslide .road{grid-template-columns:1fr 1fr}
+  .pslide .gnums{grid-template-columns:repeat(2,1fr)}
+}
+
 /* Impresión / PDF: todas las láminas, una por página. */
 @media print{
   body{overflow:visible; background:#fff}
@@ -207,6 +425,271 @@ body.negro{background:#000}
   </div>
 </div>
 
+<!-- ══════════ LÁMINAS DEL PORTAL DE CLIENTES ══════════
+     Deck de 5 min integrado al proyector: mismo flujo por pasos y mismas
+     animaciones del original. Se mezclan con las láminas del constructor
+     por seccion+orden (aquí: portal 1–8, antes de las del constructor).
+     NOTA: estas 8 NO se editan desde el constructor, viven en este archivo. -->
+<template id="tplPortal">
+
+<section class="slide pslide" data-seccion="portal" data-orden="1" data-minutos="0.5"
+  data-titulo="Portal · Ya no tienes que preguntar"
+  data-notas="Lee el mensaje en voz alta y deja un silencio. Todos en la sala lo han escrito alguna vez. Luego el número: casi seis horas de espera por un dato que ya existía cuando preguntaron. No es culpa de nadie — la pregunta viaja por cuatro escalas antes de volver.">
+  <div class="inner">
+    <div data-step="0">
+      <span class="bub"><span id="pTyped"></span><span class="caret"></span></span>
+      <span class="stamp">martes · 9:47 a.m. · entregado</span>
+    </div>
+    <h2 class="dsp" style="margin-top:clamp(18px,2.8vh,34px)" data-step="0">Ya no tienes<br>que <em>preguntar.</em></h2>
+    <div class="costo" data-step="1">
+      <div><b>5 h 53</b><span>de espera por una<br>pregunta de rutina</span></div>
+      <div><b>1 día</b><span>de retraso en el<br>dato que sí llegó</span></div>
+      <div><b>≈ 6 h</b><span>al mes de tu equipo<br>persiguiendo información</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="2" data-minutos="0.5"
+  data-titulo="Portal · Las tres áreas"
+  data-notas="El hilo de los próximos tres minutos. No son tres pantallas: son tres áreas de su empresa que dejan de esperar. Nombra a las personas — quien compra, quien programa la planta, quien concilia. Cada una entra por su cuenta y saca lo suyo.">
+  <div class="inner">
+    <span class="eyebrow" data-step="0">El recorrido</span>
+    <h2 class="dsp" data-step="0">Tres secciones.<br>Tres equipos tuyos que<br>dejan de <em>esperar.</em></h2>
+    <div class="map">
+      <article data-step="1"><div class="n">01</div><h3>Mis Compras</h3><div class="who">Tu área de compras</div><p>Tu consumo real por producto, mes a mes y contra el año anterior. Presupuesto y abasto sin reconstruir el año a mano.</p></article>
+      <article data-step="2"><div class="n">02</div><h3>Mis Pedidos</h3><div class="who">Tu planta y tu almacén</div><p>Qué viene en camino, cuándo llega y en qué transporte. Programación de turno y de patio sin llamar a nadie.</p></article>
+      <article data-step="3"><div class="n">03</div><h3>Estado de Cuenta</h3><div class="who">Tu tesorería</div><p>Qué se vence y cuándo, con cuánto crédito cuentas hoy. Conciliación y flujo con el dato en la mano.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="3" data-minutos="1"
+  data-titulo="Portal · Mis Compras"
+  data-notas="Habla al área de compras. Pregunta a la sala cuánto tarda hoy su equipo en armar el consumo del año: casi siempre contestan días. Aquí son segundos, y con el nombre del renglón real de su factura, no la descripción del catálogo. El beneficio es planeación de abasto y presupuesto, nada más.">
+  <div class="inner two">
+    <div class="say">
+      <span class="eyebrow" data-step="0">01 · Mis Compras</span>
+      <h2 class="dsp" data-step="0">Planea tu abasto<br>con tu propio <em>consumo.</em></h2>
+      <ul class="pts">
+        <li data-step="1" data-hl="#c-chart"><i>01</i><div>Tu consumo <b>mes a mes contra el año anterior</b>. Ves tu estacionalidad y proyectas el siguiente trimestre con tu propio dato.</div></li>
+        <li data-step="2" data-hl="#c-bars"><i>02</i><div>Tus diez productos principales con <b>el nombre exacto del renglón de tu factura</b>. Sabes en qué producto se te va el gasto, sin abrir una carpeta.</div></li>
+        <li data-step="3" data-hl="#c-var"><i>03</i><div>La variación del año calculada sola, lista para <b>cerrar tu presupuesto de compras sin armarlo a mano.</b></div></li>
+      </ul>
+      <div class="punch" data-step="3">Tu comprador deja de reconstruir<br>el año en una hoja de cálculo.</div>
+    </div>
+    <div class="mockwrap"><div class="mock" data-fit>
+      <div class="mh"><div><div class="tt">Natural Trade — Mi Portal</div><div class="ts">Resumen de cuenta · Customer 360</div></div><div class="pill">Maximus Pallets</div></div>
+      <div class="mtabs"><span class="on">🛒 Mis Compras</span><span>📦 Mis Pedidos</span><span>💰 Estado de Cuenta</span></div>
+      <div class="mb">
+        <div class="krow">
+          <div class="kpi"><div class="l">Total Compras 2025</div><div class="v" data-count="1599740" data-pre="$">$0</div><div class="s">Año completo</div></div>
+          <div class="kpi"><div class="l">Compras Acum. 2025</div><div class="v" data-count="982300" data-pre="$">$0</div><div class="s">Mismo período</div></div>
+          <div class="kpi bl"><div class="l">Compras Acum. 2026</div><div class="v" data-count="1204880" data-pre="$">$0</div><div class="s">62 facturas</div></div>
+          <div class="kpi" id="c-var"><div class="l">Var. vs Acum. 2025</div><div class="v" style="color:#2E7D32">+22.7%</div><div class="s">+$222,580 vs. año anterior</div></div>
+        </div>
+        <div class="chartbox" id="c-chart">
+          <div class="legend"><span><i class="f"></i>2026</span><span><i class="o"></i>2025</span></div>
+          <svg viewBox="0 0 980 230" width="100%" height="150" id="pChart" role="img" aria-label="Compras mensuales 2026 contra 2025">
+            <g id="pGrid" stroke="#DDE8CF" stroke-width="1"></g><g id="pBars"></g>
+            <g id="pXlab" font-family="IBM Plex Mono" font-size="13" fill="#7A9878" text-anchor="middle"></g>
+          </svg>
+        </div>
+        <div class="shead"><h4>🏆 Top productos — 2026</h4></div>
+        <div class="bars" id="c-bars">
+          <div class="bar"><div class="rk">1</div><div class="tr"><div class="fl" data-w="100"></div><div class="nm">Pino SPF 1x4x8' Std&amp;Btr</div></div><div class="am">$214,600</div></div>
+          <div class="bar"><div class="rk">2</div><div class="tr"><div class="fl" data-w="87"></div><div class="nm">Pino radiata 1x6x10' clear</div></div><div class="am">$186,200</div></div>
+          <div class="bar"><div class="rk">3</div><div class="tr"><div class="fl" data-w="74"></div><div class="nm">Stringer 2x4x40" pino tratado</div></div><div class="am">$158,900</div></div>
+          <div class="bar"><div class="rk">4</div><div class="tr"><div class="fl" data-w="61"></div><div class="nm">Deck board 5/8x3½x48"</div></div><div class="am">$131,450</div></div>
+          <div class="bar"><div class="rk">5</div><div class="tr"><div class="fl" data-w="55"></div><div class="nm">Pino SPF 2x4x12' #2&amp;Btr</div></div><div class="am">$118,700</div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="4" data-minutos="1"
+  data-titulo="Portal · Mis Pedidos"
+  data-notas="La sección que más van a abrir: todos los días, no una vez al mes. Aterrízalo en su piso — con el ETA a la vista, el jefe de planta programa turno y espacio de patio desde la noche anterior. Y la llamada de ¿ya viene? desaparece: son 30 minutos de dos personas, varias veces por semana.">
+  <div class="inner two">
+    <div class="say">
+      <span class="eyebrow" data-step="0">02 · Mis Pedidos</span>
+      <h2 class="dsp" data-step="0">Tu planta programa<br>con <em>certeza.</em></h2>
+      <ul class="pts">
+        <li data-step="1" data-hl="#p-eta"><i>01</i><div><b>ETA por orden</b>, no un rango vago. Programas turno, cuadrilla de descarga y espacio de patio desde la noche anterior.</div></li>
+        <li data-step="2" data-hl="#p-tbl"><i>02</i><div>Estatus, <b>paquetes y transporte</b>: furgón, contenedor o caja con su número. Tu almacén sabe qué recibe antes de que llegue.</div></li>
+        <li data-step="3" data-hl="#p-val"><i>03</i><div>El <b>valor en proceso</b>, para que tu tesorería proyecte el flujo de las próximas semanas sin pedir nada.</div></li>
+      </ul>
+      <div class="punch" data-step="3">Cada "¿ya viene?" que no tienes<br>que preguntar son 30 minutos<br>de dos personas de tu equipo.</div>
+    </div>
+    <div class="mockwrap"><div class="mock" data-fit>
+      <div class="mh"><div><div class="tt">Natural Trade — Mi Portal</div><div class="ts">Órdenes abiertas · en proceso</div></div><div class="pill">3 activas</div></div>
+      <div class="mtabs"><span>🛒 Mis Compras</span><span class="on">📦 Mis Pedidos</span><span>💰 Estado de Cuenta</span></div>
+      <div class="mb">
+        <div class="krow">
+          <div class="kpi"><div class="l">Pedidos Activos</div><div class="v" data-count="3">0</div><div class="s">En proceso</div></div>
+          <div class="kpi bl" id="p-val"><div class="l">Valor en Proceso</div><div class="v" data-count="63400" data-pre="$">$0</div><div class="s">Total órdenes abiertas</div></div>
+          <div class="kpi am" id="p-eta"><div class="l">Próximo ETA</div><div class="v" style="font-size:16px;padding-top:2px">14 ago 2026</div><div class="s">Entrega más próxima · 7 días</div></div>
+        </div>
+        <div class="tw" id="p-tbl">
+          <table class="t">
+            <thead><tr><th># OV</th><th>Estado</th><th>ETA</th><th>Transporte</th><th class="num">Paqs</th><th class="num">Monto</th></tr></thead>
+            <tbody>
+              <tr><td><span class="docn">OV-4417</span></td><td><span class="tag a30">En proceso</span></td><td class="num">14/08/26</td><td>Tren · 2 furgones</td><td class="num">14</td><td class="num">28,650.00</td></tr>
+              <tr><td><span class="docn">OV-4432</span></td><td><span class="tag ok">Confirmado</span></td><td class="num">22/08/26</td><td>Contenedor MSKU-472819</td><td class="num">22</td><td class="num">19,880.00</td></tr>
+              <tr><td><span class="docn">OV-4448</span></td><td><span class="tag a60">Por surtir</span></td><td class="num">03/09/26</td><td>Caja · N. Laredo → GDL</td><td class="num">9</td><td class="num">14,870.00</td></tr>
+            </tbody>
+            <tfoot><tr><td colspan="4">TOTAL EN PROCESO</td><td class="num">45</td><td class="num">63,400.00</td></tr></tfoot>
+          </table>
+        </div>
+        <div class="shead"><h4>📦 Top productos en órdenes abiertas</h4></div>
+        <div class="bars">
+          <div class="bar"><div class="rk">1</div><div class="tr"><div class="fl" data-w="100"></div><div class="nm">Pino SPF 1x4x8' Std&amp;Btr</div></div><div class="am">$21,400</div></div>
+          <div class="bar"><div class="rk">2</div><div class="tr"><div class="fl" data-w="76"></div><div class="nm">Stringer 2x4x40" pino tratado</div></div><div class="am">$16,280</div></div>
+          <div class="bar"><div class="rk">3</div><div class="tr"><div class="fl" data-w="61"></div><div class="nm">Deck board 5/8x3½x48"</div></div><div class="am">$13,050</div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="5" data-minutos="1"
+  data-titulo="Portal · Estado de Cuenta"
+  data-notas="Demo en vivo: en el punto 2 haz clic en FAC-10482 y se abre la factura renglón por renglón. Ese clic es el momento que más recuerdan. Remátalo con su realidad: la aclaración que hoy le toma a su contador dos correos y un día, aquí le toma tres segundos, a la hora que quiera.">
+  <div class="inner two">
+    <div class="say">
+      <span class="eyebrow" data-step="0">03 · Estado de Cuenta</span>
+      <h2 class="dsp" data-step="0">Tu conciliación,<br>en <em>minutos.</em></h2>
+      <ul class="pts">
+        <li data-step="1" data-hl="#e-tbl"><i>01</i><div>Cada saldo con su <b>antigüedad en semáforo</b>, en pesos y en dólares. Lo bajas a Excel y lo cruzas con tu contabilidad el mismo día.</div></li>
+        <li data-step="2" data-hl="#e-doc"><i>02</i><div>Clic en el folio y <b>se abre la factura renglón por renglón</b>. La aclaración deja de ser un correo y un día de espera.</div></li>
+        <li data-step="3" data-hl="#e-kpi"><i>03</i><div>Lo vencido y lo por vencer ya separados, <b>para que tu equipo priorice sin sacar la calculadora.</b></div></li>
+      </ul>
+      <div class="punch" data-step="3">Tu contador deja de cazar<br>facturas por correo.</div>
+    </div>
+    <div class="mockwrap"><div class="mock" data-fit>
+      <div class="mh"><div><div class="tt">Natural Trade — Mi Portal</div><div class="ts">Estado de cuenta · Customer 360</div></div><div class="pill">Maximus Pallets</div></div>
+      <div class="mtabs"><span>🛒 Mis Compras</span><span>📦 Mis Pedidos</span><span class="on">💰 Estado de Cuenta</span></div>
+      <div class="mb">
+        <div class="krow" id="e-kpi">
+          <div class="kpi"><div class="l">Saldo Total Pendiente</div><div class="v" data-count="120197" data-pre="$">$0</div><div class="s">6 documentos abiertos</div></div>
+          <div class="kpi or"><div class="l">Facturas Vencidas</div><div class="v" data-count="56376" data-pre="$">$0</div><div class="s">Días 1+ de aging</div></div>
+          <div class="kpi am"><div class="l">Por Vencer (30 días)</div><div class="v" data-count="65673" data-pre="$">$0</div><div class="s">Próximos 30 días</div></div>
+        </div>
+        <div class="shead"><h4>📋 Estado de Cuenta</h4><div><button class="btnx">⬇ Excel</button> <button class="btnx pdf">⬇ PDF</button></div></div>
+        <div class="tw" id="e-tbl">
+          <table class="t">
+            <thead><tr><th># Doc</th><th>Fecha</th><th>Vencimiento</th><th>Días</th><th>Mon.</th><th class="num">Saldo Abierto</th></tr></thead>
+            <tbody>
+              <tr><td><span class="docn" id="e-doc" data-inv="1">FAC-10482</span></td><td class="num">12/05/26</td><td class="num">11/06/26</td><td><span class="tag a90">+57</span></td><td>MXN</td><td class="num">412,850.00</td></tr>
+              <tr><td><span class="docn" data-inv="2">FAC-10511</span></td><td class="num">03/06/26</td><td class="num">03/07/26</td><td><span class="tag a60">+35</span></td><td>USD</td><td class="num">18,420.00</td></tr>
+              <tr><td><span class="docn" data-inv="3">FAC-10566</span></td><td class="num">28/06/26</td><td class="num">28/07/26</td><td><span class="tag a30">+10</span></td><td>MXN</td><td class="num">286,300.00</td></tr>
+              <tr><td><span class="docn" data-inv="4">FAC-10598</span></td><td class="num">15/07/26</td><td class="num">14/08/26</td><td><span class="tag ok">−7</span></td><td>USD</td><td class="num">54,900.00</td></tr>
+              <tr><td><span class="docn" data-inv="5">FAC-10620</span></td><td class="num">27/07/26</td><td class="num">26/08/26</td><td><span class="tag ok">−19</span></td><td>MXN</td><td class="num">198,440.00</td></tr>
+              <tr><td><span class="docn" data-inv="6">NC-00317</span></td><td class="num">09/07/26</td><td class="num">—</td><td>—</td><td>MXN</td><td class="num">−34,120.00</td></tr>
+            </tbody>
+            <tfoot><tr><td colspan="5">TOTAL · equivalente USD (TC 18.42)</td><td class="num">120,197.00</td></tr></tfoot>
+          </table>
+        </div>
+        <p class="hint">↑ Clic en el folio para abrir la factura.</p>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="6" data-minutos="0.5"
+  data-titulo="Portal · Plan de pagos y crédito"
+  data-notas="Aquí el portal deja de informar y empieza a trabajar para ellos: programan su propio pago según su flujo y nosotros nos ajustamos. Y el crédito en pantalla evita el peor escenario para su planta — un pedido detenido cuando ya contaban con el material. Edita un monto en vivo, el total se recalcula solo.">
+  <div class="inner two">
+    <div class="say">
+      <span class="eyebrow" data-step="0">03 · Estado de Cuenta</span>
+      <h2 class="dsp" data-step="0">Tú marcas<br>el <em>ritmo.</em></h2>
+      <ul class="pts">
+        <li data-step="1" data-hl="#f-wp"><i>01</i><div><b>Tú capturas tu plan de pagos</b> semana por semana, según tu flujo. Nosotros lo vemos al instante y nos ajustamos a tu calendario.</div></li>
+        <li data-step="2" data-hl="#f-cr"><i>02</i><div>Tu <b>crédito disponible hoy</b>: límite, saldo y pedidos en tránsito. Lo confirmas <b>antes</b> de colocar la orden, no cuando ya la esperabas en planta.</div></li>
+      </ul>
+      <div class="punch" data-step="2">Ningún pedido tuyo se detiene<br>por una sorpresa de crédito.</div>
+    </div>
+    <div class="mockwrap"><div class="mock" data-fit>
+      <div class="mh"><div><div class="tt">📅 Programación de Pagos</div><div class="ts">Lo capturas tú · lo vemos al instante</div></div><div class="pill">Editable</div></div>
+      <div class="mb">
+        <div class="wp" id="f-wp" style="border:1px solid #C8E6C9;border-radius:7px;overflow:hidden">
+          <table>
+            <thead><tr><th>Semana</th><th>Vence</th><th>Tu plan de pago (USD)</th></tr></thead>
+            <tbody>
+              <tr><td>Sem 33 · 10–16 ago</td><td>56,376.00</td><td><input type="text" inputmode="decimal" class="wpi" value="30,000"></td></tr>
+              <tr><td>Sem 34 · 17–23 ago</td><td>54,900.00</td><td><input type="text" inputmode="decimal" class="wpi" value="25,000"></td></tr>
+              <tr><td>Sem 35 · 24–30 ago</td><td>10,773.00</td><td><input type="text" inputmode="decimal" class="wpi" value="20,000"></td></tr>
+            </tbody>
+            <tfoot><tr><td>TOTAL PROGRAMADO</td><td>122,049.00</td><td id="wptot">75,000.00</td></tr></tfoot>
+          </table>
+          <div class="wpmsg" id="wpmsg"></div>
+        </div>
+        <div class="shead"><h4>💳 Línea de Crédito</h4><span style="font-size:10px;font-family:'IBM Plex Mono',monospace">73.4% utilizado</span></div>
+        <div class="gauge" id="f-cr">
+          <div class="gbar"><span class="ar" data-w="48.1"></span><span class="so" data-w="25.4"></span></div>
+          <div class="gleg">
+            <span><i style="background:#C62828"></i>Saldo · $120,197</span>
+            <span><i style="background:#F9A825"></i>Pedidos · $63,400</span>
+            <span><i style="background:#E8F5E9;border:1px solid #C8E6C9"></i>Disponible · $66,403</span>
+          </div>
+          <div class="gnums">
+            <div><b>Límite</b><u>$250,000</u></div>
+            <div style="border-color:#C62828"><b>Utilizado</b><u style="color:#C62828">$183,597</u></div>
+            <div style="border-color:#43A047"><b>Disponible hoy</b><u style="color:#2E7D32">$66,403</u></div>
+            <div style="border-color:#F9A825"><b>% línea</b><u style="color:#8D6E00">73.4%</u></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="7" data-minutos="0.5"
+  data-titulo="Portal · Acceso y seguridad"
+  data-notas="Veinte segundos, no más. Existe para matar la objeción antes de que la hagan. Si preguntan: el enlace va por correo, el PIN por WhatsApp, y tener uno solo no sirve de nada. Cierra con lo de cero costo y cero instalación, que es lo que le importa a su área de sistemas.">
+  <div class="inner">
+    <span class="eyebrow" data-step="0">Lo que siempre preguntan</span>
+    <h2 class="dsp" data-step="0">Un enlace. Un PIN.<br>Y nadie más lo <em>ve.</em></h2>
+    <div class="locks">
+      <div data-step="1"><span class="k">01 · IDENTIDAD</span><h4>Dos llaves,<br>dos canales</h4><p>Tu enlace llega por correo y tu PIN por WhatsApp. Tener uno solo no sirve de nada.</p></div>
+      <div data-step="2"><span class="k">02 · AISLAMIENTO</span><h4>Solo su<br>empresa</h4><p>Tu enlace está amarrado a tu cuenta. El sistema verifica dueño en cada consulta.</p></div>
+      <div data-step="3"><span class="k">03 · SIN FRICCIÓN</span><h4>Nada que<br>instalar</h4><p>Sin usuario, sin licencia, sin app. Abre en el navegador de tu teléfono o computadora. Sin costo para ti.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide pslide" data-seccion="portal" data-orden="8" data-minutos="0.5"
+  data-titulo="Portal · Lo que viene"
+  data-notas="Cierra sin prometer fechas. El mensaje es que el portal no es un producto terminado que les entregamos, es algo que sigue creciendo — y que lo que ellos pidan entra en la fila. Termina literal con la frase: seguimos innovando para servirte mejor.">
+  <div class="inner">
+    <span class="eyebrow" data-step="0">Lo que viene</span>
+    <h2 class="dsp" data-step="0">Esto apenas<br><em>empieza.</em></h2>
+    <div class="road">
+      <article data-step="1"><h4>Tu resumen al entrar</h4><p>Abres el portal y lo primero que ves es qué cambió desde tu última visita: qué se venció, qué pedido se movió, qué necesita tu atención hoy.</p></article>
+      <article data-step="2"><h4>Trámites de crédito en línea</h4><p>Solicitar o ampliar tu línea desde el portal, subir tus documentos y seguir el avance sin correos de ida y vuelta.</p></article>
+      <article data-step="3"><h4>Seguimiento de embarque</h4><p>La ruta completa de cada pedido, etapa por etapa, con tu papelería colgada donde corresponde: BL, packing list, certificados y evidencia de entrega.</p></article>
+      <article data-step="4"><h4>Cotizaciones que apruebas tú</h4><p>Recibes la oferta, la revisas y la apruebas desde donde estés. Tu orden se genera sola, sin un solo correo de confirmación.</p></article>
+    </div>
+    <div class="closing" data-step="5">Seguimos innovando<br>para <em>servirte mejor.</em></div>
+  </div>
+</section>
+
+</template>
+
+<div id="pModal" role="dialog" aria-modal="true" aria-label="Detalle de factura">
+  <div class="mcard">
+    <div class="mtop"><b id="pmTitle"></b><button id="pmClose" aria-label="Cerrar">×</button></div>
+    <div class="mbody">
+      <table>
+        <thead><tr><th>Descripción del renglón</th><th class="num">Paqs</th><th class="num">Pzas/paq</th><th>UOM</th><th class="num">P. unit.</th><th class="num">Importe</th></tr></thead>
+        <tbody id="pmRows"></tbody>
+        <tfoot><tr><td colspan="5">TOTAL</td><td class="num" id="pmTot"></td></tr></tfoot>
+      </table>
+      <p class="hint">Sin pedirla por correo. Sin esperar a mañana.</p>
+    </div>
+  </div>
+</div>
+
 <script>
 const FN = 'https://cytopyytymxjwvfhosvg.supabase.co/functions/v1/constructor';
 const LS = 'nt_constructor_clave';
@@ -228,6 +711,7 @@ const rico = (s) => esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 
 let laminas = [];
 let i = 0;
+let paso = 0;
 
 // YouTube / Vimeo / Drive van en iframe; cualquier otro enlace (o un archivo
 // del bucket) va en <video>. El src se pone al LLEGAR a la lámina — con
@@ -257,6 +741,170 @@ async function pedir(clave) {
   return r.json();
 }
 
+
+// ══════════ LÁMINAS DEL PORTAL DE CLIENTES (deck propio, 8 láminas) ══════════
+// Conservan su flujo original: revelado por pasos con el mismo clicker, contadores
+// que suben, barras que crecen, gráfica animada, resaltado guiado y la demo
+// interactiva (plan de pagos editable + factura al clic). Viven en el <template>
+// del HTML y se mezclan con las del constructor por seccion+orden.
+const REDUCIDO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function laminasPortal() {
+  const t = $('tplPortal');
+  if (!t) return [];
+  return [...t.content.querySelectorAll('section')].map((s) => ({
+    estatica: true, html: s.outerHTML,
+    seccion: s.dataset.seccion, orden: Number(s.dataset.orden),
+    titulo: s.dataset.titulo, presentador: s.dataset.presentador || null,
+    minutos: Number(s.dataset.minutos || 0), notas: s.dataset.notas || '',
+    creado_en: '',
+  }));
+}
+
+// ── Pasos dentro de una lámina ──
+const maxPaso = (s) => {
+  let m = 0;
+  if (s) s.querySelectorAll('[data-step]').forEach((n) => { m = Math.max(m, Number(n.dataset.step)); });
+  return m;
+};
+function pintarPasos() {
+  const s = document.querySelectorAll('.slide')[i];
+  if (!s) return;
+  s.querySelectorAll('[data-step]').forEach((n) => n.classList.toggle('show', Number(n.dataset.step) <= paso));
+  s.querySelectorAll('.hl').forEach((n) => n.classList.remove('hl'));
+  const cur = s.querySelector('[data-step="' + paso + '"][data-hl]');
+  if (cur) { const t = s.querySelector(cur.dataset.hl); if (t) t.classList.add('hl'); }
+}
+
+// ── Animaciones de entrada ──
+const nf = (n) => n.toLocaleString('en-US');
+function contarHasta(n) {
+  const t = parseFloat(n.dataset.count), pre = n.dataset.pre || '';
+  if (REDUCIDO) { n.textContent = pre + nf(t); return; }
+  let t0 = null;
+  requestAnimationFrame(function paso1(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / 1000, 1), e = 1 - Math.pow(1 - p, 3);
+    n.textContent = pre + nf(Math.round(t * e));
+    if (p < 1) requestAnimationFrame(paso1);
+  });
+}
+function teclear(s) {
+  const el = s.querySelector('#pTyped');
+  if (!el) return;
+  const TXT = 'Buen día, ¿me pueden pasar mi estado de cuenta?';
+  if (REDUCIDO) { el.textContent = TXT; return; }
+  let c = 0;
+  (function tw() {
+    if (!el.isConnected) return;
+    c++; el.textContent = TXT.slice(0, c);
+    if (c < TXT.length) setTimeout(tw, 55);
+  })();
+}
+function dibujarGrafica(s) {
+  const svg = s.querySelector('#pChart');
+  if (!svg) return;
+  const py = [96, 108, 118, 127, 139, 121, 134, 139, 152, 148, 161, 157];
+  const cy = [138, 152, 166, 181, 170, 188, 142, 68, null, null, null, null];
+  const mes = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const W = 980, H = 230, pad = { l: 12, r: 12, t: 10, b: 28 }, max = 200;
+  const iw = (W - pad.l - pad.r) / 12, ih = H - pad.t - pad.b;
+  let gh = '', bh = '', xh = '';
+  for (let k = 0; k <= 4; k++) {
+    const yy = pad.t + ih - (ih * k / 4);
+    gh += '<line x1="' + pad.l + '" y1="' + yy + '" x2="' + (W - pad.r) + '" y2="' + yy + '"/>';
+  }
+  for (let n = 0; n < 12; n++) {
+    const cx = pad.l + iw * n, bw = iw * 0.30;
+    const h1 = ih * (py[n] / max), y1 = pad.t + ih - h1;
+    bh += '<rect x="' + (cx + iw * 0.16) + '" y="' + y1 + '" width="' + bw + '" height="' + h1 + '" fill="none" stroke="#7A9878" stroke-width="1.4" rx="2"/>';
+    if (cy[n] != null) {
+      const h2 = ih * (cy[n] / max), y2 = pad.t + ih - h2, d = (n * 0.045);
+      bh += '<rect x="' + (cx + iw * 0.52) + '" y="' + (pad.t + ih) + '" width="' + bw + '" height="0" fill="#2E7D32" rx="2">'
+        + '<animate attributeName="height" to="' + h2 + '" dur="0.7s" begin="' + d + 's" fill="freeze"/>'
+        + '<animate attributeName="y" to="' + y2 + '" dur="0.7s" begin="' + d + 's" fill="freeze"/></rect>';
+    }
+    xh += '<text x="' + (cx + iw / 2) + '" y="' + (H - 8) + '">' + mes[n] + '</text>';
+  }
+  s.querySelector('#pGrid').innerHTML = gh;
+  s.querySelector('#pBars').innerHTML = bh;
+  s.querySelector('#pXlab').innerHTML = xh;
+}
+// La maqueta se escala para que siempre quepa sobre la barra del proyector.
+function ajustarMaqueta(s) {
+  const m = s && s.querySelector('[data-fit]');
+  if (!m) return;
+  m.style.transform = 'none';
+  const disp = window.innerHeight - 52 - Math.round(window.innerHeight * 0.14);
+  const h = m.offsetHeight;
+  const k = h > disp ? Math.max(disp / h, 0.62) : 1;
+  m.style.transform = 'scale(' + k + ')';
+  m.style.marginBottom = (h * (k - 1)) + 'px';
+}
+function animarPortal(s) {
+  if (!s || !s.classList.contains('pslide')) return;
+  s.querySelectorAll('[data-count]').forEach(contarHasta);
+  s.querySelectorAll('.fl,.gbar span').forEach((b) => {
+    b.style.width = '0';
+    requestAnimationFrame(() => { b.style.width = b.dataset.w + '%'; });
+  });
+  dibujarGrafica(s);
+  teclear(s);
+  ajustarMaqueta(s);
+}
+window.addEventListener('resize', () => ajustarMaqueta(document.querySelectorAll('.slide')[i]));
+
+// ── Demo interactiva: plan de pagos editable + factura al clic ──
+const FACTURAS = {
+  '1': { t: 'FAC-10482 · 12 may 2026 · MXN', r: [["Pino SPF 1x4x8' Std&Btr", 18, 240, 'pt', 48.20, 208080], ['Stringer 2x4x40" pino tratado', 9, 150, 'pza', 62.50, 84375], ['Deck board 5/8x3½x48"', 12, 200, 'pza', 50.16, 120395]], tot: '412,850.00' },
+  '2': { t: 'FAC-10511 · 3 jun 2026 · USD', r: [["Pino radiata 1x6x10' clear", 14, 160, 'pt', 9.85, 22064], ['Triplay pino 15 mm 4x8', 6, 50, 'hoja', 54.52, 16356]], tot: '38,420.00' },
+  '3': { t: 'FAC-10566 · 28 jun 2026 · MXN', r: [["Pino SPF 2x4x12' #2&Btr", 22, 120, 'pt', 74.30, 196152], ['Bloque aglomerado 95x95', 8, 300, 'pza', 37.56, 90148]], tot: '286,300.00' },
+  '4': { t: 'FAC-10598 · 15 jul 2026 · USD', r: [["Pino amarillo sureño 2x6x16'", 16, 180, 'pt', 12.40, 35712], ['Moldura pino fingerjoint 2⅝"', 10, 90, 'ml', 21.32, 19188]], tot: '54,900.00' },
+  '5': { t: 'FAC-10620 · 27 jul 2026 · MXN', r: [["Pino SPF 1x4x8' Std&Btr", 12, 240, 'pt', 48.90, 140832], ['OSB 11 mm 4x8', 7, 45, 'hoja', 182.25, 57408]], tot: '198,440.00' },
+  '6': { t: 'NC-00317 · 9 jul 2026 · MXN', r: [['Ajuste por merma en descarga — OV-4390', -2, 240, 'pt', 48.20, -23136], ['Bonificación por retraso de entrega', -1, 0, '—', 10984, -10984]], tot: '−34,120.00' },
+};
+const pnum = (v) => parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0;
+function recalcPlan() {
+  const tot = $('wptot'), msg = $('wpmsg');
+  if (!tot) return;
+  let t = 0;
+  document.querySelectorAll('.wpi').forEach((inp) => { t += pnum(inp.value); });
+  tot.textContent = t.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const vencido = 56376;
+  if (t >= 122049) msg.innerHTML = '<b>Plan completo.</b> Cubre todo el saldo abierto en tres semanas.';
+  else if (t >= vencido) msg.innerHTML = '<b>Vencido cubierto.</b> El plan alcanza para todo lo que ya se venció ($56,376).';
+  else msg.innerHTML = 'Faltan <b>$' + (vencido - t).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</b> para cubrir lo vencido.';
+}
+// El deck se re-dibuja cada vez que se construye: hay que volver a cablear.
+function cablearPortal() {
+  document.querySelectorAll('.wpi').forEach((inp) => {
+    inp.addEventListener('input', recalcPlan);
+    inp.addEventListener('blur', () => {
+      inp.value = pnum(inp.value).toLocaleString('en-US', { maximumFractionDigits: 2 });
+      recalcPlan();
+    });
+    inp.addEventListener('click', (e) => e.stopPropagation());
+  });
+  recalcPlan();
+  document.querySelectorAll('.docn[data-inv]').forEach((n) => {
+    n.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const d = FACTURAS[n.dataset.inv];
+      if (!d) return;
+      $('pmTitle').textContent = d.t;
+      $('pmRows').innerHTML = d.r.map((x) =>
+        '<tr><td>' + esc(x[0]) + '</td><td class="num">' + x[1] + '</td><td class="num">' + (x[2] || '—') +
+        '</td><td>' + x[3] + '</td><td class="num">' + x[4].toLocaleString('en-US', { minimumFractionDigits: 2 }) +
+        '</td><td class="num">' + x[5].toLocaleString('en-US', { minimumFractionDigits: 2 }) + '</td></tr>').join('');
+      $('pmTot').textContent = d.tot;
+      $('pModal').classList.add('on');
+    });
+  });
+}
+const cerrarFactura = () => $('pModal').classList.remove('on');
+$('pmClose').addEventListener('click', cerrarFactura);
+$('pModal').addEventListener('click', (e) => { if (e.target === $('pModal')) cerrarFactura(); });
+
 // ── Construcción de las láminas (misma lógica visual que presentacion.html) ──
 function construir() {
   const deck = $('deck');
@@ -269,6 +917,7 @@ function construir() {
     return;
   }
   deck.innerHTML = laminas.map((l, n) => {
+    if (l.estatica) return l.html;   // lámina propia del Portal
     const puntos = (l.cuerpo || '').split('\n').map((x) => x.trim()).filter(Boolean);
     const lista = puntos.length
       ? `<ul>${puntos.map((p) => `<li>${rico(p)}</li>`).join('')}</ul>` : '';
@@ -313,6 +962,7 @@ function construir() {
     return `<section class="slide m-${tam}">${media}${txt}</section>`;
   }).join('');
   // Clic sobre un video: pausa/reanuda (no navega); sobre un iframe no hay control.
+  cablearPortal();
   deck.querySelectorAll('.video').forEach((v) => v.addEventListener('click', (e) => {
     e.stopPropagation();
     const vd = v.querySelector('video');
@@ -355,11 +1005,21 @@ const pintar = () => {
       esc(secLabel(l.seccion)) + ' · ' + Number(l.minutos || 0) + ' min' +
       (l.video_url ? ' · el video entra solo · <b>V</b> pausa' : '')
     : 'Evento 1-sep-2026 · Natural Trade / Global Forest';
+  pintarPasos();
+  animarPortal(slides[i]);
   pintarNotas();
 };
 const mover = (d) => {
   if (!laminas.length) return;
-  i = Math.max(0, Math.min(laminas.length - 1, i + d));
+  const slides = document.querySelectorAll('.slide');
+  // Las láminas del Portal se revelan por pasos con el MISMO clicker: primero
+  // se agotan sus pasos y hasta entonces se pasa a la siguiente lámina.
+  if (d > 0 && paso < maxPaso(slides[i])) { paso++; pintarPasos(); return; }
+  if (d < 0 && paso > 0) { paso--; pintarPasos(); return; }
+  const ni = Math.max(0, Math.min(laminas.length - 1, i + d));
+  if (ni === i) return;
+  i = ni;
+  paso = d < 0 ? maxPaso(slides[i]) : 0;   // al regresar, la lámina llega completa
   pintar();
 };
 
@@ -377,11 +1037,14 @@ const enGate = () => !$('gate').classList.contains('fuera');
 
 document.addEventListener('keydown', (e) => {
   if (enGate()) return;
+  // Si el foco está en un campo de la demo del Portal, el teclado es suyo.
+  if (document.activeElement && document.activeElement.tagName === 'INPUT' && e.key !== 'Escape') return;
   const k = e.key;
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); mover(1); }
   else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); mover(-1); }
-  else if (k === 'Home') { i = 0; pintar(); }
-  else if (k === 'End') { i = laminas.length - 1; pintar(); }
+  else if (k === 'Home') { i = 0; paso = 0; pintar(); }
+  else if (k === 'End') { i = laminas.length - 1; paso = 0; pintar(); }
+  else if (k === 'Escape') { cerrarFactura(); }
   else if (k === 'b' || k === 'B' || k === '.') { document.body.classList.toggle('negro'); }
   else if (k === 'f' || k === 'F') { pantallaCompleta(); }
   else if (k === 'n' || k === 'N') { $('notas').classList.toggle('ver'); }
@@ -397,6 +1060,7 @@ document.addEventListener('keydown', (e) => {
 
 // Clic en la lámina: mitad derecha avanza, mitad izquierda retrocede.
 $('deck').addEventListener('click', (e) => {
+  if (e.target.closest('input,button,a,.docn')) return;   // demo del Portal
   if (document.body.classList.contains('negro')) { document.body.classList.remove('negro'); return; }
   mover(e.clientX > window.innerWidth / 2 ? 1 : -1);
 });
@@ -428,7 +1092,8 @@ async function entrar(cl) {
   try {
     const j = await pedir(cl);
     localStorage.setItem(LS, cl);
-    laminas = (j.laminas || []).sort((a, b) =>
+    // Las 8 del Portal se mezclan con las del constructor por seccion+orden.
+    laminas = [...(j.laminas || []), ...laminasPortal()].sort((a, b) =>
       secIdx(a.seccion) - secIdx(b.seccion) || a.orden - b.orden ||
       String(a.creado_en).localeCompare(String(b.creado_en)));
     $('gate').classList.add('fuera');
