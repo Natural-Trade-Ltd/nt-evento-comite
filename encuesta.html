@@ -369,8 +369,8 @@ function preguntaHTML(q, i){
 
   if (q.tipo === 'multi' || q.tipo === 'unica'){
     const tipo = q.tipo === 'multi' ? 'checkbox' : 'radio';
-    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}">${cab}
-      <legend>${tit}</legend>${ayuda}
+    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}" aria-labelledby="tit_${q.id}">${cab}
+      <div class="titulo" id="tit_${q.id}">${tit}</div>${ayuda}
       ${ops(q.opciones, tipo, q.mosaico ? 'mosaico' : 'grupo')}${err}</fieldset>`;
   }
 
@@ -381,8 +381,8 @@ function preguntaHTML(q, i){
           1 + (DEF.preguntas.findIndex(p => p.id === (fa.depende || {}).pregunta))}</span></div>
       <div class="mosaico">${(fa.opciones || []).map(o => opcionHTML(
         {id: q.id + '__' + fa.clave}, o, 'checkbox')).join('')}</div>`).join('');
-    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}">${cab}
-      <legend>${tit}</legend>${ayuda}${fam}${err}</fieldset>`;
+    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}" aria-labelledby="tit_${q.id}">${cab}
+      <div class="titulo" id="tit_${q.id}">${tit}</div>${ayuda}${fam}${err}</fieldset>`;
   }
 
   if (q.tipo === 'matriz'){
@@ -398,8 +398,8 @@ function preguntaHTML(q, i){
             <input type="radio" name="m_${q.id}__${slug(fila)}" value="${k}"
               data-fila="${esc(fila)}" aria-label="${esc(fila)}, ${k}">${k}</label>`).join('')}
         </div></div>`).join('');
-    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}">${cab}
-      <legend>${tit}</legend>${ayuda}
+    return `<fieldset class="q" id="q_${q.id}" data-q="${q.id}" aria-labelledby="tit_${q.id}">${cab}
+      <div class="titulo" id="tit_${q.id}">${tit}</div>${ayuda}
       <div class="escala" aria-hidden="true" style="grid-template-columns:1fr repeat(${n},44px)">
         <div></div>${cabs}</div>
       <div class="escala-movil" aria-hidden="true">
