@@ -132,21 +132,22 @@ a{color:var(--acc)}
 
   <!-- Android -->
   <section id="android" class="hide">
-    <a class="btn" id="btnAnd" href="apk/NT-App.apk">Instalar en Android</a>
+    <a class="btn" id="btnAnd" href="https://play.google.com/store/apps/details?id=com.naturaltrade.ntapp">Instalar en Android</a>
     <div class="pasos">
       <h2>Tres pasos</h2>
       <ol>
-        <li>Toca el botón — se descarga el <b>instalador oficial</b> (~90 MB; con datos móviles o buen WiFi).</li>
-        <li>Ábrelo. Si tu teléfono pregunta, toca <b>"Permitir de esta fuente"</b> y luego <b>Instalar</b>.</li>
+        <li>Toca el botón — se abre <b>Google Play</b>.</li>
+        <li>Toca <b>Instalar</b> (descarga normal, sin nada extra).</li>
         <li>Abre la app y escribe tu <b>nombre y celular</b>. Listo, ya estás dentro.</li>
       </ol>
+      <p class="nota">¿No te deja Google Play? <a href="apk/NT-App.apk">Descarga el instalador directo</a>.</p>
     </div>
   </section>
 
   <!-- Computadora o teléfono no reconocido -->
   <section id="ambos" class="hide">
     <a class="btn" href="https://apps.apple.com/mx/app/id6795663750">Instalar en iPhone</a>
-    <a class="btn" href="apk/NT-App.apk">Instalar en Android</a>
+    <a class="btn" href="https://play.google.com/store/apps/details?id=com.naturaltrade.ntapp">Instalar en Android</a>
     <div class="nota">Abre esta página desde tu teléfono para que el botón correcto salga solo.</div>
   </section>
 
@@ -169,7 +170,7 @@ const esAndroid = /Android/.test(ua);
 
 const ver = (id) => document.getElementById(id).classList.remove('hide');
 const OTRO = {
-  ios:     ['¿Traes Android?', 'apk/NT-App.apk', 'Instalar en Android'],
+  ios:     ['¿Traes Android?', 'https://play.google.com/store/apps/details?id=com.naturaltrade.ntapp', 'Instalar en Android'],
   android: ['¿Traes iPhone?',  'https://apps.apple.com/mx/app/id6795663750',                  'Instalar en iPhone'],
 };
 
