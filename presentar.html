@@ -694,7 +694,9 @@ body.negro{background:#000}
 const FN = 'https://cytopyytymxjwvfhosvg.supabase.co/functions/v1/constructor';
 const LS = 'nt_constructor_clave';
 
-const SEC = [
+// Secciones dinámicas (Jorge 29-ago): se leen de ev_seccion, igual que el constructor.
+// Esta lista es el RESPALDO — si el servidor no contesta, el proyector arranca igual.
+let SEC = [
   ['bienvenida',      'Bienvenida'],
   ['quienes_somos',   'Quiénes somos'],
   ['diferenciadores', 'Qué nos diferencia'],
@@ -702,7 +704,10 @@ const SEC = [
   ['app',             'NT App'],
   ['cierre',          'Cierre'],
 ];
-const secIdx   = (s) => Math.max(0, SEC.findIndex((x) => x[0] === s));
+// Una lámina cuya sección ya no existe se va al FINAL, nunca al principio:
+// si alguien quita una sección en pleno evento, lo peor que pasa es que sus
+// láminas queden al cierre — no que abran la presentación.
+const secIdx   = (s) => { const i = SEC.findIndex((x) => x[0] === s); return i < 0 ? 999 : i; };
 const secLabel = (s) => (SEC.find((x) => x[0] === s) || ['', s])[1];
 
 const $ = (id) => document.getElementById(id);
@@ -739,6 +744,20 @@ async function pedir(clave) {
   if (r.status === 401) throw new Error('clave');
   if (!r.ok) throw new Error('servidor');
   return r.json();
+}
+
+// Secciones vigentes. Si falla, se queda con el respaldo: mejor un orden viejo que
+// una presentación que no abre delante de la sala.
+async function pedirSecciones(clave) {
+  try {
+    const r = await fetch(FN, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'secciones', clave }),
+    });
+    if (!r.ok) return;
+    const j = await r.json();
+    if (Array.isArray(j.secciones) && j.secciones.length) SEC = j.secciones.map((x) => [x.clave, x.nombre]);
+  } catch (_) { /* respaldo */ }
 }
 
 
@@ -1091,6 +1110,7 @@ async function entrar(cl) {
   $('entrar').disabled = true;
   try {
     const j = await pedir(cl);
+    await pedirSecciones(cl);
     localStorage.setItem(LS, cl);
     // Las 8 del Portal se mezclan con las del constructor por seccion+orden.
     laminas = [...(j.laminas || []), ...laminasPortal()].sort((a, b) =>

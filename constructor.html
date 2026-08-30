@@ -229,6 +229,7 @@ footer{margin-top:30px; color:var(--faint); font-size:12px; line-height:1.7}
     <div class="tools">
       <button id="nueva">+ Nueva lámina</button>
       <button class="ghost" id="verReparto">Por presentador</button>
+      <button class="ghost" id="verSecciones">⚙ Secciones</button>
       <button class="ghost" onclick="location.href='presentar.html'">▶ Presentar</button>
       <span class="chipMin" id="chipMin"></span>
       <span class="spacer"></span>
@@ -350,7 +351,11 @@ const FN = 'https://cytopyytymxjwvfhosvg.supabase.co/functions/v1/constructor';
 const LS = 'nt_constructor_clave';
 const META_MIN = 30;   // meta del comité: presentación de 30 minutos
 
-const SEC = [
+// Las SECCIONES ya no son fijas (Jorge 29-ago): viven en ev_seccion y se administran
+// desde este mismo constructor. Esta lista es solo el respaldo con el que arranca la
+// página antes de que responda el servidor —o si no responde—, para no quedarse sin
+// índice en pleno evento.
+let SEC = [
   ['bienvenida',      'Bienvenida'],
   ['quienes_somos',   'Quiénes somos'],
   ['diferenciadores', 'Qué nos diferencia'],
@@ -358,7 +363,18 @@ const SEC = [
   ['app',             'NT App'],
   ['cierre',          'Cierre'],
 ];
-const secIdx   = (s) => Math.max(0, SEC.findIndex((x) => x[0] === s));
+async function cargarSecciones() {
+  try {
+    const j = await api('secciones');
+    if (Array.isArray(j.secciones) && j.secciones.length) {
+      SEC = j.secciones.map((x) => [x.clave, x.nombre]);
+    }
+  } catch (_) { /* se queda con el respaldo */ }
+}
+// Una lámina cuya sección ya no existe se va al FINAL, nunca al principio:
+// si alguien quita una sección en pleno evento, lo peor que pasa es que sus
+// láminas queden al cierre — no que abran la presentación.
+const secIdx   = (s) => { const i = SEC.findIndex((x) => x[0] === s); return i < 0 ? 999 : i; };
 const secLabel = (s) => (SEC.find((x) => x[0] === s) || ['', s])[1];
 
 const $ = (id) => document.getElementById(id);
@@ -395,6 +411,7 @@ const deck = () => [...laminas].sort((a, b) =>
   String(a.creado_en).localeCompare(String(b.creado_en)));
 
 async function cargar() {
+  await cargarSecciones();
   const j = await api('listar');
   laminas = j.laminas || [];
   render();
@@ -681,10 +698,131 @@ async function entrar(cl) {
   }
 }
 
+// ══════════ ADMINISTRADOR DE SECCIONES (29-ago) ══════════
+// Antes las secciones eran una lista fija en el código y no se podían tocar. Aquí se
+// agregan, renombran, reordenan y quitan. Al quitar una que tiene láminas, NO se borra
+// nada: se pregunta a qué sección se mudan.
+// El proyector trae 8 láminas del Portal escritas dentro de presentar.html (no están
+// en la base, así que el constructor no las ve). Si se quita esa sección, esas 8 no se
+// pueden mudar solas: quedan al final. Por eso aquí se avisa aparte.
+const FIJAS = { portal: 8 };
+
+function cerrarSecciones() { const m = $('secModal'); if (m) m.remove(); }
+
+function pintaSecciones() {
+  const cont = $('secLista');
+  if (!cont) return;
+  const cuenta = (k) => laminas.filter((l) => l.seccion === k).length;
+  const rotulo = (k) => cuenta(k) + ' lám.' + (FIJAS[k] ? ` + ${FIJAS[k]} fijas` : '');
+  cont.innerHTML = SEC.map(([k, nombre], i) => `
+    <div class="secFila" style="display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)">
+      <input class="secNom" data-k="${esc(k)}" value="${esc(nombre)}"
+             style="flex:1;min-width:0" aria-label="Nombre de la sección">
+      <span class="meta" style="white-space:nowrap">${rotulo(k)}</span>
+      <button class="ghost" data-sec-sube="${esc(k)}" ${i === 0 ? 'disabled' : ''} title="Subir">↑</button>
+      <button class="ghost" data-sec-baja="${esc(k)}" ${i === SEC.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
+      <button class="ghost" data-sec-borra="${esc(k)}" title="Quitar" ${SEC.length <= 1 ? 'disabled' : ''}>✕</button>
+    </div>`).join('');
+}
+
+function abrirSecciones() {
+  cerrarSecciones();
+  const d = document.createElement('div');
+  d.id = 'secModal';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px';
+  d.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;max-width:620px;width:100%;
+                max-height:86vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+      <h2 style="margin:0 0 4px;font-size:19px">Secciones de la presentación</h2>
+      <p class="meta" style="margin:0 0 12px">
+        Cambia el nombre escribiendo encima, muévelas con las flechas y agrega las que necesites.
+        Al quitar una con láminas te preguntamos a dónde se mudan — nunca se borra una lámina.
+      </p>
+      <div id="secLista"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+        <input id="secNueva" placeholder="Nombre de la sección nueva · ej. Casos de clientes" style="flex:1">
+        <button id="secAgrega">+ Agregar</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+        <button class="ghost" id="secCerrar">Cerrar</button>
+        <button id="secGuardar">Guardar cambios</button>
+      </div>
+    </div>`;
+  document.body.appendChild(d);
+  pintaSecciones();
+
+  d.addEventListener('click', async (e) => {
+    if (e.target === d || e.target.id === 'secCerrar') return cerrarSecciones();
+    const b = e.target.closest('button'); if (!b) return;
+
+    if (b.id === 'secAgrega') {
+      const nombre = $('secNueva').value.trim();
+      if (nombre.length < 2) return aviso('Ponle nombre a la sección');
+      b.disabled = true;
+      try { await api('sec_guardar', { nombre }); $('secNueva').value = ''; await cargar(); pintaSecciones(); aviso('Sección agregada'); }
+      catch (_) { aviso('No se pudo agregar'); }
+      finally { b.disabled = false; }
+      return;
+    }
+    if (b.dataset.secSube || b.dataset.secBaja) {
+      const k = b.dataset.secSube || b.dataset.secBaja;
+      const i = SEC.findIndex((x) => x[0] === k);
+      const j = b.dataset.secSube ? i - 1 : i + 1;
+      if (i < 0 || j < 0 || j >= SEC.length) return;
+      [SEC[i], SEC[j]] = [SEC[j], SEC[i]];
+      pintaSecciones();
+      try { await api('sec_orden', { ordenes: SEC.map(([c], n) => ({ clave: c, orden: (n + 1) * 10 })) }); await cargar(); pintaSecciones(); }
+      catch (_) { aviso('No se pudo reordenar'); }
+      return;
+    }
+    if (b.dataset.secBorra) {
+      const k = b.dataset.secBorra;
+      const nombre = (SEC.find((x) => x[0] === k) || [k, k])[1];
+      const n = laminas.filter((l) => l.seccion === k).length;
+      let mover_a = '';
+      if (n > 0) {
+        const otras = SEC.filter((x) => x[0] !== k);
+        const eleccion = prompt(
+          `«${nombre}» tiene ${n} lámina${n === 1 ? '' : 's'}. ¿A qué sección las movemos?\n\n` +
+          otras.map((x, i) => `${i + 1}. ${x[1]}`).join('\n') + '\n\nEscribe el número:');
+        if (eleccion === null) return;
+        const idx = Number(eleccion) - 1;
+        if (!otras[idx]) return aviso('Número no válido');
+        mover_a = otras[idx][0];
+      } else if (!confirm(`¿Quitar la sección «${nombre}»?`)) return;
+      if (FIJAS[k] && !confirm(
+        `Ojo: «${nombre}» también carga ${FIJAS[k]} láminas fijas del proyector, que no viven ` +
+        `en la base y no se pueden mudar desde aquí. Si quitas la sección, esas ${FIJAS[k]} se ` +
+        `van al final de la presentación. ¿Sigo?`)) return;
+      try {
+        const j = await api('sec_borrar', { sec: k, mover_a });
+        await cargar(); pintaSecciones();
+        aviso(j.movidas ? `Sección quitada · ${j.movidas} láminas movidas` : 'Sección quitada');
+      } catch (e2) {
+        aviso(e2.message === 'ultima_seccion' ? 'Tiene que quedar al menos una sección' : 'No se pudo quitar');
+      }
+      return;
+    }
+    if (b.id === 'secGuardar') {
+      b.disabled = true;
+      try {
+        for (const inp of d.querySelectorAll('.secNom')) {
+          const nombre = inp.value.trim();
+          const actual = (SEC.find((x) => x[0] === inp.dataset.k) || ['', ''])[1];
+          if (nombre.length >= 2 && nombre !== actual) await api('sec_guardar', { sec: inp.dataset.k, nombre });
+        }
+        await cargar(); pintaSecciones(); aviso('Secciones guardadas');
+      } catch (_) { aviso('No se pudieron guardar'); }
+      finally { b.disabled = false; }
+    }
+  });
+}
+
 // ── Cableado ──
 $('entrar').addEventListener('click', () => entrar($('clave').value.trim()));
 $('clave').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar($('clave').value.trim()); });
 $('nueva').addEventListener('click', () => abrirEditor(null));
+$('verSecciones').addEventListener('click', abrirSecciones);
 $('refrescar').addEventListener('click', () => cargar().catch(manejar));
 $('salir').addEventListener('click', salir);
 $('guardar').addEventListener('click', guardar);

@@ -16,6 +16,10 @@
 //    el video o la imagen que otro guardó — así se perdió el primer video.
 //  · Diseño por lámina: media_tam (chico|normal|grande|lleno) y
 //    titulo_modo (lado|arriba|oculto).
+// v5 (29-ago-2026, pedido de Jorge): las SECCIONES dejan de ser una lista fija en el
+//    código y viven en public.ev_seccion — se agregan, renombran, reordenan y quitan
+//    desde el constructor. `guardar` valida contra esa tabla; si por lo que sea la
+//    tabla quedara vacía, se cae a las 6 originales para no bloquear el evento.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const URL_SB = Deno.env.get('SUPABASE_URL')!;
@@ -29,7 +33,16 @@ const CORS = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { 'Content-Type': 'application/json', ...CORS } });
 
-const SECCIONES = ['bienvenida', 'quienes_somos', 'diferenciadores', 'portal', 'app', 'cierre'];
+// Respaldo si ev_seccion quedara vacía: la presentación nunca se queda sin secciones.
+const SECCIONES_BASE = ['bienvenida', 'quienes_somos', 'diferenciadores', 'portal', 'app', 'cierre'];
+const clavesSeccion = async (db: ReturnType<typeof createClient>): Promise<string[]> => {
+  const { data } = await db.from('ev_seccion').select('clave').order('orden');
+  const cs = (data ?? []).map((r: Record<string, unknown>) => String(r.clave));
+  return cs.length ? cs : SECCIONES_BASE;
+};
+// Clave técnica a partir del nombre: minúsculas, sin acentos, guion bajo.
+const claveDe = (v: unknown) => String(v ?? '').toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
 const MEDIA_TAM = ['chico', 'normal', 'grande', 'lleno'];
 const TITULO_MODO = ['lado', 'arriba', 'oculto'];
 const MIMES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -74,7 +87,8 @@ Deno.serve(async (req) => {
   if (b.action === 'guardar') {
     const titulo = String(b.titulo ?? '').trim().slice(0, 140);
     if (titulo.length < 2) return json({ error: 'titulo_requerido' }, 400);
-    const seccion = SECCIONES.includes(String(b.seccion)) ? String(b.seccion) : 'bienvenida';
+    const secs = await clavesSeccion(db);
+    const seccion = secs.includes(String(b.seccion)) ? String(b.seccion) : secs[0];
     // Solo entran las columnas PRESENTES en el cuerpo: un cliente viejo que no
     // conoce un campo no lo puede vaciar por accidente (candado del 24-ago).
     const fila: Record<string, unknown> = { seccion, titulo };
@@ -166,6 +180,72 @@ Deno.serve(async (req) => {
       subida: data.signedUrl,   // absoluta; el navegador hace PUT aquí
       url: `${URL_SB}/storage/v1/object/public/laminas/${ruta}`,
     });
+  }
+
+  // ══════════ SECCIONES (v5) ══════════
+  // Listar: lo usan el constructor y el proyector para armar el índice.
+  if (b.action === 'secciones') {
+    const { data, error } = await db.from('ev_seccion').select('clave, nombre, orden').order('orden');
+    if (error) return json({ error: error.message }, 500);
+    const filas = data ?? [];
+    return json({ ok: true, secciones: filas.length ? filas : SECCIONES_BASE.map((c, i) => ({ clave: c, nombre: c, orden: (i + 1) * 10 })) });
+  }
+
+  // Alta o renombrado. Al crear se deriva la clave del nombre; al renombrar la clave
+  // NO cambia, para no dejar huérfanas las láminas que ya la apuntan.
+  if (b.action === 'sec_guardar') {
+    const nombre = String(b.nombre ?? '').trim().slice(0, 60);
+    if (nombre.length < 2) return json({ error: 'nombre_requerido' }, 400);
+    // OJO: `b.clave` es la CONTRASEÑA del portal. La llave de la sección viaja como
+    // `sec` — mezclarlas creaba una sección llamada como la contraseña (bug 29-ago).
+    const clave = String(b.sec ?? '').trim() || claveDe(nombre);
+    if (!clave) return json({ error: 'clave_invalida' }, 400);
+    const { data: ya } = await db.from('ev_seccion').select('clave').eq('clave', clave).maybeSingle();
+    if (ya) {
+      const { error } = await db.from('ev_seccion').update({ nombre }).eq('clave', clave);
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true, clave, creada: false });
+    }
+    const { data: ult } = await db.from('ev_seccion').select('orden').order('orden', { ascending: false }).limit(1).maybeSingle();
+    const { error } = await db.from('ev_seccion').insert({ clave, nombre, orden: Number(ult?.orden ?? 0) + 10 });
+    if (error) return json({ error: error.message }, 500);
+    return json({ ok: true, clave, creada: true });
+  }
+
+  // Quitar. Nunca se borra en silencio una sección con láminas: o se mueven a otra
+  // (mover_a) o se responde cuántas hay para que el constructor pregunte.
+  if (b.action === 'sec_borrar') {
+    const clave = String(b.sec ?? '').trim();   // ver nota en sec_guardar
+    if (!clave) return json({ error: 'clave' }, 400);
+    const { count } = await db.from('ev_lamina').select('id', { count: 'exact', head: true }).eq('seccion', clave);
+    const n = Number(count ?? 0);
+    if (n > 0) {
+      const destino = String(b.mover_a ?? '').trim();
+      if (!destino) return json({ ok: false, error: 'con_laminas', laminas: n });
+      const secs = await clavesSeccion(db);
+      if (!secs.includes(destino) || destino === clave) return json({ error: 'destino_invalido' }, 400);
+      const { error: eMov } = await db.from('ev_lamina').update({ seccion: destino }).eq('seccion', clave);
+      if (eMov) return json({ error: eMov.message }, 500);
+    }
+    const { count: quedan } = await db.from('ev_seccion').select('clave', { count: 'exact', head: true });
+    if (Number(quedan ?? 0) <= 1) return json({ error: 'ultima_seccion' }, 400);
+    const { error } = await db.from('ev_seccion').delete().eq('clave', clave);
+    if (error) return json({ error: error.message }, 500);
+    return json({ ok: true, movidas: n });
+  }
+
+  // Reordenar: [{clave, orden}] que calcula el constructor.
+  if (b.action === 'sec_orden') {
+    const lista = Array.isArray(b.ordenes) ? b.ordenes.slice(0, 60) : [];
+    let cambiadas = 0;
+    for (const o of lista) {
+      const clave = String((o as Record<string, unknown>)?.clave ?? '');
+      const n = Number((o as Record<string, unknown>)?.orden);
+      if (!clave || !Number.isFinite(n)) continue;
+      const { error } = await db.from('ev_seccion').update({ orden: n }).eq('clave', clave);
+      if (!error) cambiadas++;
+    }
+    return json({ ok: true, cambiadas });
   }
 
   return json({ error: 'action' }, 400);
