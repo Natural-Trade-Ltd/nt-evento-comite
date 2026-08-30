@@ -110,6 +110,17 @@ con láminas se pregunta a qué sección se mudan — nunca se borra una lámina
 quedar al menos una. Ojo: la sección «portal» carga además las 8 láminas del recorrido del Portal,
 que viven dentro de `presentar.html` y no se pueden mudar desde ahí.
 
+**La barra del proyector no lleva nada.** Antes mostraba quién presenta, la sección y
+los minutos de la lámina — datos de operación que la sala podía leer. Ahora arranca
+invisible y solo aparece al mover el ratón (el clicker no la despierta), con el contador
+y los botones; se esconde sola a los 2.5 s. Esa información vive en la vista de presentador.
+
+**Tipografía.** El deck se dimensiona para 1920×1080 y cada lámina de texto **se acerca
+sola** hasta llenar ~82% del alto útil, acotada por el ancho de su columna y con tope 1.6:
+con un tamaño fijo, el que hace caber la lámina de cuatro puntos deja media pantalla en
+blanco en la de una frase suelta. Si una lámina se ve vacía es porque trae poco texto —
+agregar puntos en el constructor la llena sola, sin tocar CSS.
+
 **Vista de presentador (`presentador.html`, tecla P).** Las notas viven en la ventana que se
 proyecta, así que encenderlas delante de la sala las ponía en la pantalla grande. Esta segunda
 ventana se queda en la laptop con las notas en grande, la lámina que sigue, el reloj corrido
