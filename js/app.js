@@ -1505,7 +1505,7 @@ const MOMENTOS = [
   ['cierre',   'Cierre',   'Al terminar y al día siguiente']
 ];
 const momLbl = k => (MOMENTOS.find(m => m[0] === k) || [k, k])[1];
-let fMom = 'todos', fSoloMias = false, fVerHechas = true;
+let fMom = 'todos', fSoloMias = false, fVerHechas = true, fSinDueno = false;
 
 function rDia(el) {
   const todos = D.dia;
@@ -1516,6 +1516,7 @@ function rDia(el) {
   let items = [...todos];
   if (fMom !== 'todos') items = items.filter(d => d.momento === fMom);
   if (fSoloMias) items = items.filter(d => d.responsable === me.email);
+  if (fSinDueno) items = items.filter(d => !d.responsable);
   if (!fVerHechas) items = items.filter(d => !d.hecho);
 
   const fila = (d, i, arr) => `
@@ -1530,8 +1531,9 @@ function rDia(el) {
           ${d.detalle ? `<div class="mut tiny" style="margin-top:4px">${br(d.detalle)}</div>` : ''}
           <div class="meta">
             <span class="chip click" data-act="fMom" data-v="${d.momento}">${esc(momLbl(d.momento))}</span>
-            ${d.responsable ? `<span class="chip"><span class="av sm">${initials(nombreDe(d.responsable))}</span>${esc(nombreDe(d.responsable))}</span>`
-              : `<button class="chip click bad" data-act="tomarDia" data-id="${d.id}">sin dueño · tomarlo</button>`}
+            ${d.responsable
+              ? `<button class="chip click" data-act="dueDia" data-id="${d.id}" title="Cambiar responsable"><span class="av sm">${initials(nombreDe(d.responsable))}</span>${esc(nombreDe(d.responsable))}</button>`
+              : `<button class="chip click bad" data-act="dueDia" data-id="${d.id}">sin dueño · asignar</button>`}
             ${d.apoyo ? `<span class="chip">+ ${esc(nombreDe(d.apoyo))}</span>` : ''}
             ${d.hecho && d.hecho_por ? `<span class="chip ok">✓ ${esc(nombreDe(d.hecho_por))} · ${hace(d.hecho_en)}</span>` : ''}
             <span class="acts">
@@ -1554,7 +1556,8 @@ function rDia(el) {
 
   el.innerHTML = head('Día del evento',
     `Todo lo que hay que hacer el 1 de septiembre, en orden. <b>Palomea cuando quede listo</b>,
-     ponle hora y dueño a lo que falte, y usa las flechas para acomodarlo.
+     ponle hora y dueño a lo que falte —toca el chip del responsable para asignarlo,
+     puedes elegir del equipo o escribir a cualquier persona— y usa las flechas para acomodarlo.
      La hoja para imprimir sale con todo lo que veas aquí.`,
     `<button class="btn" data-act="dImprimir">🖨 Hoja del día</button>
      <button class="btn p" data-act="nuevoDia">＋ Pendiente</button>`) + `
@@ -1562,7 +1565,7 @@ function rDia(el) {
     <div class="grid g4" style="margin-bottom:12px">
       <div class="stat click" data-act="dLimpia"><div class="v">${todos.length}</div><div class="k">Pendientes</div></div>
       <div class="stat click ok"><div class="v">${hechas}</div><div class="k">Listos</div></div>
-      <div class="stat click ${sinDueno ? 'bad' : 'ok'}"><div class="v">${sinDueno}</div><div class="k">Sin dueño</div></div>
+      <div class="stat click ${sinDueno ? 'bad' : 'ok'} ${fSinDueno ? 'on' : ''}" data-act="dSinDueno"><div class="v">${sinDueno}</div><div class="k">Sin dueño</div></div>
       <div class="stat click warn" data-act="dMias"><div class="v">${mias}</div><div class="k">Míos</div></div>
     </div>
 
@@ -1571,10 +1574,30 @@ function rDia(el) {
       ${MOMENTOS.map(([k, t]) => `<span class="chip click ${fMom === k ? 'on' : ''}" data-act="fMom" data-v="${k}">${t} · ${
         todos.filter(d => d.momento === k).length}</span>`).join('')}
       <span class="chip click ${fSoloMias ? 'on' : ''}" data-act="dMias">Solo lo mío</span>
+      <span class="chip click ${fSinDueno ? 'on' : ''}" data-act="dSinDueno">Sin dueño</span>
       <span class="chip click ${fVerHechas ? '' : 'on'}" data-act="dHechas">${fVerHechas ? 'Ocultar los listos' : 'Ver también los listos'}</span>
     </div>
 
     ${grupos || '<div class="empty">Nada con esos filtros.</div>'}`;
+}
+
+/* Responsable de un pendiente del día (Jorge 29-ago): cualquiera del comité puede
+   dejar asentado QUIÉN se hace cargo — de la lista del equipo o escribiendo el nombre
+   de quien sea (hotel, proveedor, alguien sin acceso al portal). Antes solo existía
+   "tomarlo", que se asignaba a ti mismo, y lo demás obligaba a abrir Editar. */
+function dueDia(id) {
+  const d = D.dia.find(x => x.id === id) || {};
+  const enRoster = !!d.responsable && roster().includes(d.responsable);
+  modal('¿Quién se hace responsable?',
+    `<div class="mut tiny" style="margin-bottom:10px">${esc(d.titulo || '')}</div>` +
+    campo('duSel', 'Del equipo', '', 'select', optPersonas(enRoster ? d.responsable : '')) +
+    campo('duTxt', 'O escribe quién (cualquier persona)', enRoster ? '' : (d.responsable || ''), 'text',
+      'placeholder="Nombre y apellido · ej. Hilario Ramírez (montaje del hotel)"') +
+    `<div class="mut tiny" style="margin-top:8px">Si escribes un nombre, ese manda sobre la lista.
+      Déjalo todo vacío para dejarlo sin dueño.</div>`,
+    `<button class="btn" data-cerrar>Cancelar</button>
+     <button class="btn" data-act="dueMio" data-id="${id}">Me lo quedo yo</button>
+     <button class="btn p" data-act="dueGuarda" data-id="${id}">Guardar</button>`);
 }
 
 function edDia(id) {
@@ -2195,6 +2218,14 @@ document.addEventListener('click', async e => {
         : { hecho: true, hecho_en: new Date().toISOString(), hecho_por: me.email });
     },
     tomarDia:  async () => { await upd('dia', id, { responsable: me.email }); toast('Es tuyo.'); },
+    dueDia:    () => dueDia(id),
+    dueMio:    async () => { if (await upd('dia', id, { responsable: me.email })) { cerrar(); toast('Es tuyo.'); } },
+    dueGuarda: async () => {
+      // Lo escrito a mano gana sobre la lista: es el caso de alguien fuera del portal.
+      const quien = val('duTxt') || val('duSel') || null;
+      if (await upd('dia', id, { responsable: quien })) { cerrar(); toast(quien ? 'Responsable: ' + quien : 'Quedó sin dueño'); }
+    },
+    dSinDueno: () => { fSinDueno = !fSinDueno; ir('dia'); },
     subeDia:   () => mueveDia(id, -1),
     bajaDia:   () => mueveDia(id, +1),
     dImprimir: diaImprimir,
