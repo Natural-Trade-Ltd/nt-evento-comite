@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista de presentador · Evento 1-sep-2026</title>
+<!--
+  VISTA DE PRESENTADOR — se abre desde presentar.html con la tecla P.
+
+  Por qué existe: las notas del presentador vivían dentro de la MISMA ventana
+  que se proyecta, así que encenderlas con N delante de la sala las ponía en la
+  pantalla grande. Esta ventana se queda en la laptop; el proyector conserva la
+  suya, limpia y sin cambios.
+
+  Cómo se hablan: BroadcastChannel 'nt-presentacion' entre dos ventanas del
+  mismo origen — sin servidor, sin base, sin red. Si el navegador no lo trae,
+  se cae a localStorage, que también dispara evento entre ventanas.
+  Esta ventana NO consulta la base: todo (láminas, notas, orden) se lo pasa la
+  ventana que proyecta, así que nunca pueden discrepar.
+
+  Paleta: la de noche del portal del comité (Dueto Tierra). Es una pantalla que
+  se mira en un salón a oscuras; el marfil del proyector aquí encandila.
+-->
+<style>
+:root{
+  --nt:#469466; --nt-soft:#7bbf97; --gf:#5E8A75;
+  --bg:#0b1310; --bg2:#101a15; --card:#14211b; --card2:#182a21;
+  --line:#22382c; --line2:#2d4a3a;
+  --tx:#e6efe9; --tx2:#9fb5a8; --tx3:#6d857a;
+  --warn:#d99a3f; --bad:#d9603f; --ok:#4fb87a;
+  --r:14px; --rs:9px;
+  --ff:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box} b,strong{font-weight:600}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg); color:var(--tx); font-family:var(--ff);
+  font-size:15px; line-height:1.5; overflow:hidden;
+  display:flex; flex-direction:column; -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
+
+/* ── Encabezado ── */
+.cab{
+  display:flex; align-items:center; gap:14px; padding:10px 18px;
+  border-bottom:1px solid var(--line); background:var(--bg2); flex:0 0 auto;
+}
+.cuenta{font-size:22px; font-weight:600; letter-spacing:.01em; white-space:nowrap}
+.sec{color:var(--tx2); font-size:13.5px; text-transform:uppercase; letter-spacing:.1em; min-width:0;
+     overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.esp{flex:1}
+.reloj{font-size:26px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.02em}
+.ritmo{font-size:13px; padding:4px 11px; border-radius:999px; white-space:nowrap;
+       border:1px solid var(--line2); color:var(--tx2)}
+.ritmo.bien{color:var(--ok); border-color:#2a5d40}
+.ritmo.tarde{color:var(--warn); border-color:#5b4520}
+.ritmo.mucho{color:var(--bad); border-color:#5e2c20}
+.enlace{font-size:12.5px; padding:4px 10px; border-radius:999px; border:1px solid var(--line2);
+        color:var(--tx3); white-space:nowrap}
+.enlace.vivo{color:var(--nt-soft); border-color:#2a5d40}
+
+/* ── Cuerpo ── */
+.cuerpo{flex:1; display:grid; grid-template-columns:minmax(280px,38%) 1fr; gap:14px; padding:14px 18px; min-height:0}
+.col{display:flex; flex-direction:column; gap:12px; min-height:0}
+.caja{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:13px 15px; min-height:0}
+.rot{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--tx3); margin:0 0 8px}
+.rot b{color:var(--nt-soft); font-weight:600}
+
+/* Vista previa 16:9 de la lámina */
+.prev{
+  aspect-ratio:16/9; width:100%; border-radius:var(--rs); border:1px solid var(--line2);
+  background:var(--card2); overflow:hidden; display:flex; align-items:center;
+  justify-content:center; padding:12px; text-align:center;
+}
+.prev img{max-width:100%; max-height:100%; object-fit:contain; border-radius:4px}
+.prev .mini{min-width:0}
+.prev .miniT{font-size:15px; line-height:1.3; margin:0; overflow:hidden; display:-webkit-box;
+             -webkit-line-clamp:3; -webkit-box-orient:vertical}
+.prev .miniF{font-size:12px; color:var(--tx2); margin:6px 0 0; overflow:hidden;
+             display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+.prev .marca{font-size:12px; color:var(--tx3); letter-spacing:.08em; text-transform:uppercase}
+.tit{font-size:19px; line-height:1.3; margin:10px 0 4px; font-weight:600}
+.tit.chico{font-size:15.5px; font-weight:400; color:var(--tx)}
+.meta{font-size:12.5px; color:var(--tx2); margin:0}
+.meta b{color:var(--tx)}
+
+/* Notas */
+.notas{flex:1; display:flex; flex-direction:column; min-height:0}
+.notasTxt{
+  flex:1; overflow:auto; margin:0; white-space:pre-wrap;
+  font-size:21px; line-height:1.62; color:var(--tx);
+}
+.notasTxt.vacio{color:var(--tx3); font-size:17px; font-style:italic}
+
+/* Índice */
+.indice{max-height:34vh; overflow:auto; display:none}
+.indice.ver{display:block}
+.fila{
+  display:flex; gap:9px; align-items:baseline; padding:6px 8px; border-radius:8px;
+  cursor:pointer; border:1px solid transparent; font-size:13px;
+}
+.fila:hover{background:var(--card2)}
+.fila.hoy{border-color:#2a5d40; background:#132a1e}
+.fila .num{color:var(--tx3); font-variant-numeric:tabular-nums; flex:0 0 26px}
+.fila .nom{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.fila .min{color:var(--tx3); font-size:11.5px; white-space:nowrap}
+
+/* ── Barra ── */
+.barra{
+  flex:0 0 auto; display:flex; align-items:center; gap:9px; padding:10px 18px;
+  border-top:1px solid var(--line); background:var(--bg2);
+}
+.barra button{
+  background:var(--card); border:1px solid var(--line2); color:var(--tx);
+  border-radius:10px; padding:9px 15px; font-size:14px;
+}
+.barra button:hover{border-color:var(--nt); color:var(--nt-soft)}
+.barra .grande{font-size:19px; padding:7px 22px}
+.barra .ayuda{color:var(--tx3); font-size:12px; margin-left:auto; text-align:right; line-height:1.45}
+.barra kbd{
+  font-family:inherit; font-size:11px; border:1px solid var(--line2); border-radius:4px;
+  padding:1px 5px; color:var(--tx2);
+}
+
+/* ── Espera ── */
+.espera{
+  position:fixed; inset:0; z-index:50; background:var(--bg);
+  display:flex; align-items:center; justify-content:center; padding:30px;
+}
+.espera.fuera{display:none}
+.espera .caja{max-width:520px; text-align:center; padding:30px 34px}
+.espera h1{font-size:23px; font-weight:600; margin:0 0 12px}
+.espera p{color:var(--tx2); margin:0 0 10px}
+.espera ol{color:var(--tx2); text-align:left; margin:16px 0 0; padding-left:22px; line-height:1.75}
+.espera b{color:var(--tx)}
+.punto{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--warn); margin-right:7px}
+
+@media (max-width:820px){ .cuerpo{grid-template-columns:1fr} .notasTxt{font-size:18px} }
+</style>
+</head>
+<body>
+
+<div class="espera" id="espera">
+  <div class="caja">
+    <h1><span class="punto"></span>Buscando la presentación…</h1>
+    <p>Esta ventana es solo para ti: aquí van las notas, el reloj y lo que sigue.
+       El proyector se queda con la otra, limpia.</p>
+    <ol>
+      <li>Abre <b>presentar.html</b> y entra con la clave del comité.</li>
+      <li>Manda esa ventana a la pantalla del <b>proyector</b> y ponla en completa con <b>F</b>.</li>
+      <li>Desde ahí presiona <b>P</b> — esta ventana se conecta sola.</li>
+    </ol>
+    <p style="margin-top:16px;font-size:13px;color:var(--tx3)">
+      Ojo: con las pantallas en <b>espejo</b> no hay forma de separarlas. Tienen que estar
+      en modo <b>pantalla extendida</b>.
+    </p>
+  </div>
+</div>
+
+<div class="cab">
+  <span class="cuenta" id="cuenta">— / —</span>
+  <span class="sec" id="secc"></span>
+  <span class="esp"></span>
+  <span class="ritmo" id="ritmo">—</span>
+  <span class="reloj" id="reloj">00:00</span>
+  <span class="enlace" id="enlace">sin conexión</span>
+</div>
+
+<div class="cuerpo">
+  <div class="col">
+    <div class="caja">
+      <p class="rot"><b>Ahora</b> · <span id="minAhora"></span></p>
+      <div class="prev" id="prevAhora"></div>
+      <h2 class="tit" id="titAhora">—</h2>
+      <p class="meta" id="metaAhora"></p>
+    </div>
+    <div class="caja">
+      <p class="rot">Sigue</p>
+      <div class="prev" id="prevSigue"></div>
+      <h2 class="tit chico" id="titSigue">—</h2>
+      <p class="meta" id="metaSigue"></p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="caja notas">
+      <p class="rot">Notas del presentador</p>
+      <p class="notasTxt" id="notasTxt">—</p>
+    </div>
+    <div class="caja indice" id="indice"></div>
+  </div>
+</div>
+
+<div class="barra">
+  <button class="grande" id="ant" title="Anterior">◀</button>
+  <button class="grande" id="sig" title="Siguiente">▶</button>
+  <button id="negro" title="Apagar la proyección (B)">⬛ Negro</button>
+  <button id="cero" title="Poner el reloj en cero">⏱ Reiniciar</button>
+  <button id="verIndice" title="Índice de láminas (I)">☰ Índice</button>
+  <span class="ayuda">
+    <kbd>←</kbd> <kbd>→</kbd> avanzan también desde aquí · <kbd>B</kbd> negro · <kbd>I</kbd> índice<br>
+    El clicker sigue mandando en la ventana del proyector.
+  </span>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ══════════ Puente con la ventana que proyecta ══════════
+const BUS = 'nt-presentacion';
+const canal = (() => { try { return new BroadcastChannel(BUS); } catch (_) { return null; } })();
+
+// El id es lo que evita el mensaje DOBLE: si un navegador entregara lo mismo por
+// los dos caminos, un solo ▶ avanzaría dos láminas. Por eso el respaldo de
+// localStorage solo entra cuando NO hay BroadcastChannel, y aun así se descartan
+// los repetidos al recibir.
+let nSeq = 0;
+const vistos = [];
+const nuevo = (id) => {
+  if (!id || vistos.includes(id)) return false;
+  vistos.push(id);
+  if (vistos.length > 60) vistos.shift();
+  return true;
+};
+
+const emitir = (msg) => {
+  const m = { ...msg, de: 'presentador', id: 'pres-' + Date.now() + '-' + (++nSeq), ts: Date.now() };
+  if (canal) { canal.postMessage(m); return; }
+  // Respaldo para navegadores sin BroadcastChannel: el evento 'storage' salta
+  // en las OTRAS ventanas del mismo origen. El sufijo evita que dos mensajes
+  // iguales seguidos (dos ▶ al hilo) se pierdan por escribir el mismo valor.
+  try { localStorage.setItem(BUS, JSON.stringify(m)); } catch (_) {}
+};
+
+let deck = [];        // resumen de láminas que manda el proyector
+let idx = 0;          // lámina actual
+let vivo = 0;         // último mensaje recibido (ms)
+
+// ══════════ Reloj ══════════
+// Sobrevive a una recarga de esta ventana: si se cierra por accidente a media
+// presentación, al reabrirla el reloj no arranca de cero.
+const T0 = 'nt_pres_t0';
+let t0 = Number(localStorage.getItem(T0) || 0);
+if (!t0) { t0 = Date.now(); localStorage.setItem(T0, String(t0)); }
+let tLamina = Date.now();
+
+const mmss = (ms) => {
+  const s = Math.max(0, Math.round(ms / 1000));
+  return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+};
+
+// Minutos programados ANTES de la lámina n: contra eso se compara el reloj.
+const programadoHasta = (n) => deck.slice(0, Math.max(0, n)).reduce((a, l) => a + Number(l.minutos || 0), 0);
+
+function tic() {
+  $('reloj').textContent = mmss(Date.now() - t0);
+  const r = $('ritmo');
+  if (!deck.length) { r.textContent = '—'; r.className = 'ritmo'; return; }
+  const corridos = (Date.now() - t0) / 60000;
+  const debidos = programadoHasta(idx);
+  const d = corridos - debidos;                 // + = vas tarde
+  const m = Math.abs(Math.round(d));
+  r.className = 'ritmo ' + (m <= 1 ? 'bien' : (m <= 4 ? 'tarde' : 'mucho'));
+  r.textContent = m <= 1 ? 'en tiempo'
+    : (d > 0 ? `${m} min tarde` : `${m} min adelante`) +
+      ` · programa de ${Math.round(programadoHasta(deck.length))} min`;
+}
+setInterval(tic, 1000);
+
+// ══════════ Vista previa de una lámina ══════════
+// No es la lámina real (eso exigiría recargar el deck entero y los videos
+// sonarían dos veces): es lo que basta para reconocerla de un vistazo.
+function preview(l) {
+  if (!l) return '<span class="marca">fin</span>';
+  if (l.imagen_url) return `<img src="${esc(l.imagen_url)}" alt="">`;
+  if (l.video) return `<span class="marca">▶ video · ${esc(l.titulo)}</span>`;
+  if (l.estatica) return `<div class="mini"><p class="miniT">${esc(l.titulo)}</p>` +
+                         `<p class="miniF">Lámina del Portal · se revela por pasos</p></div>`;
+  return `<div class="mini"><p class="miniT">${esc(l.titulo)}</p>` +
+         (l.frase ? `<p class="miniF">${esc(l.frase)}</p>` : '') + '</div>';
+}
+
+// Muchas láminas duran medio minuto: "0.5 min" se lee mal de reojo.
+const dura = (m) => {
+  const n = Number(m || 0);
+  if (!n) return '';
+  return n < 1 ? Math.round(n * 60) + ' s' : (Number.isInteger(n) ? n : n.toFixed(1)) + ' min';
+};
+const conMinutos = (l) => dura(l && l.minutos);
+
+function pintar() {
+  const l = deck[idx], s = deck[idx + 1];
+  $('cuenta').textContent = deck.length ? (idx + 1) + ' / ' + deck.length : '— / —';
+  $('secc').textContent = l ? (l.seccionNombre || l.seccion || '') : '';
+
+  $('prevAhora').innerHTML = preview(l);
+  $('titAhora').textContent = l ? l.titulo : '—';
+  $('minAhora').textContent = l ? (conMinutos(l) || 'sin tiempo asignado') : '';
+  $('metaAhora').innerHTML = l
+    ? (l.presentador ? `Presenta <b>${esc(l.presentador)}</b> · ` : '') +
+      `llevas <b>${mmss(Date.now() - tLamina)}</b> en esta lámina`
+    : '';
+
+  $('prevSigue').innerHTML = preview(s);
+  $('titSigue').textContent = s ? s.titulo : 'Es la última lámina.';
+  $('metaSigue').innerHTML = s
+    ? (s.presentador ? `Presenta <b>${esc(s.presentador)}</b>` : '') +
+      (s.presentador && conMinutos(s) ? ' · ' : '') + conMinutos(s)
+    : '';
+
+  const n = l && l.notas ? l.notas : '';
+  $('notasTxt').textContent = n || 'Esta lámina no tiene notas.';
+  $('notasTxt').className = 'notasTxt' + (n ? '' : ' vacio');
+
+  pintarIndice();
+  tic();
+}
+
+// El cronómetro de la lámina se refresca aparte, sin repintar todo.
+setInterval(() => {
+  const l = deck[idx];
+  if (!l) return;
+  $('metaAhora').innerHTML = (l.presentador ? `Presenta <b>${esc(l.presentador)}</b> · ` : '') +
+    `llevas <b>${mmss(Date.now() - tLamina)}</b> en esta lámina`;
+}, 1000);
+
+function pintarIndice() {
+  const c = $('indice');
+  if (!c.classList.contains('ver')) return;
+  c.innerHTML = '<p class="rot">Índice · toca una para saltar</p>' + deck.map((l, n) => `
+    <div class="fila${n === idx ? ' hoy' : ''}" data-ir="${n}">
+      <span class="num">${n + 1}</span>
+      <span class="nom">${esc(l.titulo)}</span>
+      <span class="min">${esc(l.seccionNombre || '')}${l.minutos ? ' · ' + dura(l.minutos) : ''}</span>
+    </div>`).join('');
+  const hoy = c.querySelector('.fila.hoy');
+  if (hoy) hoy.scrollIntoView({ block: 'nearest' });
+}
+
+// ══════════ Mensajes del proyector ══════════
+function atender(m) {
+  if (!m || m.de !== 'proyector' || !nuevo(m.id)) return;
+  vivo = Date.now();
+  $('espera').classList.add('fuera');
+  $('enlace').textContent = 'conectada'; $('enlace').classList.add('vivo');
+  if (m.t === 'deck') { deck = Array.isArray(m.laminas) ? m.laminas : []; pintar(); return; }
+  if (m.t === 'estado') {
+    if (Number.isFinite(m.i) && m.i !== idx) { idx = m.i; tLamina = Date.now(); }
+    if (!deck.length) emitir({ t: 'hola' });   // llegó el estado antes que el deck
+    pintar();
+    return;
+  }
+  if (m.t === 'adios') {
+    $('enlace').textContent = 'se cerró el proyector'; $('enlace').classList.remove('vivo');
+  }
+}
+
+if (canal) canal.onmessage = (e) => atender(e.data);
+window.addEventListener('storage', (e) => {
+  if (e.key !== BUS || !e.newValue) return;
+  try { atender(JSON.parse(e.newValue)); } catch (_) {}
+});
+
+// Saludo insistente: esta ventana puede abrirse antes que la del proyector, o
+// el proyector puede recargarse a medio evento. Mientras no haya respuesta se
+// vuelve a saludar; una vez conectada, el latido detecta si se cayó.
+emitir({ t: 'hola' });
+setInterval(() => {
+  const callado = Date.now() - vivo;
+  if (!vivo || callado > 4000) emitir({ t: 'hola' });
+  if (vivo && callado > 9000) {
+    $('enlace').textContent = 'sin conexión'; $('enlace').classList.remove('vivo');
+  }
+}, 1500);
+
+// ══════════ Controles ══════════
+const mover = (d) => emitir({ t: 'mover', d });
+
+$('sig').addEventListener('click', () => mover(1));
+$('ant').addEventListener('click', () => mover(-1));
+$('negro').addEventListener('click', () => emitir({ t: 'negro' }));
+$('cero').addEventListener('click', () => {
+  t0 = Date.now(); localStorage.setItem(T0, String(t0)); tLamina = Date.now(); tic();
+});
+$('verIndice').addEventListener('click', () => { $('indice').classList.toggle('ver'); pintarIndice(); });
+$('indice').addEventListener('click', (e) => {
+  const f = e.target.closest('[data-ir]');
+  if (f) emitir({ t: 'ir', i: Number(f.dataset.ir) });
+});
+
+document.addEventListener('keydown', (e) => {
+  const k = e.key;
+  if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); mover(1); }
+  else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); mover(-1); }
+  else if (k === 'b' || k === 'B' || k === '.') { emitir({ t: 'negro' }); }
+  else if (k === 'i' || k === 'I') { $('indice').classList.toggle('ver'); pintarIndice(); }
+});
+
+window.addEventListener('beforeunload', () => emitir({ t: 'adios' }));
+</script>
+</body>
+</html>

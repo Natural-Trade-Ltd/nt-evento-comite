@@ -96,6 +96,7 @@ li b{color:var(--ink)}
 .rule{width:74px; height:3px; background:var(--acc2); border-radius:999px; margin:26px 0}
 .lede{color:var(--sub); font-size:22px; max-width:680px; margin:0; font-style:normal}
 .ayuda{margin:38px 0 0; color:var(--faint); font-size:13.5px}
+.gate .ayuda{margin:20px 0 0; text-align:left; line-height:1.7; font-size:13px}
 .ayuda b{color:var(--sub)}
 
 /* Portón de clave (misma clave del constructor) */
@@ -132,6 +133,15 @@ li b{color:var(--ink)}
   border-radius:16px; padding:14px 18px; box-shadow:var(--shadow); font-size:14.5px;
 }
 .notas.ver{display:block}
+
+/* Aviso pasajero al pie (p.ej. "las notas están en tu otra ventana") */
+.aviso{
+  position:fixed; left:50%; bottom:74px; transform:translateX(-50%); z-index:40;
+  background:var(--ink); color:var(--card); padding:9px 18px; border-radius:999px;
+  font-size:14px; box-shadow:var(--shadow); opacity:0; pointer-events:none;
+  transition:opacity .18s; max-width:70vw; text-align:center;
+}
+.aviso.ver{opacity:.95}
 .notas h3{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin:0 0 6px; font-weight:600}
 .notas .cuerpoNota{margin:0; color:var(--ink); white-space:pre-wrap}
 .notas .sigue{color:var(--sub); font-size:12.5px; border-top:1px solid var(--line); padding-top:8px; margin:10px 0 0}
@@ -158,7 +168,7 @@ li b{color:var(--ink)}
 }
 
 /* Pantalla en negro: tecla B del clicker, para cuando quieras que te miren a ti. */
-body.negro .deck, body.negro .barra, body.negro .notas{visibility:hidden}
+body.negro .deck, body.negro .barra, body.negro .notas, body.negro .aviso{visibility:hidden}
 body.negro{background:#000}
 
 
@@ -385,7 +395,7 @@ body.negro{background:#000}
     height:100vh; page-break-after:always; break-after:page; padding:26px 40px;
   }
   .slide:last-child{page-break-after:auto}
-  .barra,.ayuda,.notas,.gate{display:none !important}
+  .barra,.ayuda,.notas,.aviso,.gate{display:none !important}
   .media img{box-shadow:none}
 }
 </style>
@@ -401,6 +411,12 @@ body.negro{background:#000}
     <input type="password" id="clave" autocomplete="current-password" placeholder="••••••••••••">
     <p class="err" id="gateErr"></p>
     <button id="entrar">Abrir la presentación</button>
+    <p class="ayuda">
+      Avanza con el clicker, las flechas o clic en la lámina.<br>
+      <b>F</b> pantalla completa · <b>B</b> pantalla en negro · los videos entran solos, <b>V</b> los pausa.<br>
+      <b>P</b> abre la <b>vista de presentador</b> en otra ventana: ahí van tus notas, el reloj
+      y lo que sigue. Déjala en tu laptop; el proyector se queda con esta.
+    </p>
   </div>
 </div>
 
@@ -412,6 +428,8 @@ body.negro{background:#000}
   <p class="sigue" id="notasSigue"></p>
 </div>
 
+<div class="aviso" id="avisoP"></div>
+
 <div class="barra">
   <span class="pie" id="pie">Evento 1-sep-2026 · Natural Trade / Global Forest</span>
   <div class="pista"><i id="pista"></i></div>
@@ -420,6 +438,7 @@ body.negro{background:#000}
     <button id="ant" title="Anterior">←</button>
     <button id="sig" title="Siguiente">→</button>
     <button id="notasBtn" title="Notas del presentador (N)">N</button>
+    <button id="presBtn" title="Vista de presentador en otra ventana (P)">P</button>
     <button id="pantalla" title="Pantalla completa">⛶</button>
     <a href="constructor.html" title="Editar en el constructor">✎</a>
   </div>
@@ -793,6 +812,7 @@ function pintarPasos() {
   s.querySelectorAll('.hl').forEach((n) => n.classList.remove('hl'));
   const cur = s.querySelector('[data-step="' + paso + '"][data-hl]');
   if (cur) { const t = s.querySelector(cur.dataset.hl); if (t) t.classList.add('hl'); }
+  difundir();
 }
 
 // ── Animaciones de entrada ──
@@ -949,7 +969,7 @@ function construir() {
         <h1>${esc(l.titulo)}</h1>
         <div class="rule"></div>
         ${l.frase ? `<p class="lede">${rico(l.frase)}</p>` : ''}
-        ${n === 0 ? '<p class="ayuda">Avanza con el clicker, las flechas o clic en la lámina. <b>F</b> pantalla completa · <b>B</b> pantalla en negro · <b>N</b> notas · los videos entran solos, <b>V</b> los pausa.</p>' : ''}
+        
       </section>`;
     }
 
@@ -1027,6 +1047,7 @@ const pintar = () => {
   pintarPasos();
   animarPortal(slides[i]);
   pintarNotas();
+  difundir();
 };
 const mover = (d) => {
   if (!laminas.length) return;
@@ -1066,7 +1087,8 @@ document.addEventListener('keydown', (e) => {
   else if (k === 'Escape') { cerrarFactura(); }
   else if (k === 'b' || k === 'B' || k === '.') { document.body.classList.toggle('negro'); }
   else if (k === 'f' || k === 'F') { pantallaCompleta(); }
-  else if (k === 'n' || k === 'N') { $('notas').classList.toggle('ver'); }
+  else if (k === 'n' || k === 'N') { alternarNotas(); }
+  else if (k === 'p' || k === 'P') { abrirPresentador(); }
   else if (k === 'v' || k === 'V') {
     const v = document.querySelector('.slide.on video');
     if (v) {
@@ -1102,7 +1124,104 @@ const pantallaCompleta = () => {
 $('sig').addEventListener('click', (e) => { e.stopPropagation(); mover(1); });
 $('ant').addEventListener('click', (e) => { e.stopPropagation(); mover(-1); });
 $('pantalla').addEventListener('click', (e) => { e.stopPropagation(); pantallaCompleta(); });
-$('notasBtn').addEventListener('click', (e) => { e.stopPropagation(); $('notas').classList.toggle('ver'); });
+// Con la vista de presentador conectada, la N deja de descubrir las notas aquí:
+// esta ventana es la que ve la sala y ya no hay razón para arriesgarlas.
+function alternarNotas() {
+  if (hayPresentador) { avisar('Las notas están en tu ventana de presentador'); return; }
+  $('notas').classList.toggle('ver');
+}
+$('notasBtn').addEventListener('click', (e) => { e.stopPropagation(); alternarNotas(); });
+$('presBtn').addEventListener('click', (e) => { e.stopPropagation(); abrirPresentador(); });
+
+// ══════════ PUENTE CON LA VISTA DE PRESENTADOR (30-ago) ══════════
+// Las notas viven en ESTA ventana, que es la que se proyecta: encenderlas con N
+// delante de la sala las pone en la pantalla grande. Por eso existe
+// presentador.html — una segunda ventana que se queda en la laptop y recibe de
+// aquí las notas, el reloj y lo que sigue. Esta ventana no cambia en nada.
+//
+// Se hablan por BroadcastChannel entre dos ventanas del mismo origen: sin
+// servidor y sin red. Si el navegador no lo trae, se cae a localStorage, cuyo
+// evento 'storage' también salta en las otras ventanas.
+const BUS = 'nt-presentacion';
+const canal = (() => { try { return new BroadcastChannel(BUS); } catch (_) { return null; } })();
+let hayPresentador = false;
+
+// El id es lo que evita el mensaje DOBLE: si un navegador entregara lo mismo por
+// los dos caminos, un solo ▶ avanzaría dos láminas. Por eso el respaldo de
+// localStorage solo entra cuando NO hay BroadcastChannel, y aun así se descartan
+// los repetidos al recibir.
+let nSeq = 0;
+const vistos = [];
+const nuevo = (id) => {
+  if (!id || vistos.includes(id)) return false;
+  vistos.push(id);
+  if (vistos.length > 60) vistos.shift();
+  return true;
+};
+
+const emitir = (msg) => {
+  const m = { ...msg, de: 'proyector', id: 'proy-' + Date.now() + '-' + (++nSeq), ts: Date.now() };
+  if (canal) { canal.postMessage(m); return; }
+  try { localStorage.setItem(BUS, JSON.stringify(m)); } catch (_) {}
+};
+
+// Solo lo que la otra ventana necesita. El html de las 8 láminas del Portal pesa
+// y allá no se usa: la vista de presentador muestra un resumen, no la lámina.
+const resumenDeck = () => laminas.map((l) => ({
+  seccion: l.seccion, seccionNombre: secLabel(l.seccion),
+  titulo: l.titulo || '', frase: l.frase || '', notas: l.notas || '',
+  presentador: l.presentador || '', minutos: Number(l.minutos || 0),
+  imagen_url: l.imagen_url || '', video: !!l.video_url, estatica: !!l.estatica,
+}));
+
+function difundir() {
+  if (!laminas.length) return;
+  emitir({
+    t: 'estado', i, paso, total: laminas.length,
+    negro: document.body.classList.contains('negro'),
+  });
+}
+
+function atender(m) {
+  if (!m || m.de !== 'presentador' || !nuevo(m.id)) return;
+  hayPresentador = true;
+  if (m.t === 'hola') {
+    // Todavía en el portón: mejor dejarla esperando que mandarle un deck vacío.
+    if (!laminas.length) return;
+    emitir({ t: 'deck', laminas: resumenDeck() });
+    difundir();
+    return;
+  }
+  if (m.t === 'mover') mover(Number(m.d) > 0 ? 1 : -1);
+  else if (m.t === 'ir' && Number.isFinite(Number(m.i))) {
+    const ni = Math.max(0, Math.min(laminas.length - 1, Number(m.i)));
+    if (ni !== i) { i = ni; paso = 0; pintar(); }
+  } else if (m.t === 'negro') { document.body.classList.toggle('negro'); difundir(); }
+  else if (m.t === 'adios') hayPresentador = false;
+}
+
+if (canal) canal.onmessage = (e) => atender(e.data);
+window.addEventListener('storage', (e) => {
+  if (e.key !== BUS || !e.newValue) return;
+  try { atender(JSON.parse(e.newValue)); } catch (_) {}
+});
+window.addEventListener('beforeunload', () => emitir({ t: 'adios' }));
+
+let tAviso = 0;
+function avisar(texto) {
+  const a = $('avisoP');
+  a.textContent = texto;
+  a.classList.add('ver');
+  clearTimeout(tAviso);
+  tAviso = setTimeout(() => a.classList.remove('ver'), 3000);
+}
+
+function abrirPresentador() {
+  const w = window.open('presentador.html', 'nt_presentador', 'width=1180,height=800');
+  if (!w) { avisar('El navegador bloqueó la ventana. Permite las emergentes de este sitio y vuelve a presionar P.'); return; }
+  hayPresentador = true;
+  avisar('Vista de presentador abierta — arrástrala a la pantalla de tu laptop');
+}
 
 // ── Portón ──
 async function entrar(cl) {
@@ -1119,6 +1238,8 @@ async function entrar(cl) {
     $('gate').classList.add('fuera');
     $('gate').style.display = 'none';
     construir();
+    emitir({ t: 'deck', laminas: resumenDeck() });   // por si la otra ventana ya esperaba
+    difundir();
     window.focus();
   } catch (e) {
     $('gateErr').textContent = e.message === 'clave' ? 'Clave incorrecta.' : 'No se pudo conectar. Reintenta.';
