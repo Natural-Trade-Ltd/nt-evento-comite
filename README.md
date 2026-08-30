@@ -83,6 +83,7 @@ css/app.css                estilos (claro/oscuro, marca NT #469466)
 js/app.js                  toda la app (módulo ES, sin build)
 constructor.html           constructor de la presentación principal (clave compartida)
 presentar.html             modo presentar del constructor (mismo motor que presentacion.html)
+presentador.html           vista de presentador: notas, reloj y lo que sigue, en la otra pantalla
 presentacion.html          NT App pantalla por pantalla (deck aparte, estático)
 sql/01_schema.sql          esquema completo, RLS y bucket (referencia)
 sql/02_horas_programa.sql  migración aplicada: inicio/fin por bloque del programa
@@ -98,11 +99,24 @@ test/mock-supabase.js      el mock (sesión lista y los bloques reales; ?premig=
 
 `constructor.html` es donde el comité arma la presentación principal de la noche: láminas con
 título, puntos, imagen y **video** opcionales, quién la presenta, minutos y notas, agrupadas en
-seis secciones fijas (bienvenida → quiénes somos → diferenciadores → portal → app → cierre). Se
-reordena con flechas y hay una vista «por presentador» con los tiempos de cada quien contra la
-meta de 30 min. `presentar.html` proyecta ese deck con el mismo motor de `presentacion.html`
-(clicker Av/Re Pág, flechas, **B** pantalla en negro, **F** pantalla completa, **N** notas del
-presentador, **V** reproduce el video, impresión a PDF).
+secciones. Se reordena con flechas y hay una vista «por presentador» con los tiempos de cada
+quien contra la meta de 30 min. `presentar.html` proyecta ese deck con el mismo motor de
+`presentacion.html` (clicker Av/Re Pág, flechas, **B** pantalla en negro, **F** pantalla
+completa, **P** vista de presentador, **V** reproduce el video, impresión a PDF).
+
+**Las secciones se administran desde el constructor** (botón «⚙ Secciones»): agregar, renombrar,
+reordenar y quitar. Viven en `ev_seccion`; ya no son una lista fija en el código. Al quitar una
+con láminas se pregunta a qué sección se mudan — nunca se borra una lámina — y siempre tiene que
+quedar al menos una. Ojo: la sección «portal» carga además las 8 láminas del recorrido del Portal,
+que viven dentro de `presentar.html` y no se pueden mudar desde ahí.
+
+**Vista de presentador (`presentador.html`, tecla P).** Las notas viven en la ventana que se
+proyecta, así que encenderlas delante de la sala las ponía en la pantalla grande. Esta segunda
+ventana se queda en la laptop con las notas en grande, la lámina que sigue, el reloj corrido
+contra los minutos programados y un índice para saltar (tecla **I**); avanza, retrocede y apaga
+la proyección. Las dos ventanas se hablan por `BroadcastChannel` del mismo origen —sin servidor,
+sin base y sin red— y con ella conectada la **N** del proyector ya no descubre las notas. Requiere
+las pantallas en modo **extendido**: en espejo no hay forma de separarlas.
 
 **Video por lámina:** se pega un enlace de YouTube, Vimeo o Drive (va en iframe) o se sube el
 archivo MP4/WebM/MOV hasta 300 MB (va en `<video>` con controles). Una lámina de solo video se
