@@ -102,6 +102,19 @@ body{
 .slide.m-lleno.t-arriba .media img{max-height:78vh; max-width:96vw}
 .slide.m-lleno .video{width:min(96vw,calc(86vh*16/9))}
 .slide.m-lleno.t-oculto .video{width:min(100vw,calc(100vh*16/9)); border:none; border-radius:0; box-shadow:none}
+
+/* ── Video con el título ARRIBA ──
+   Antes el video se calculaba contra la pantalla ENTERA y luego el título se sumaba
+   encima: «25 Años» pedía 133 px de título + 20 de hueco + 929 de video sobre 1080 y
+   se comía la orilla de abajo. Aquí el video se mide por ALTO —el ancho lo deduce la
+   proporción 16/9, así que nunca se deforma— y flex-shrink lo encoge solo cuando el
+   título ocupa más de lo previsto. */
+.slide.t-arriba .video,
+.slide.t-arriba.m-normal .video{height:62vh; width:auto; max-width:92vw; flex:0 1 auto; min-height:0}
+.slide.t-arriba.m-chico  .video{height:44vh; width:auto; max-width:92vw; flex:0 1 auto; min-height:0}
+.slide.t-arriba.m-grande .video{height:72vh; width:auto; max-width:92vw; flex:0 1 auto; min-height:0}
+.slide.t-arriba.m-lleno  .video{height:82vh; width:auto; max-width:96vw; flex:0 1 auto; min-height:0}
+.slide.t-arriba .txt{flex:0 0 auto}
 .slide.solo{justify-content:center}
 .slide.solo .txt{max-width:1500px}
 .slide.solo h2{font-size:104px}
@@ -922,12 +935,20 @@ function ajustarTexto(s) {
   c.style.maxWidth = '';
 
   const cs = getComputedStyle(s);
-  const altoUtil = s.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-  // Lo que la columna de texto tiene libre a lo ancho: el hueco menos lo que ocupan
-  // la imagen o el video de al lado.
+  // Los hermanos (imagen, video) le quitan sitio al texto, pero por dónde depende del
+  // acomodo: EN FILA le comen ancho, EN COLUMNA le comen alto. Descontarlo siempre del
+  // ancho dejaba que en las láminas de título arriba el texto se acercara como si
+  // tuviera la pantalla entera, y empujaba al video fuera del cuadro.
+  const enColumna = cs.flexDirection.startsWith('column');
+  const hermanos = [...s.children].filter((e) => e !== c)
+    .reduce((a, e) => {
+      const r = e.getBoundingClientRect();
+      return a + (enColumna ? r.height : r.width) + parseFloat(cs.gap || 0);
+    }, 0);
+  const altoUtil = s.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+    - (enColumna ? hermanos : 0);
   const anchoUtil = s.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-    - [...s.children].filter((e) => e !== c)
-        .reduce((a, e) => a + e.getBoundingClientRect().width + parseFloat(cs.gap || 0), 0);
+    - (enColumna ? 0 : hermanos);
   if (altoUtil < 40 || anchoUtil < 40) return;
 
   const caja = c.getBoundingClientRect();
@@ -1090,8 +1111,12 @@ function construir() {
     // Diseño elegido en el constructor: dónde va el título y qué tan grande el media.
     const tam  = ['chico', 'normal', 'grande', 'lleno'].includes(l.media_tam) ? l.media_tam : 'normal';
     let modo = ['lado', 'arriba', 'oculto'].includes(l.titulo_modo) ? l.titulo_modo : 'lado';
-    // Video sin puntos en modo clásico: el título solo estorbaría al lado → arriba.
-    if (modo === 'lado' && l.video_url && !puntos.length) modo = 'arriba';
+    // Modo clásico + media + sin puntos: el título al lado no tiene con qué convivir.
+    // Si además se pidió PANTALLA COMPLETA, el título sobra del todo — si no, el video
+    // y el título se pelean el alto y uno de los dos se corta (pasó con «25 Años»:
+    // 133 px de título + 20 de hueco + 929 de video en una pantalla de 1080).
+    if (modo === 'lado' && (l.video_url || l.imagen_url) && !puntos.length)
+      modo = tam === 'lleno' ? 'oculto' : 'arriba';
 
     if (modo === 'oculto')
       return `<section class="slide t-oculto m-${tam}${fte}"${esc10}>${media}</section>`;
