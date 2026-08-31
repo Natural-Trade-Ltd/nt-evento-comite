@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Día del evento · NT + GF</title>
+<style>
+  /* Dueto Tierra, móvil primero: esta página se usa caminando por el salón. */
+  :root{
+    --bg:#F2EDE3; --card:#FBF8F1; --line:#E0D8C8;
+    --ink:#3A3129; --sub:#71655A; --faint:#9C8F80;
+    --acc:#587F6B; --acc2:#8A6F5B; --mal:#AE4E2B; --ok:#4E7A5A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 14px 90px}
+  header{margin-bottom:14px}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--acc);margin:0 0 4px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:28px;margin:0 0 2px}
+  .sub{color:var(--sub);font-size:13.5px;margin:0}
+  .aviso{background:#FBF8F1;border:1px solid var(--line);border-left:3px solid var(--mal);
+    border-radius:12px;padding:12px 14px;margin:40px auto;max-width:480px;font-size:14.5px;color:var(--sub)}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 4px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--sub);
+    font-size:12.5px;font-weight:600;padding:7px 13px;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--acc);border-color:var(--acc);color:#F6FBF7}
+
+  .mom{margin:20px 0 8px;display:flex;align-items:baseline;gap:8px}
+  .mom b{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc2)}
+  .mom span{color:var(--faint);font-size:12px}
+
+  .item{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px 13px;margin-bottom:9px;display:flex;gap:11px;align-items:flex-start}
+  .item.hecho{opacity:.55}
+  .item.hecho .t{text-decoration:line-through}
+  .check{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--line);
+    background:#fff;cursor:pointer;font-size:17px;line-height:26px;text-align:center;color:#fff;padding:0}
+  .item.hecho .check{background:var(--ok);border-color:var(--ok)}
+  .cuerpo{flex:1;min-width:0}
+  .hora{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px;color:var(--acc2)}
+  .t{font-weight:600;margin:1px 0 2px}
+  .d{color:var(--sub);font-size:13.5px}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+  .resp{background:#fff;border:1px solid var(--line);border-radius:999px;font-size:12.5px;
+    font-weight:600;color:var(--ink);padding:4px 11px;cursor:pointer}
+  .resp.libre{color:var(--mal);border-color:rgba(174,78,43,.4)}
+  .resp:active{background:var(--bg)}
+  .porq{color:var(--faint);font-size:11.5px}
+
+  button.b{background:var(--acc);color:#F6FBF7;border:0;border-radius:11px;font-size:14px;
+    font-weight:600;padding:11px 16px;cursor:pointer;font-family:inherit}
+  button.b2{background:transparent;color:var(--sub);border:1px solid var(--line);border-radius:11px;
+    font-size:14px;font-weight:600;padding:11px 16px;cursor:pointer;font-family:inherit}
+  .fab{position:fixed;right:16px;bottom:16px;box-shadow:0 8px 24px rgba(58,49,41,.25);border-radius:999px}
+
+  /* hoja modal simple */
+  .velo{position:fixed;inset:0;background:rgba(40,33,27,.45);display:none;align-items:flex-end;
+    justify-content:center;z-index:50;padding:0}
+  .velo.on{display:flex}
+  .hoja{background:var(--card);border-radius:18px 18px 0 0;width:100%;max-width:560px;
+    padding:18px 16px 26px;max-height:86vh;overflow-y:auto}
+  .hoja h2{font-size:17px;margin:0 0 4px}
+  .hoja .quien{color:var(--sub);font-size:13px;margin:0 0 12px}
+  .hoja label{display:block;font-size:11px;color:var(--faint);text-transform:uppercase;
+    letter-spacing:.1em;font-weight:600;margin:12px 0 4px}
+  .hoja input,.hoja select,.hoja textarea{width:100%;background:#fff;border:1px solid var(--line);
+    border-radius:10px;color:var(--ink);font-size:16px;padding:11px 12px;outline:none;font-family:inherit}
+  .hoja input:focus,.hoja select:focus{border-color:var(--acc)}
+  .hoja .fila{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .hoja .err{color:var(--mal);font-size:13px;min-height:16px;margin-top:8px}
+  .equipo{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+  .eqp{background:#fff;border:1px solid var(--line);border-radius:999px;font-size:13px;
+    font-weight:600;padding:7px 12px;cursor:pointer}
+  .eqp.on{background:var(--acc);border-color:var(--acc);color:#F6FBF7}
+  #toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(60px);opacity:0;
+    background:var(--ink);color:#F6F1E7;border-radius:10px;padding:9px 16px;font-size:13.5px;
+    transition:.2s;pointer-events:none;z-index:60;max-width:90vw}
+  #toast.on{transform:translateX(-50%);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap" id="app" style="display:none">
+  <header>
+    <p class="eyebrow">Natural Trade · Global Forest — martes 1 de septiembre</p>
+    <h1>Día del evento</h1>
+    <p class="sub" id="resumen">Cargando…</p>
+    <div class="chips" id="chips"></div>
+  </header>
+  <div id="lista"></div>
+</div>
+<div class="aviso" id="sinLlave" style="display:none">
+  Este link necesita su llave. Pide el <b>link completo</b> del día del evento
+  (el que se compartió por WhatsApp) y ábrelo tal cual.
+</div>
+
+<button class="b fab" id="fabAdd">＋ Pendiente</button>
+
+<div class="velo" id="velo">
+  <div class="hoja" id="hoja"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+  var FN = 'https://cytopyytymxjwvfhosvg.supabase.co/functions/v1/dia';
+  var MOMENTOS = [
+    ['montaje',  'Montaje',  'Antes de que llegue nadie'],
+    ['registro', 'Registro', 'Recepción y gafetes'],
+    ['evento',   'Evento',   'Con los invitados en el salón'],
+    ['cierre',   'Cierre',   'Al terminar y al día siguiente']
+  ];
+  var K = new URLSearchParams(location.search).get('k') || localStorage.getItem('dia_k') || '';
+  if (K) { localStorage.setItem('dia_k', K); }
+  var items = [], equipo = [];
+  var fMom = 'todos', fMias = false;
+
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+
+  function quien(forzar){
+    var q = localStorage.getItem('dia_quien') || '';
+    if (!q || forzar){
+      q = (prompt('¿Quién eres? (tu nombre — así queda registrado qué tomas y qué palomeas)') || '').trim();
+      if (q) localStorage.setItem('dia_quien', q);
+    }
+    return q;
+  }
+  // el nombre de un responsable puede ser correo del equipo o texto libre
+  function nombreDe(v){
+    if (!v) return null;
+    var p = equipo.filter(function(e){ return e.email === v; })[0];
+    return p ? p.nombre : (v.indexOf('@') > 0 ? v.split('@')[0] : v);
+  }
+  function esMio(v){
+    var yo = (localStorage.getItem('dia_quien') || '').toLowerCase();
+    var n = (nombreDe(v) || '').toLowerCase();
+    return !!yo && !!n && (n.indexOf(yo) >= 0 || yo.indexOf(n) >= 0);
+  }
+  function toast(m){
+    var t = document.getElementById('toast'); t.textContent = m; t.className = 'on';
+    clearTimeout(toast._x); toast._x = setTimeout(function(){ t.className = ''; }, 2600);
+  }
+  function h12(hhmm){
+    if (!hhmm) return '';
+    var h = +hhmm.slice(0,2), m = hhmm.slice(3,5);
+    var am = h < 12; var h2 = h % 12 === 0 ? 12 : h % 12;
+    return h2 + ':' + m + (am ? ' am' : ' pm');
+  }
+
+  function api(cuerpo){
+    cuerpo.k = K; cuerpo.quien = localStorage.getItem('dia_quien') || null;
+    return fetch(FN, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(cuerpo) })
+      .then(function(r){ return r.json().then(function(j){ return { s:r.status, j:j }; }); });
+  }
+
+  function pintar(){
+    var vivos = items.filter(function(d){
+      if (fMom !== 'todos' && d.momento !== fMom) return false;
+      if (fMias && !esMio(d.responsable) && !esMio(d.apoyo)) return false;
+      return true;
+    });
+    var hechos = items.filter(function(d){ return d.hecho; }).length;
+    var sinD = items.filter(function(d){ return !d.hecho && !d.responsable; }).length;
+    document.getElementById('resumen').innerHTML =
+      '<b>' + hechos + '</b> de <b>' + items.length + '</b> listos · <b>' + sinD +
+      '</b> sin dueño — toca el chip de responsable para quedarte con uno';
+
+    var chips = '<span class="chip ' + (fMom === 'todos' ? 'on' : '') + '" data-m="todos">Todo · ' + items.length + '</span>';
+    MOMENTOS.forEach(function(m){
+      var n = items.filter(function(d){ return d.momento === m[0]; }).length;
+      if (n) chips += '<span class="chip ' + (fMom === m[0] ? 'on' : '') + '" data-m="' + m[0] + '">' + m[1] + ' · ' + n + '</span>';
+    });
+    chips += '<span class="chip ' + (fMias ? 'on' : '') + '" data-mias="1">Solo lo mío</span>';
+    document.getElementById('chips').innerHTML = chips;
+
+    var h = '';
+    MOMENTOS.forEach(function(m){
+      var ds = vivos.filter(function(d){ return d.momento === m[0]; });
+      if (!ds.length) return;
+      h += '<div class="mom"><b>' + m[1] + '</b><span>' + m[2] + ' · ' +
+        ds.filter(function(d){ return d.hecho; }).length + '/' + ds.length + ' listos</span></div>';
+      ds.forEach(function(d){
+        var quienHizo = d.hecho && d.hecho_por ? ' <span class="porq">· lo palomeó ' + esc(d.hecho_por) + '</span>' : '';
+        h += '<div class="item ' + (d.hecho ? 'hecho' : '') + '">' +
+          '<button class="check" data-chk="' + d.id + '">' + (d.hecho ? '✓' : '&nbsp;') + '</button>' +
+          '<div class="cuerpo">' +
+            (d.hora ? '<div class="hora">' + h12(String(d.hora).slice(0,5)) + '</div>' : '') +
+            '<div class="t">' + esc(d.titulo) + quienHizo + '</div>' +
+            (d.detalle ? '<div class="d">' + esc(d.detalle) + '</div>' : '') +
+            '<div class="meta">' +
+              '<button class="resp ' + (d.responsable ? '' : 'libre') + '" data-asig="' + d.id + '">' +
+                (d.responsable ? '👤 ' + esc(nombreDe(d.responsable)) : '⚠ Sin dueño · tómalo') + '</button>' +
+              (d.apoyo ? '<span class="porq">apoya ' + esc(nombreDe(d.apoyo)) + '</span>' : '') +
+            '</div>' +
+          '</div></div>';
+      });
+    });
+    document.getElementById('lista').innerHTML = h || '<div class="aviso">Nada con ese filtro.</div>';
+  }
+
+  function cargar(silencioso){
+    api({ action:'lista' }).then(function(res){
+      if (res.s !== 200 || !res.j.ok){
+        if (!silencioso){
+          document.getElementById('app').style.display = 'none';
+          document.getElementById('fabAdd').style.display = 'none';
+          document.getElementById('sinLlave').style.display = 'block';
+        }
+        return;
+      }
+      items = res.j.items; equipo = res.j.equipo;
+      document.getElementById('app').style.display = 'block';
+      pintar();
+    }).catch(function(){ if (!silencioso) toast('Sin conexión. Reintenta.'); });
+  }
+
+  // ---------- interacciones ----------
+  document.getElementById('chips').addEventListener('click', function(e){
+    var c = e.target.closest('.chip'); if (!c) return;
+    if (c.dataset.mias) fMias = !fMias; else fMom = c.dataset.m;
+    pintar();
+  });
+
+  document.getElementById('lista').addEventListener('click', function(e){
+    var chk = e.target.closest('[data-chk]');
+    if (chk){
+      var d = items.filter(function(x){ return x.id === chk.dataset.chk; })[0];
+      if (!d.hecho && !quien()) return;
+      api({ action:'marcar', id:d.id, hecho:!d.hecho }).then(function(res){
+        if (res.j.ok){ Object.assign(d, res.j.fila); pintar(); }
+        else toast(res.j.error || 'No se pudo guardar.');
+      });
+      return;
+    }
+    var asig = e.target.closest('[data-asig]');
+    if (asig) abrirAsignar(asig.dataset.asig);
+  });
+
+  function abrirAsignar(id){
+    var d = items.filter(function(x){ return x.id === id; })[0];
+    var h = '<h2>¿Quién se hace cargo?</h2><p class="quien">' + esc(d.titulo) + '</p>' +
+      '<button class="b" style="width:100%" id="hMio">🙋 Me lo quedo yo</button>' +
+      '<label>O elige del equipo</label><div class="equipo">' +
+      equipo.map(function(p){ return '<span class="eqp' + (d.responsable === p.email ? ' on' : '') +
+        '" data-e="' + esc(p.email) + '">' + esc(p.nombre) + '</span>'; }).join('') + '</div>' +
+      '<label>O escribe quién (hotel, proveedor, quien sea)</label>' +
+      '<input id="hLibre" placeholder="Nombre · ej. Capitán del salón" value="' +
+        esc(d.responsable && d.responsable.indexOf('@') < 0 ? d.responsable : '') + '">' +
+      '<div class="fila"><button class="b" id="hGuardar">Guardar</button>' +
+      '<button class="b2" id="hQuitar">Dejar sin dueño</button>' +
+      '<button class="b2" id="hCerrar">Cancelar</button></div><div class="err" id="hErr"></div>';
+    document.getElementById('hoja').innerHTML = h;
+    document.getElementById('velo').className = 'velo on';
+
+    var sel = d.responsable && d.responsable.indexOf('@') > 0 ? d.responsable : '';
+    document.querySelectorAll('.eqp').forEach(function(el){
+      el.onclick = function(){ sel = this.dataset.e;
+        document.querySelectorAll('.eqp').forEach(function(x){ x.className = 'eqp'; });
+        this.className = 'eqp on'; document.getElementById('hLibre').value = ''; };
+    });
+    var guardar = function(valor){
+      api({ action:'asignar', id:id, responsable:valor }).then(function(res){
+        if (res.j.ok){ Object.assign(d, res.j.fila); cerrarHoja(); pintar();
+          toast(valor ? 'Asignado a ' + nombreDe(valor) : 'Quedó sin dueño'); }
+        else document.getElementById('hErr').textContent = res.j.error || 'No se pudo guardar.';
+      });
+    };
+    document.getElementById('hMio').onclick = function(){
+      var yo = quien();          // usa el nombre guardado; solo pregunta la primera vez
+      if (yo) guardar(yo);
+    };
+    document.getElementById('hGuardar').onclick = function(){
+      var libre = document.getElementById('hLibre').value.trim();
+      guardar(libre || sel || null);
+    };
+    document.getElementById('hQuitar').onclick = function(){ guardar(null); };
+    document.getElementById('hCerrar').onclick = cerrarHoja;
+  }
+
+  document.getElementById('fabAdd').addEventListener('click', function(){
+    var h = '<h2>Nuevo pendiente del día</h2>' +
+      '<label>Qué hay que hacer</label><input id="nTit" placeholder="Revisar el audio del salón">' +
+      '<label>Detalle (opcional)</label><input id="nDet">' +
+      '<label>Hora</label><input id="nHora" type="time">' +
+      '<label>Momento</label><select id="nMom">' +
+      MOMENTOS.map(function(m){ return '<option value="' + m[0] + '">' + m[1] + ' — ' + m[2] + '</option>'; }).join('') +
+      '</select>' +
+      '<div class="fila"><button class="b" id="nGuardar">Guardar</button>' +
+      '<button class="b2" id="hCerrar">Cancelar</button></div><div class="err" id="hErr"></div>';
+    document.getElementById('hoja').innerHTML = h;
+    document.getElementById('velo').className = 'velo on';
+    document.getElementById('hCerrar').onclick = cerrarHoja;
+    document.getElementById('nGuardar').onclick = function(){
+      api({ action:'agregar', titulo:document.getElementById('nTit').value.trim(),
+        detalle:document.getElementById('nDet').value.trim(),
+        hora:document.getElementById('nHora').value,
+        momento:document.getElementById('nMom').value }).then(function(res){
+        if (res.j.ok){ cerrarHoja(); toast('Agregado.'); cargar(true); }
+        else document.getElementById('hErr').textContent = res.j.error || 'No se pudo guardar.';
+      });
+    };
+  });
+
+  function cerrarHoja(){ document.getElementById('velo').className = 'velo'; }
+  document.getElementById('velo').addEventListener('click', function(e){
+    if (e.target.id === 'velo') cerrarHoja();
+  });
+
+  // refresco silencioso: varios celulares en el salón se ven entre sí
+  setInterval(function(){
+    if (document.visibilityState === 'visible' && K) cargar(true);
+  }, 45000);
+
+  if (!K){
+    document.getElementById('sinLlave').style.display = 'block';
+    document.getElementById('fabAdd').style.display = 'none';
+  } else {
+    cargar(false);
+  }
+})();
+</script>
+</body>
+</html>

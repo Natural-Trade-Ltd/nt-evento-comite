@@ -88,6 +88,14 @@ const TABS = [
   { k:'encuesta',    t:'Encuesta QR',   n:() => D.encuesta.filter(r => r.completada).length }
 ];
 
+// Link directo a una pestaña: …/nt-evento-comite/#dia (o #programa, #tareas…).
+// Se guarda ANTES del viaje del login de Google, porque ese redirect pierde el hash;
+// al volver, el portal abre en la pestaña pedida.
+{
+  const pedida = location.hash.replace(/^#/, '').toLowerCase();
+  if (TABS.some(t => t.k === pedida)) { TAB = pedida; localStorage.setItem('ev_tab', pedida); }
+}
+
 /* ------------------------------------------------- AUDIOVISUALES FINALES
    Archivos terminados, en Drive: «1. NT-GF PRESENTACION SEPTIEMBRE /
    Audiovisuales finales». Al agregar una pieza nueva basta con sumarla aquí
