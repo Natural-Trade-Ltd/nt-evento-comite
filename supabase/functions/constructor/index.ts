@@ -20,6 +20,10 @@
 //    código y viven en public.ev_seccion — se agregan, renombran, reordenan y quitan
 //    desde el constructor. `guardar` valida contra esa tabla; si por lo que sea la
 //    tabla quedara vacía, se cae a las 6 originales para no bloquear el evento.
+// v6 (30-ago-2026, pedido de Jorge): tipografía POR LÁMINA — 'fuente' (casa, serif,
+//    sans, condensada, mono) y 'escala' (multiplicador acotado 0.6–1.8 sobre el tamaño
+//    que calcula solo el proyector). Y el TÍTULO admite saltos de línea: el Enter del
+//    constructor es el corte de renglón que se proyecta.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const URL_SB = Deno.env.get('SUPABASE_URL')!;
@@ -44,6 +48,7 @@ const clavesSeccion = async (db: ReturnType<typeof createClient>): Promise<strin
 const claveDe = (v: unknown) => String(v ?? '').toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
 const MEDIA_TAM = ['chico', 'normal', 'grande', 'lleno'];
+const FUENTES = ['casa', 'serif', 'sans', 'condensada', 'mono'];
 const TITULO_MODO = ['lado', 'arriba', 'oculto'];
 const MIMES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const MIMES_VIDEO: Record<string, string> = {
@@ -85,8 +90,15 @@ Deno.serve(async (req) => {
 
   // ── Alta / edición ──
   if (b.action === 'guardar') {
-    const titulo = String(b.titulo ?? '').trim().slice(0, 140);
-    if (titulo.length < 2) return json({ error: 'titulo_requerido' }, 400);
+    // El título admite SALTOS DE LÍNEA: el Enter del constructor es el corte de
+    // renglón que se proyecta. Máximo 4 renglones, para que nadie empuje una lámina
+    // fuera de la pantalla a base de Enters. Se quitan los vacíos de arriba y de
+    // abajo, pero los de EN MEDIO se respetan: son una decisión de composición.
+    const renglones = String(b.titulo ?? '').replace(/\r\n?/g, '\n').split('\n').map((r) => r.trim());
+    while (renglones.length && !renglones[0]) renglones.shift();
+    while (renglones.length && !renglones[renglones.length - 1]) renglones.pop();
+    const titulo = renglones.slice(0, 4).join('\n').slice(0, 140);
+    if (titulo.replace(/\n/g, '').length < 2) return json({ error: 'titulo_requerido' }, 400);
     const secs = await clavesSeccion(db);
     const seccion = secs.includes(String(b.seccion)) ? String(b.seccion) : secs[0];
     // Solo entran las columnas PRESENTES en el cuerpo: un cliente viejo que no
@@ -100,6 +112,10 @@ Deno.serve(async (req) => {
     if ('notas'       in b) fila.notas       = texto(b.notas, 4000);
     if ('minutos'     in b) fila.minutos     = Math.min(60, Math.max(0, Number(b.minutos ?? 2) || 0));
     if ('media_tam'   in b && MEDIA_TAM.includes(String(b.media_tam)))     fila.media_tam   = String(b.media_tam);
+    if ('fuente'      in b && FUENTES.includes(String(b.fuente)))          fila.fuente      = String(b.fuente);
+    // Multiplicador sobre el tamaño que calcula solo el proyector. Se acota aquí
+    // además del CHECK: un 5 escrito a mano dejaría la lámina fuera de pantalla.
+    if ('escala'      in b) fila.escala = Math.min(1.8, Math.max(0.6, Number(b.escala) || 1));
     if ('titulo_modo' in b && TITULO_MODO.includes(String(b.titulo_modo))) fila.titulo_modo = String(b.titulo_modo);
     if (b.id) {
       // Si cambiaron la imagen o el video, el archivo viejo del bucket sobra.

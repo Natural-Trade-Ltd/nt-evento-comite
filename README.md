@@ -121,6 +121,19 @@ con un tamaño fijo, el que hace caber la lámina de cuatro puntos deja media pa
 blanco en la de una frase suelta. Si una lámina se ve vacía es porque trae poco texto —
 agregar puntos en el constructor la llena sola, sin tocar CSS.
 
+Cada lámina además elige lo suyo en el constructor:
+
+- **Tipografía** (`ev_lamina.fuente`): de la casa (títulos serif + texto sans), toda serif,
+  toda sans, condensada o monoespaciada. Todas son pilas del **sistema**: si el salón se
+  queda sin red a media presentación, no hay fuente web que se quede sin cargar.
+- **Tamaño del texto** (`ev_lamina.escala`, 0.6–1.8): multiplica lo que calculó el ajuste
+  automático. «Automático» es 1 y no desvía nada. Al acercar la letra, la columna se
+  estrecha en la misma proporción, así que el bloque crece **hacia abajo** y no invade la
+  imagen de al lado; un techo duro impide que la lámina se salga de la pantalla.
+- **El Enter del título es el corte de renglón** que se proyecta (hasta 4). Cuando el
+  título trae cortes puestos a mano se apaga el `text-wrap:balance`, que si no le metía
+  un renglón de más al reparto automático.
+
 **Vista de presentador (`presentador.html`, tecla P).** Las notas viven en la ventana que se
 proyecta, así que encenderlas delante de la sala las ponía en la pantalla grande. Esta segunda
 ventana se queda en la laptop con las notas en grande, la lámina que sigue, el reloj corrido
