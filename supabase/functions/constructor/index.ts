@@ -20,6 +20,9 @@
 //    código y viven en public.ev_seccion — se agregan, renombran, reordenan y quitan
 //    desde el constructor. `guardar` valida contra esa tabla; si por lo que sea la
 //    tabla quedara vacía, se cae a las 6 originales para no bloquear el evento.
+// v7 (1-sep-2026, pedido de Jorge): 'tipo' de lámina. 'linea_tiempo' pinta los
+//    renglones del cuerpo («fecha | hito») como una línea de tiempo que el proyector
+//    revela hito por hito con el mismo clicker.
 // v6 (30-ago-2026, pedido de Jorge): tipografía POR LÁMINA — 'fuente' (casa, serif,
 //    sans, condensada, mono) y 'escala' (multiplicador acotado 0.6–1.8 sobre el tamaño
 //    que calcula solo el proyector). Y el TÍTULO admite saltos de línea: el Enter del
@@ -49,6 +52,7 @@ const claveDe = (v: unknown) => String(v ?? '').toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
 const MEDIA_TAM = ['chico', 'normal', 'grande', 'lleno'];
 const FUENTES = ['casa', 'serif', 'sans', 'condensada', 'mono'];
+const TIPOS = ['normal', 'linea_tiempo'];
 const TITULO_MODO = ['lado', 'arriba', 'oculto'];
 const MIMES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const MIMES_VIDEO: Record<string, string> = {
@@ -113,6 +117,7 @@ Deno.serve(async (req) => {
     if ('minutos'     in b) fila.minutos     = Math.min(60, Math.max(0, Number(b.minutos ?? 2) || 0));
     if ('media_tam'   in b && MEDIA_TAM.includes(String(b.media_tam)))     fila.media_tam   = String(b.media_tam);
     if ('fuente'      in b && FUENTES.includes(String(b.fuente)))          fila.fuente      = String(b.fuente);
+    if ('tipo'        in b && TIPOS.includes(String(b.tipo)))              fila.tipo        = String(b.tipo);
     // Multiplicador sobre el tamaño que calcula solo el proyector. Se acota aquí
     // además del CHECK: un 5 escrito a mano dejaría la lámina fuera de pantalla.
     if ('escala'      in b) fila.escala = Math.min(1.8, Math.max(0.6, Number(b.escala) || 1));
