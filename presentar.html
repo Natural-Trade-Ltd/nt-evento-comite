@@ -132,6 +132,36 @@ li{position:relative; padding-left:38px; margin-bottom:24px; color:var(--sub); f
 li::before{content:''; position:absolute; left:0; top:20px; width:12px; height:12px; border-radius:999px; background:var(--acc)}
 li b{color:var(--ink)}
 
+/* ── LÍNEA DE TIEMPO (1-sep) ──
+   Los renglones del cuerpo, «fecha | hito», se pintan como hitos sobre un eje y
+   el proyector los descubre UNO A UNO con el mismo clicker: el motor de pasos
+   (data-step) ya era general, solo le faltaba a quién aplicárselo. */
+.slide.ltiempo{flex-direction:column; justify-content:center; gap:0; text-align:center}
+.slide.ltiempo .cabeza{flex:0 0 auto; margin-bottom:88px; max-width:1500px}
+.slide.ltiempo h2{font-size:92px; margin:0}
+.slide.ltiempo .frase{margin:18px 0 0}
+.lt{display:flex; align-items:flex-start; width:100%; max-width:1720px}
+.lt .hito{flex:1 1 0; position:relative; padding:0 14px; min-width:0}
+/* El eje: cada hito trae su propio tramo, así la línea CRECE conforme aparecen. */
+.lt .hito .eje{position:relative; height:34px; margin:22px 0 26px}
+.lt .hito .eje::before{
+  content:''; position:absolute; left:-14px; right:-14px; top:50%; height:4px;
+  margin-top:-2px; background:var(--acc); opacity:.28; border-radius:2px;
+}
+.lt .hito .punto{
+  position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px 0 0 -13px;
+  border-radius:50%; background:var(--acc); box-shadow:0 0 0 8px var(--bg);
+}
+.lt .hito .fecha{
+  font-size:36px; font-weight:600; color:var(--acc); margin:0;
+  letter-spacing:.02em; line-height:1.2;
+}
+.lt .hito .quees{font-size:38px; line-height:1.32; color:var(--ink); margin:0; text-wrap:balance}
+/* El primero es el lanzamiento: pesa más que los que vienen después. */
+.lt .hito.primero .punto{width:34px; height:34px; margin:-17px 0 0 -17px}
+.lt .hito.primero .fecha{color:var(--acc2)}
+.lt .hito.primero .quees{font-weight:600}
+
 /* Portada y láminas centradas (sin puntos ni imagen) */
 .slide.centro{flex-direction:column; text-align:center; gap:0}
 .slide.centro .txt{display:flex; flex-direction:column; align-items:center; flex:0 0 auto; max-width:1500px}
@@ -256,9 +286,9 @@ body.negro{background:#000}
 .pslide .dsp em{font-style:normal;color:var(--p-tinta)}
 
 /* revelado por pasos */
-.pslide [data-step]{opacity:0;transform:translateY(10px);
+.pslide [data-step], .slide.ltiempo [data-step]{opacity:0;transform:translateY(10px);
   transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.3,1)}
-.pslide [data-step].show{opacity:1;transform:none}
+.pslide [data-step].show, .slide.ltiempo [data-step].show{opacity:1;transform:none}
 
 /* portada */
 .pslide .bub{display:inline-block;background:var(--p-papel2);border:1px solid var(--p-br);
@@ -1083,6 +1113,29 @@ function construir() {
     const tCls = String(l.titulo || '').includes('\n') ? ' class="manual"' : '';
     // La escala la lee ajustarTexto() al repintar; aquí solo viaja pegada al nodo.
     const esc10 = ` data-escala="${Math.min(1.8, Math.max(0.6, Number(l.escala) || 1))}"`;
+
+    // ── Línea de tiempo ──
+    // Cada renglón del cuerpo es un hito, «fecha | qué es». El data-step hace que
+    // el clicker los descubra uno a uno, sin tocar el motor de navegación.
+    if (l.tipo === 'linea_tiempo' && puntos.length) {
+      const hitos = puntos.map((p) => {
+        const c = p.split('|');
+        return { fecha: (c[0] || '').trim(), quees: c.slice(1).join('|').trim() };
+      });
+      return `<section class="slide ltiempo${fte}"${esc10}>
+        <div class="cabeza">
+          <p class="eyebrow">${esc(secLabel(l.seccion))}</p>
+          <h2${tCls}>${esc(l.titulo)}</h2>
+          ${l.frase ? `<p class="frase">${rico(l.frase)}</p>` : ''}
+        </div>
+        <div class="lt">${hitos.map((h, k) => `
+          <div class="hito${k === 0 ? ' primero' : ''}" data-step="${k}">
+            <p class="fecha">${esc(h.fecha)}</p>
+            <div class="eje"><span class="punto"></span></div>
+            <p class="quees">${rico(h.quees)}</p>
+          </div>`).join('')}</div>
+      </section>`;
+    }
 
     // Portada / cierre: sin puntos y sin nada que proyectar → lámina centrada.
     if (!puntos.length && !l.imagen_url && !l.video_url) {

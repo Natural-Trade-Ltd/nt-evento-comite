@@ -130,6 +130,10 @@ Cada lámina además elige lo suyo en el constructor:
   automático. «Automático» es 1 y no desvía nada. Al acercar la letra, la columna se
   estrecha en la misma proporción, así que el bloque crece **hacia abajo** y no invade la
   imagen de al lado; un techo duro impide que la lámina se salga de la pantalla.
+- **Tipo de lámina** (`ev_lamina.tipo`): «normal» o **línea de tiempo**. En la línea de
+  tiempo cada renglón del cuerpo es un hito con el formato `fecha | qué es`; el proyector
+  los reparte en partes iguales sobre un eje y los descubre **uno a uno con el mismo
+  clicker**. El primero lleva el punto más grande. Al regresar, la lámina llega completa.
 - **El Enter del título es el corte de renglón** que se proyecta (hasta 4). Cuando el
   título trae cortes puestos a mano se apaga el `text-wrap:balance`, que si no le metía
   un renglón de más al reparto automático.

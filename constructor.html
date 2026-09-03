@@ -330,6 +330,15 @@ footer{margin-top:30px; color:var(--faint); font-size:12px; line-height:1.7}
     <!-- Tipografía por lámina (30-ago): antes la fuente y el tamaño eran de todo el deck -->
     <div class="fila2">
       <div class="campo">
+        <label for="fTipo">Tipo de lámina</label>
+        <select id="fTipo">
+          <option value="normal">Normal (título, frase y puntos)</option>
+          <option value="linea_tiempo">Línea de tiempo</option>
+        </select>
+        <p class="pista">En «línea de tiempo» cada renglón de los puntos es un hito con el
+          formato <b>fecha | qué es</b>. Al presentar, el clicker los va descubriendo de uno en uno.</p>
+      </div>
+      <div class="campo">
         <label for="fFuente">Tipografía</label>
         <select id="fFuente">
           <option value="casa">De la casa (serif + sans)</option>
@@ -562,6 +571,7 @@ function abrirEditor(id, seccionPreset) {
   $('fVideo').value = editando?.video_url || '';
   $('fTituloModo').value = editando?.titulo_modo || 'lado';
   $('fMediaTam').value = editando?.media_tam || 'normal';
+  $('fTipo').value = editando?.tipo || 'normal';
   $('fFuente').value = editando?.fuente || 'casa';
   // Se pega al valor más cercano de la lista: un 1.2 escrito a mano en la base
   // no debe dejar el select en blanco.
@@ -643,6 +653,7 @@ async function guardar() {
       imagen_url: imagenUrl,
       video_url: $('fVideo').value.trim(),
       titulo_modo: $('fTituloModo').value,
+      tipo: $('fTipo').value,
       fuente: $('fFuente').value,
       escala: Number($('fEscala').value) || 1,
       media_tam: $('fMediaTam').value,
