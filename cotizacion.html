@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solicita tu cotización · Natural Trade / Global Forest</title>
+<style>
+:root{
+  --bg:#F2EDE3; --card:#FBF8F1; --ink:#3A3129; --faint:#9C8F80;
+  --acc:#587F6B; --accInk:#F6FBF7; --line:#E0D8C8; --lineFuerte:#CBBFA9;
+  --placa:#F7F5EC; --terra:#AE4E2B; --alerta:#9A6A12; --alertaBg:#F5EBD6;
+  --okBg:#E4EDE7; --sombra:0 10px 30px rgba(58,49,41,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1A1713; --card:#241F1A; --ink:#F0EAE0; --faint:#8D8072;
+    --acc:#8FB89F; --accInk:#17241C; --line:#3A322A; --lineFuerte:#4E4238;
+    --alerta:#E0B463; --alertaBg:#33291A; --okBg:#1E2E24;
+    --sombra:0 10px 30px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5; -webkit-text-size-adjust:100%; padding:0 0 60px}
+.wrap{max-width:640px; margin:0 auto; padding:22px 18px}
+.kick{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--terra);
+  font-weight:600; margin:2px 0 6px}
+h1{font-family:"Palatino Linotype",Palatino,Georgia,serif; font-weight:400;
+  font-size:clamp(26px,7vw,38px); line-height:1.12; margin:0 0 8px}
+.lede{color:var(--faint); font-size:15px; margin:0 0 4px}
+.marca{display:flex; gap:14px; align-items:center; margin:16px 0 4px}
+.marca img{height:30px; width:auto; background:var(--placa); border-radius:7px; padding:5px 8px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:18px 16px; margin:16px 0; box-shadow:var(--sombra)}
+.q{font-weight:600; font-size:16px; margin:0 0 3px}
+.ayuda{color:var(--faint); font-size:13px; margin:0 0 12px}
+label.f{display:block; font-weight:600; font-size:14px; margin:12px 0 5px}
+label.f .req{color:var(--terra); font-weight:700}
+label.f .opt{color:var(--faint); font-weight:400; font-size:12px}
+input[type=text],input[type=tel],input[type=email],textarea{
+  width:100%; font:inherit; color:var(--ink); background:var(--bg);
+  border:1.5px solid var(--lineFuerte); border-radius:11px; padding:12px 13px; outline:none}
+input:focus,textarea:focus{border-color:var(--acc); box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 22%, transparent)}
+textarea{min-height:96px; resize:vertical}
+.chips{display:flex; flex-wrap:wrap; gap:9px; margin-top:4px}
+.chip{position:relative}
+.chip input{position:absolute; opacity:0; inset:0; cursor:pointer}
+.chip span{display:inline-block; padding:10px 14px; border-radius:999px;
+  border:1.5px solid var(--lineFuerte); font-size:14px; cursor:pointer; user-select:none;
+  transition:.12s}
+.chip input:checked + span{background:var(--acc); color:var(--accInk); border-color:var(--acc)}
+.otroWrap{margin-top:10px}
+.err{color:var(--terra); font-size:13px; font-weight:600; margin-top:6px; display:none}
+.err.ver{display:block}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; background:var(--acc); color:var(--accInk); border:none; border-radius:13px;
+  padding:15px 18px; font:inherit; font-weight:700; font-size:16px; cursor:pointer; margin-top:6px}
+.btn:disabled{opacity:.6; cursor:default}
+.foot{color:var(--faint); font-size:12.5px; text-align:center; margin-top:14px}
+.hide{display:none !important}
+/* gracias */
+#gracias{text-align:center; padding:40px 10px}
+#gracias .big{font-family:"Palatino Linotype",serif; font-size:clamp(28px,8vw,42px); margin:8px 0}
+#gracias .check{width:74px;height:74px;border-radius:50%;background:var(--okBg);
+  display:grid;place-items:center;margin:0 auto 6px;border:2px solid var(--acc)}
+#gracias .check svg{width:38px;height:38px;stroke:var(--acc);stroke-width:3;fill:none}
+.sello{font-size:12px;color:var(--faint);text-align:right;min-height:16px;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="form">
+    <div class="kick">Conferencia LATAM · Woodpack Global 2026</div>
+    <h1>Solicita tu cotización</h1>
+    <p class="lede">Déjanos tus datos y qué necesitas. Te contactamos con precio en firme
+      y opciones a tu medida — sin listas genéricas.</p>
+    <div class="marca">
+      <img id="logoNT" alt="Natural Trade">
+      <img id="logoGF" alt="Global Forest">
+    </div>
+
+    <div class="card">
+      <label class="f" for="nombre">Nombre completo <span class="req">*</span></label>
+      <input type="text" id="nombre" autocomplete="name" placeholder="Nombre y apellido">
+      <div class="err" id="e_nombre">Nos falta tu nombre.</div>
+
+      <label class="f" for="movil">Móvil / WhatsApp <span class="req">*</span></label>
+      <input type="tel" id="movil" autocomplete="tel" inputmode="tel" placeholder="+52 55 0000 0000">
+      <div class="err" id="e_movil">Nos falta un móvil para contactarte.</div>
+
+      <label class="f" for="email">Correo electrónico <span class="req">*</span></label>
+      <input type="email" id="email" autocomplete="email" inputmode="email" placeholder="tu@empresa.com">
+      <div class="err" id="e_email">Revisa tu correo.</div>
+
+      <label class="f" for="empresa">Empresa <span class="opt">· opcional</span></label>
+      <input type="text" id="empresa" autocomplete="organization" placeholder="Razón social o nombre comercial">
+    </div>
+
+    <div class="card">
+      <p class="q">1 · ¿Qué te interesa cotizar?</p>
+      <p class="ayuda">Selecciona todo lo que aplique.</p>
+      <div class="chips" id="productos">
+        <label class="chip"><input type="checkbox" value="Madera dimensional"><span>Madera dimensional</span></label>
+        <label class="chip"><input type="checkbox" value="Madera precortada"><span>Madera precortada</span></label>
+        <label class="chip"><input type="checkbox" value="Triplay"><span>Triplay</span></label>
+        <label class="chip"><input type="checkbox" value="OSB"><span>OSB</span></label>
+        <label class="chip"><input type="checkbox" value="Otros tableros"><span>Otros tableros</span></label>
+        <label class="chip"><input type="checkbox" value="Molduras / precortados"><span>Molduras / precortados</span></label>
+      </div>
+      <div class="otroWrap"><input type="text" id="producto_otro" placeholder="¿Algo más? Escríbelo aquí (especie, medida, grado…)"></div>
+      <div class="err" id="e_productos">Dinos al menos un producto.</div>
+    </div>
+
+    <div class="card">
+      <p class="q">2 · ¿Dónde lo necesitas?</p>
+      <p class="ayuda">Ciudad, estado o país de entrega.</p>
+      <input type="text" id="destino" placeholder="Ej. Monterrey, N.L.  ·  Guadalajara  ·  CDMX">
+      <div class="err" id="e_destino">Dinos a dónde lo necesitas.</div>
+    </div>
+
+    <div class="card">
+      <p class="q">3 · ¿Qué cantidad y para cuándo?</p>
+      <p class="ayuda">Volumen aproximado y cuándo lo necesitas.</p>
+      <input type="text" id="volumen" placeholder="Ej. 2 contenedores al mes  ·  1 tráiler para octubre">
+      <div class="err" id="e_volumen">Dinos cantidad y tiempo aproximados.</div>
+    </div>
+
+    <div class="card">
+      <p class="q">Comentarios <span class="opt" style="color:var(--faint);font-weight:400;font-size:12px">· opcional</span></p>
+      <p class="ayuda">Cualquier detalle que nos ayude a cotizarte mejor.</p>
+      <textarea id="comentarios" placeholder="Escribe aquí…"></textarea>
+    </div>
+
+    <button class="btn" id="btnEnviar" type="button">Enviar mi solicitud</button>
+    <div class="sello" id="sello"></div>
+    <p class="foot">Usamos tus datos solo para darte seguimiento a esta solicitud.<br>
+      Natural Trade · Global Forest</p>
+  </div>
+
+  <div id="gracias" class="hide">
+    <div class="check"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></div>
+    <div class="kick" style="justify-content:center">Recibido</div>
+    <div class="big">¡Gracias!</div>
+    <p class="lede" style="max-width:460px;margin:0 auto">
+      Ya tenemos tu solicitud. El equipo de Natural Trade / Global Forest te contacta
+      con tu cotización a la brevedad.</p>
+    <div class="marca" style="justify-content:center;margin-top:22px">
+      <img id="logoNT2" alt="Natural Trade">
+      <img id="logoGF2" alt="Global Forest">
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CONFIG = {
+  URL : 'https://cytopyytymxjwvfhosvg.supabase.co',
+  KEY : 'sb_publishable_IjJWRYALvIWN-yzM11IYVw_GaVEf6RN',
+  FN  : 'wp_cotizacion_guardar',
+};
+const LOGO_NT = 'img/nt.png', LOGO_GF = 'img/gf.png';
+['logoNT','logoNT2'].forEach(id=>{const e=document.getElementById(id); if(e) e.src=LOGO_NT;});
+['logoGF','logoGF2'].forEach(id=>{const e=document.getElementById(id); if(e) e.src=LOGO_GF;});
+
+const $ = s => document.querySelector(s);
+const ID_LLAVE = 'wp_cotizacion_id';
+function idCot(){
+  let id = localStorage.getItem(ID_LLAVE);
+  if(!id){ id = (crypto.randomUUID ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3|0x8)).toString(16);}));
+    localStorage.setItem(ID_LLAVE, id); }
+  return id;
+}
+function productosSel(){
+  const arr = [...document.querySelectorAll('#productos input:checked')].map(i=>i.value);
+  const otro = $('#producto_otro').value.trim();
+  if(otro) arr.push(otro);
+  return arr;
+}
+function valores(){
+  return {
+    nombre: $('#nombre').value.trim(),
+    movil: $('#movil').value.trim(),
+    email: $('#email').value.trim(),
+    empresa: $('#empresa').value.trim(),
+    producto: productosSel().join(' · '),
+    productos: productosSel(),
+    destino: $('#destino').value.trim(),
+    volumen: $('#volumen').value.trim(),
+    comentarios: $('#comentarios').value.trim(),
+    dispositivo: navigator.userAgent,
+  };
+}
+function marca(id, mal){
+  const e = document.getElementById('e_'+id);
+  if(e) e.classList.toggle('ver', !!mal);
+  return !mal;
+}
+function valida(d){
+  let ok = true;
+  ok = marca('nombre', !d.nombre) && ok;
+  ok = marca('movil', d.movil.replace(/[^0-9]/g,'').length < 8) && ok;
+  ok = marca('email', !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) && ok;
+  ok = marca('productos', !d.productos.length) && ok;
+  ok = marca('destino', !d.destino) && ok;
+  ok = marca('volumen', !d.volumen) && ok;
+  return ok;
+}
+async function guardar(d){
+  const res = await fetch(`${CONFIG.URL}/rest/v1/rpc/${CONFIG.FN}`, {
+    method:'POST',
+    headers:{'apikey':CONFIG.KEY,'Authorization':`Bearer ${CONFIG.KEY}`,'Content-Type':'application/json'},
+    body: JSON.stringify({ p_id: idCot(), p_datos: d, p_completada: true }),
+  });
+  if(!res.ok) throw new Error('guardar '+res.status);
+  return true;
+}
+// limpia el error de un campo al escribir
+['nombre','movil','email','destino','volumen'].forEach(id=>{
+  $('#'+id).addEventListener('input',()=>marca(id,false));
+});
+document.querySelectorAll('#productos input, #producto_otro').forEach(el=>
+  el.addEventListener('input',()=>marca('productos',false)));
+
+let enviando = false;
+$('#btnEnviar').addEventListener('click', async ()=>{
+  if(enviando) return;
+  const d = valores();
+  if(!valida(d)){
+    const primer = document.querySelector('.err.ver');
+    if(primer) primer.closest('.card').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  enviando = true;
+  const b = $('#btnEnviar'); b.disabled = true; b.textContent = 'Enviando…';
+  $('#sello').textContent = '';
+  try{
+    await guardar(d);
+    $('#form').classList.add('hide');
+    $('#gracias').classList.remove('hide');
+    window.scrollTo(0,0);
+    localStorage.removeItem(ID_LLAVE);   // la próxima persona empieza limpio
+  }catch(err){
+    b.disabled = false; b.textContent = 'Enviar mi solicitud';
+    $('#sello').textContent = 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.';
+    enviando = false;
+  }
+});
+</script>
+</body>
+</html>
